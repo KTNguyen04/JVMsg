@@ -9,7 +9,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             try {
                 UserView userView = new UserView();
-                UserController userController = new UserController(userView);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
