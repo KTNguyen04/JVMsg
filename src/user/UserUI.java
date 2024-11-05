@@ -1,7 +1,7 @@
 package user;
 
 import javax.imageio.ImageIO;
-import javax.smartcardio.Card;
+
 import javax.swing.*;
 
 import java.awt.*;
@@ -9,6 +9,10 @@ import java.awt.event.*;
 import java.io.*;
 import java.awt.image.BufferedImage;
 
+import com.toedter.calendar.JDateChooser;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import config.AppConfig;
 
 class UserView {
@@ -31,6 +35,8 @@ class UserView {
         frame.setLayout(new CardLayout());
 
         frame.setLocationRelativeTo(null); // center the frame
+
+        frame.setResizable(false);
         mode = Mode.LOGIN;
 
         cardLO = new CardLayout();
@@ -165,6 +171,8 @@ class SignupPanel extends JPanel {
     private JTextField fullnameField;
     private JTextField emailField;
     private JTextField addressField;
+    private JDateChooser dobField;
+
     private CardLayout cardLO;
     private JPanel container;
 
@@ -224,6 +232,15 @@ class SignupPanel extends JPanel {
         addressField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
         addressField.setMaximumSize(usernameField.getPreferredSize());
         addressField.setMargin(new Insets(5, 5, 5, 5));
+
+        JLabel dobLabel = new JLabel("Date of birth");
+        dobLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+        dobField = new JDateChooser();
+        // dobField.setPreferredSize(new Dimension(330, 80));
+        dobField.setMaximumSize(new Dimension(770, 80));
+        dobField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+        dobField.setDate(new Date());
+        // dobField.setMaximumSize(new Dimension(380, 80));
 
         JLabel genderLabel = new JLabel("Gender");
         genderLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
@@ -312,6 +329,11 @@ class SignupPanel extends JPanel {
         rightPanel.add(emailLabel);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 3)));
         rightPanel.add(emailField);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        rightPanel.add(dobLabel);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 3)));
+        rightPanel.add(dobField);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
         rightPanel.add(genderLabel);
