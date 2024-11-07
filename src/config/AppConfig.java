@@ -13,6 +13,10 @@ public class AppConfig {
     public static int bannerWidth;
     public static int bannerHeight;
 
+    public static String serverTitle;
+    public static int serverWidth;
+    public static int serverHeight;
+
     AppConfig() {
     }
 
@@ -31,6 +35,9 @@ public class AppConfig {
             bannerWidth = Integer.valueOf(props.getProperty("banner.width"));
             bannerHeight = Integer.valueOf(props.getProperty("banner.height"));
 
+            serverTitle = props.getProperty("server.title");
+            serverWidth = Integer.valueOf(props.getProperty("server.width"));
+            serverHeight = Integer.valueOf(props.getProperty("server.height"));
         } catch (IOException e) {
             System.out.println(e);
         } catch (Exception e) {
