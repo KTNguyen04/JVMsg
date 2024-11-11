@@ -3,6 +3,8 @@ package user;
 import javax.imageio.ImageIO;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
 import com.google.gson.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -114,6 +116,7 @@ class UserView {
                     new Thread(() -> {
                         SocketController sc = new SocketController();
                         String packet = getLogInData();
+                        System.out.println(packet);
                         sc.sendRequest(packet);
 
                         System.out.println("test");
@@ -520,6 +523,15 @@ class UserView {
 
             JLabel userIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/user.png"));
             userIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            userIcon.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent me) {
+                    JDialog userInfoDialog = createUserInfoDialog();
+
+                    userInfoDialog.setVisible(true);
+
+                }
+            });
+
             JLabel addFriendIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/add_friend.png"));
             addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             JLabel friendsIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/friends.png"));
@@ -537,6 +549,133 @@ class UserView {
 
             // add(usersPanel);
             // add(chatPanel);
+
+        }
+
+        JDialog createUserInfoDialog() {
+            JDialog dialog = new JDialog(frame, "User info");
+            JPanel dPanel = new JPanel();
+            dPanel.setLayout(new BoxLayout(dPanel, BoxLayout.Y_AXIS));
+
+            JLabel usernameLabel = new JLabel("Username");
+            usernameLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            JLabel usnField = new JLabel(user.getUsername());
+            usnField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            usnField.setMaximumSize(usnField.getPreferredSize());
+
+            JLabel fullnameLabel = new JLabel("Full name");
+            fullnameLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            JTextField fnField = new JTextField(40);
+            fnField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            fnField.setText(user.getFullname());
+
+            fnField.setMaximumSize(fnField.getPreferredSize());
+
+            JLabel addressLabel = new JLabel("Address");
+            addressLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            JTextField addrField = new JTextField(40);
+            addrField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            addrField.setText(user.getAddress());
+
+            addrField.setMaximumSize(addrField.getPreferredSize());
+
+            JLabel dobLabel = new JLabel("Date of Birth");
+            dobLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            JTextField dField = new JTextField(40);
+            dField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            dField.setText(user.getDob());
+
+            dField.setMaximumSize(dField.getPreferredSize());
+
+            JLabel genderLabel = new JLabel("Gender");
+            genderLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            JTextField gField = new JTextField(40);
+            gField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            gField.setText(user.getGender());
+
+            gField.setMaximumSize(gField.getPreferredSize());
+
+            JLabel emailLabel = new JLabel("Email");
+            emailLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            JTextField emField = new JTextField(40);
+            emField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            emField.setText(user.getEmail());
+
+            emField.setMaximumSize(emField.getPreferredSize());
+
+            dialog.setSize(500, 600);
+
+            dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+            dPanel.add(usernameLabel);
+            dPanel.add(usnField);
+            dPanel.add(fullnameLabel);
+            dPanel.add(fnField);
+            dPanel.add(addressLabel);
+            dPanel.add(addrField);
+            dPanel.add(dobLabel);
+            dPanel.add(dField);
+            dPanel.add(genderLabel);
+            dPanel.add(gField);
+            dPanel.add(emailLabel);
+            dPanel.add(emField);
+
+            dialog.add(dPanel);
+
+            dialog.setLocationRelativeTo(null); // center the frame
+
+            dialog.setResizable(false);
+            // JLabel emailLabel = new JLabel("Email");
+            // emailLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            // emailField = new JTextField(40);
+            // emailField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // emailField.setMaximumSize(usernameField.getPreferredSize());
+            // emailField.setMargin(new Insets(5, 5, 5, 5));
+            // // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            // JLabel addressLabel = new JLabel("Address");
+            // addressLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            // addressField = new JTextField(40);
+            // addressField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // addressField.setMaximumSize(usernameField.getPreferredSize());
+            // addressField.setMargin(new Insets(5, 5, 5, 5));
+
+            // JLabel dobLabel = new JLabel("Date of birth");
+            // dobLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+            // dobField = new JDateChooser();
+            // // dobField.setPreferredSize(new Dimension(330, 80));40
+            // dobField.setMaximumSize(new Dimension(770, 45));
+            // dobField.setPreferredSize(new Dimension(770, 45));
+            // dobField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // dobField.setDate(new Date());
+            // // dobField.setMaximumSize(new Dimension(380, 80));
+
+            // JLabel genderLabel = new JLabel("Gender");
+            // genderLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            // maleRadio = new JRadioButton("Male");
+            // femaleRadio = new JRadioButton("Female");
+            // maleRadio.setBackground(Color.WHITE);
+            // maleRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // femaleRadio.setBackground(Color.WHITE);
+            // femaleRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // ButtonGroup bg = new ButtonGroup();
+            // bg.add(maleRadio);
+            // bg.add(femaleRadio);
+            // JPanel genderRow = new JPanel();
+            // genderRow.add(maleRadio);
+            // genderRow.add(femaleRadio);
+            // genderRow.setBackground(Color.WHITE);
+            // genderRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            return dialog;
 
         }
     }

@@ -13,9 +13,33 @@ class User {
         // TODO Auto-generated method stub
         return this.username;
     }
-    // public User() {
-    // };
 
+    public User() {
+    };
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public String getGender() {
+        return gender;
+    }
     // public void setUsername(String username) {
     // this.username = username;
     // }
