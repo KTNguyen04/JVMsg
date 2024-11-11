@@ -30,6 +30,7 @@ public class User {
         this.email = email;
         this.dob = dob;
         this.gender = gender;
+        this.friends = null;
     };
 
     public String getUsername() {
@@ -57,6 +58,7 @@ public class User {
     }
 
     public ArrayList<User> getFriends() {
+
         return friends;
     }
 
