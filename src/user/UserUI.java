@@ -3,16 +3,17 @@ package user;
 import javax.imageio.ImageIO;
 
 import javax.swing.*;
-
+import com.google.gson.Gson;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.image.BufferedImage;
 
 import com.toedter.calendar.JDateChooser;
-
+import java.util.*;
 import java.util.Date;
 import config.AppConfig;
+import java.text.SimpleDateFormat;
 
 class UserView {
     private JFrame frame;
@@ -45,6 +46,7 @@ class UserView {
 
         panel.add("LOGIN", new LoginPanel());
         panel.add("SIGNUP", new SignupPanel());
+        panel.add("HOME", new HomePanel());
 
         cardLO.show(panel, "LOGIN");
         // new SignupPanel(panel);
@@ -106,12 +108,14 @@ class UserView {
             submitButton.setMaximumSize(new Dimension(380, 40));
             submitButton.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
-                    socketController = new SocketController();
-                    socketController.send();
-                    socketController.close();
+                    SocketController sc = new SocketController();
+                    String packet = getLogInData();
+                    sc.sendRequest(packet);
 
+                    cardLO.show(panel, "HOME");
+
+                    sc.close();
                 }
-
             });
 
             JPanel registerInstruction = new JPanel();
@@ -169,6 +173,22 @@ class UserView {
             add(rightPanel, BorderLayout.CENTER);
         }
 
+        String getLogInData() {
+            HashMap<String, String> loginData = new HashMap<>();
+
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+
+            loginData.put("header", "login");
+            loginData.put("username", username);
+            loginData.put("password", password);
+
+            Gson gson = new Gson();
+            String json = gson.toJson(loginData);
+            return json;
+
+        }
+
         // void sendLoginRequest() {
         // System.out.println(usernameField.getText());
         // System.out.println(passwordField.getText());
@@ -182,6 +202,9 @@ class UserView {
         private JTextField emailField;
         private JTextField addressField;
         private JDateChooser dobField;
+
+        JRadioButton maleRadio;
+        JRadioButton femaleRadio;
 
         // private JTextField addressField;
         // tên đăng nhập, họ tên, địa chỉ, ngàysinh, giới tính, emai
@@ -241,8 +264,9 @@ class UserView {
             JLabel dobLabel = new JLabel("Date of birth");
             dobLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
             dobField = new JDateChooser();
-            // dobField.setPreferredSize(new Dimension(330, 80));
-            dobField.setMaximumSize(new Dimension(770, 80));
+            // dobField.setPreferredSize(new Dimension(330, 80));40
+            dobField.setMaximumSize(new Dimension(770, 45));
+            dobField.setPreferredSize(new Dimension(770, 45));
             dobField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             dobField.setDate(new Date());
             // dobField.setMaximumSize(new Dimension(380, 80));
@@ -250,8 +274,8 @@ class UserView {
             JLabel genderLabel = new JLabel("Gender");
             genderLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
 
-            JRadioButton maleRadio = new JRadioButton("Male");
-            JRadioButton femaleRadio = new JRadioButton("Female");
+            maleRadio = new JRadioButton("Male");
+            femaleRadio = new JRadioButton("Female");
             maleRadio.setBackground(Color.WHITE);
             maleRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             femaleRadio.setBackground(Color.WHITE);
@@ -284,7 +308,10 @@ class UserView {
             submitButton.setMaximumSize(new Dimension(380, 40));
             submitButton.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
-                    // cardLO.show(frame, "LOGIN");
+                    SocketController sc = new SocketController();
+                    String packet = getSignUpData();
+                    sc.sendRequest(packet);
+                    sc.close();
                 }
             });
 
@@ -366,6 +393,109 @@ class UserView {
             add(rightPanel, BorderLayout.CENTER);
         }
 
+        String getSignUpData() {
+            HashMap<String, String> signupData = new HashMap<>();
+            // registrationData.put("username", "user123");
+            // registrationData.put("email", "user@example.com");
+            // registrationData.put("password", "securePassword");
+            String username = usernameField.getText();
+            String fullname = fullnameField.getText();
+            String address = addressField.getText();
+            String email = emailField.getText();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            String dob = sdf.format(dobField.getDate());
+            String gender = maleRadio.isSelected() ? "male" : "female";
+            String password = passwordField.getText();
+
+            signupData.put("header", "signup");
+            signupData.put("username", username);
+            signupData.put("fullname", fullname);
+            signupData.put("address", address);
+            signupData.put("email", email);
+            signupData.put("dob", dob);
+            signupData.put("gender", gender);
+            signupData.put("password", password);
+
+            Gson gson = new Gson();
+            String json = gson.toJson(signupData);
+            return json;
+            // for (Map.Entry<String, String> entry : registrationData.entrySet()) {
+            // String key = entry.getKey();
+            // String value = entry.getValue();
+            // System.out.println(key + ": " + value);
+            // }
+            // System.out.println(dob);
+            // System.out.println(usernameField.getText());
+            // System.out.println(passwordField.getText());
+            // System.out.println(fullnameField.getText());
+            // System.out.println(emailField.getText());
+            // System.out.println(addressField.getText());
+            // System.out.println(maleRadio.getText());
+        }
     }
 
+    class HomePanel extends JPanel {
+        HomePanel() {
+            super();
+            setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.BOTH;
+
+            JPanel settingPanel = new JPanel();
+            settingPanel.setLayout(new BoxLayout(settingPanel, BoxLayout.Y_AXIS));
+            settingPanel.setSize(120, 800);
+
+            settingPanel.setBackground(Color.WHITE);
+            gbc.gridx = 0;
+            gbc.weightx = 1;
+            gbc.weighty = 1;
+
+            add(settingPanel, gbc);
+
+            JPanel usersPanel = new JPanel();
+            usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
+            // usersPanel.setBorder(BorderFactory.create(0, 20, 0, 0));
+
+            usersPanel.setBackground(Color.BLUE);
+            gbc.gridx = 1;
+            gbc.weightx = 6;
+            gbc.weighty = 1;
+
+            add(usersPanel, gbc);
+
+            JPanel chatPanel = new JPanel();
+            chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
+
+            chatPanel.setBackground(Color.YELLOW);
+            gbc.gridx = 2;
+            gbc.weightx = 18;
+            gbc.weighty = 1;
+            add(chatPanel, gbc);
+
+            JLabel setting = new JLabel("setting panel");
+            JLabel users = new JLabel("users panel");
+            JLabel chat = new JLabel("chat panel");
+
+            JLabel userIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/user.png"));
+            userIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel addFriendIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/add_friend.png"));
+            addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel friendsIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/friends.png"));
+            friendsIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel unfriendIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/unfriend.png"));
+            unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            settingPanel.add(userIcon);
+            settingPanel.add(addFriendIcon);
+            settingPanel.add(friendsIcon);
+            settingPanel.add(unfriendIcon);
+            // settingPanel.add(setting);
+            usersPanel.add(users);
+            chatPanel.add(chat);
+
+            // add(usersPanel);
+            // add(chatPanel);
+
+        }
+    }
 }

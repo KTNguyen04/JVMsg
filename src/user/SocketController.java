@@ -50,9 +50,13 @@ class SocketController {
 
     }
 
-    void send() {
-        pw.write("Fuck Server");
+    void sendRequest(String data) {
+        pw.write(data);
         pw.flush();
+    }
+
+    String getResponse() {
+        return "";
     }
 
     void close() {

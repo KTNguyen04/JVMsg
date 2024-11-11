@@ -2,7 +2,9 @@ package server;
 
 import java.io.*;
 import java.net.*;
-import java.util.LinkedList;
+import java.util.*;
+
+import com.google.gson.Gson;
 
 class SocketController {
     private int port;
@@ -42,13 +44,13 @@ class SocketController {
 
                     } while (!listenSocket.isClosed());
                 } catch (Exception e) {
-                    // TODO: handle exception
+
                     e.printStackTrace();
                 }
             }).start();
 
         } catch (Exception e) {
-            // TODO: handle exception
+
             e.printStackTrace();
         }
     }
@@ -68,9 +70,13 @@ class SocketController {
 }
 
 class ClientHandler extends Thread {
+
+    private DatabaseController dbc;
+
     private Socket communicateSocket;
 
     ClientHandler(Socket communicateSocket) {
+        dbc = new DatabaseController();
         this.communicateSocket = communicateSocket;
     }
 
@@ -79,8 +85,33 @@ class ClientHandler extends Thread {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(communicateSocket.getInputStream()));
                 PrintWriter pw = new PrintWriter(communicateSocket.getOutputStream())) {
 
-            String str = br.readLine();
-            System.out.println("message= " + str);
+            String json = br.readLine();
+            System.out.println("message= " + json);
+            Gson gson = new Gson();
+            HashMap<String, String> data = gson.fromJson(json, HashMap.class);
+
+            // for (Map.Entry<String, String> me : data.entrySet()) {
+            // System.out.print(me.getKey() + ": ");
+            // System.out.println(me.getValue());
+            // }
+
+            switch (data.get("header")) {
+                case "signup":
+                    System.out.println("Signuphandle");
+
+                    break;
+                case "login":
+                    String username = data.get("username");
+                    String password = data.get("password");
+                    if (dbc.checkLogin(username, password)) {
+                        System.out.println("Login thanh con");
+                    }
+
+                    break;
+
+                default:
+                    break;
+            }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -93,5 +124,9 @@ class ClientHandler extends Thread {
         }
 
     }
+
+    // String getUserData() {
+
+    // }
 
 }
