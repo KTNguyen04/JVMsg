@@ -108,6 +108,8 @@ class ClientHandler extends Thread {
                         String header = "logined";
 
                         String userData = dbc.getUserData(username);
+                        // String userFriends = dbc.getUserFriends(username);
+
                         JsonObject jsonObject = JsonParser.parseString(userData).getAsJsonObject();
 
                         jsonObject.addProperty("header", header);

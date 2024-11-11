@@ -1,7 +1,8 @@
 package server;
 
+import user.User;
 import java.sql.*;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import com.google.gson.Gson;
 
@@ -31,7 +32,7 @@ class DatabaseController {
     String getUserData(String username) {
         Connection connection = connect();
 
-        String query = String.format("select username,fullname,address,gender,dob,email from %s.%s where username= ?",
+        String query = String.format("SELECT username,fullname,address,gender,dob,email from %s.%s where username= ?",
                 this.USERS, "USER");
 
         PreparedStatement pstm = null;
@@ -41,23 +42,24 @@ class DatabaseController {
             pstm.setString(1, username);
             rs = pstm.executeQuery();
 
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
+            User user = null;
             if (rs.next()) {
-                HashMap<String, String> data = new HashMap<>();
-                for (int i = 1; i <= columnCount; i++) {
-                    String columnName = metaData.getColumnName(i);
-                    data.put(columnName, rs.getString(i));
 
-                    String columnValue = rs.getString(i);
-                    System.out.println(columnName + ": " + columnValue);
-                }
+                String usrn = rs.getString("username");
+                String fullname = rs.getString("fullname");
+                String address = rs.getString("address");
+                String email = rs.getString("email");
+                String dob = rs.getString("dob");
+                String gender = rs.getString("gender");
 
-                Gson gson = new Gson();
-                return gson.toJson(data);
+                user = new User(usrn, fullname, address, email, dob, gender);
+
             }
             connection.close();
+
+            user.setFriends(getUserFriends(username));
+            Gson gson = new Gson();
+            return gson.toJson(user);
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -81,7 +83,78 @@ class DatabaseController {
                 e.printStackTrace();
             }
         }
-        return "false";
+        return "";
+    }
+
+    ArrayList<User> getUserFriends(String username) {
+        Connection connection = connect();
+
+        String query = String.format("\n" + //
+                "        SELECT " + //
+                "        u.username,u.fullname,u.address,u.gender,u.dob,u.email\n" + //
+                "    FROM \n" + //
+                "        %s.%s f\n" + //
+                "    JOIN \n" + //
+                "       %s.%s u\n" + //
+                "        ON u.username = \n" + //
+                "            CASE \n" + //
+                "                WHEN f.username1 = ? THEN f.username2 \n" + //
+                "                ELSE f.username1 \n" + //
+                "            END\n" + //
+                "    WHERE \n" + //
+                "        f.username1 = ? OR f.username2 = ?;",
+                this.USERS, "FRIENDS", this.USERS, "USER");
+
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        ArrayList<User> friends = new ArrayList<>();
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username);
+            pstm.setString(2, username);
+            pstm.setString(3, username);
+            rs = pstm.executeQuery();
+            while (rs.next()) {
+
+                String usrn = rs.getString("username");
+                String fullname = rs.getString("fullname");
+                String address = rs.getString("address");
+                String email = rs.getString("email");
+                String dob = rs.getString("dob");
+                String gender = rs.getString("gender");
+
+                User user = new User(usrn, fullname, address, email, dob, gender);
+                friends.add(user);
+
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+
+            return friends;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return friends;
     }
 
     boolean checkLogin(String username, String password) {

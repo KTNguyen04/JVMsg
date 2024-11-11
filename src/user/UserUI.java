@@ -128,8 +128,10 @@ class UserView {
                         JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = jsonObject.get("header").getAsString();
                         if (resHeader.equals("logined")) {
+                            System.out.println("Break1");
                             user = gson.fromJson(res, User.class);
                             cardLO.show(panel, "HOME");
+                            System.out.println("Break2");
 
                         } else {
                             messageHolder.setText("LOGIN FAILED");
@@ -631,49 +633,8 @@ class UserView {
             dialog.setLocationRelativeTo(null); // center the frame
 
             dialog.setResizable(false);
-            // JLabel emailLabel = new JLabel("Email");
-            // emailLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
 
-            // emailField = new JTextField(40);
-            // emailField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // emailField.setMaximumSize(usernameField.getPreferredSize());
-            // emailField.setMargin(new Insets(5, 5, 5, 5));
-            // // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            // JLabel addressLabel = new JLabel("Address");
-            // addressLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
-
-            // addressField = new JTextField(40);
-            // addressField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // addressField.setMaximumSize(usernameField.getPreferredSize());
-            // addressField.setMargin(new Insets(5, 5, 5, 5));
-
-            // JLabel dobLabel = new JLabel("Date of birth");
-            // dobLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
-            // dobField = new JDateChooser();
-            // // dobField.setPreferredSize(new Dimension(330, 80));40
-            // dobField.setMaximumSize(new Dimension(770, 45));
-            // dobField.setPreferredSize(new Dimension(770, 45));
-            // dobField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // dobField.setDate(new Date());
-            // // dobField.setMaximumSize(new Dimension(380, 80));
-
-            // JLabel genderLabel = new JLabel("Gender");
-            // genderLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
-
-            // maleRadio = new JRadioButton("Male");
-            // femaleRadio = new JRadioButton("Female");
-            // maleRadio.setBackground(Color.WHITE);
-            // maleRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // femaleRadio.setBackground(Color.WHITE);
-            // femaleRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // ButtonGroup bg = new ButtonGroup();
-            // bg.add(maleRadio);
-            // bg.add(femaleRadio);
-            // JPanel genderRow = new JPanel();
-            // genderRow.add(maleRadio);
-            // genderRow.add(femaleRadio);
-            // genderRow.setBackground(Color.WHITE);
-            // genderRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+            System.out.println(user.getFriends().get(0));
 
             return dialog;
 
