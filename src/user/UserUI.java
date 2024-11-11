@@ -22,6 +22,7 @@ class UserView {
     private JPanel panel;
     private CardLayout cardLO;
     private SocketController socketController;
+
     Mode mode;
 
     User user;
@@ -50,7 +51,7 @@ class UserView {
 
         panel.add("LOGIN", new LoginPanel());
         panel.add("SIGNUP", new SignupPanel());
-        panel.add("HOME", new HomePanel());
+        // panel.add("HOME", new HomePanel());
 
         cardLO.show(panel, "LOGIN");
         // new SignupPanel(panel);
@@ -130,6 +131,9 @@ class UserView {
                         if (resHeader.equals("logined")) {
                             System.out.println("Break1");
                             user = gson.fromJson(res, User.class);
+
+                            panel.add("HOME", new HomePanel());
+
                             cardLO.show(panel, "HOME");
                             System.out.println("Break2");
 
@@ -499,16 +503,24 @@ class UserView {
 
             add(settingPanel, gbc);
 
-            JPanel usersPanel = new JPanel();
-            usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
+            JPanel friendsPanel = new JPanel();
+            friendsPanel.setLayout(new BoxLayout(friendsPanel, BoxLayout.Y_AXIS));
             // usersPanel.setBorder(BorderFactory.create(0, 20, 0, 0));
 
-            usersPanel.setBackground(Color.BLUE);
+            // friendsPanel.setBackground(Color.BLUE);
             gbc.gridx = 1;
             gbc.weightx = 6;
             gbc.weighty = 1;
 
-            add(usersPanel, gbc);
+            JLabel friendsLabel = new JLabel("Friend List");
+            friendsLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            friendsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JScrollPane friendListScroll = createFriendListPanel();
+
+            friendsPanel.add(friendsLabel);
+            friendsPanel.add(friendListScroll);
+            add(friendsPanel, gbc);
 
             JPanel chatPanel = new JPanel();
             chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
@@ -546,11 +558,39 @@ class UserView {
             settingPanel.add(friendsIcon);
             settingPanel.add(unfriendIcon);
             // settingPanel.add(setting);
-            usersPanel.add(users);
+            // friendsPanel.add(users);
             chatPanel.add(chat);
 
             // add(usersPanel);
             // add(chatPanel);
+
+        }
+
+        JScrollPane createFriendListPanel() {
+            JPanel friendListPanel = new JPanel();
+            friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
+            JScrollPane friendListScroll = new JScrollPane(friendListPanel);
+            friendListScroll.getVerticalScrollBar().setUnitIncrement(16);
+
+            // friendsLabel.setForeground(new Color(82, 82, 82));
+            ArrayList<User> friendList = user.getFriends();
+            friendList.forEach((User usr) -> {
+                JButton btn = new JButton(
+                        "<html><b>" + usr.getUsername() + "</b><br/>" + usr.getFullname() + "</html>");
+                btn.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+                // btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                btn.setPreferredSize(new Dimension(100, 100));
+                btn.setMaximumSize(new Dimension(400, 100));
+                friendListPanel.add(btn);
+            });
+            // for (var i = 1; i <= 9; ++i) {
+            // JButton btn = new JButton("test");
+            // btn.setPreferredSize(new Dimension(100, 100));
+            // btn.setMaximumSize(new Dimension(400, 100));
+            // friendListPanel.add(btn);
+            // }
+
+            return friendListScroll;
 
         }
 
@@ -634,10 +674,11 @@ class UserView {
 
             dialog.setResizable(false);
 
-            System.out.println(user.getFriends().get(0));
+            // System.out.println(user.getFriends().get(0));
 
             return dialog;
 
         }
+
     }
 }
