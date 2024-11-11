@@ -1,6 +1,8 @@
 package user;
 
-class User {
+import java.util.ArrayList;
+
+public class User {
     private String username;
     private String fullname;
     private String address;
@@ -8,13 +10,26 @@ class User {
     private String dob;
     private String gender;
 
+    ArrayList<User> friends;
+
     @Override
     public String toString() {
         // TODO Auto-generated method stub
         return this.username;
     }
 
-    public User() {
+    public User(String username,
+            String fullname,
+            String address,
+            String email,
+            String dob,
+            String gender) {
+        this.username = username;
+        this.fullname = fullname;
+        this.address = address;
+        this.email = email;
+        this.dob = dob;
+        this.gender = gender;
     };
 
     public String getUsername() {
@@ -40,9 +55,14 @@ class User {
     public String getGender() {
         return gender;
     }
-    // public void setUsername(String username) {
-    // this.username = username;
-    // }
+
+    public ArrayList<User> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(ArrayList<User> friends) {
+        this.friends = friends;
+    }
 
     // public void setFullname(String fullname) {
     // this.fullname = fullname;
