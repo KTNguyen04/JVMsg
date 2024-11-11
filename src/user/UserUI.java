@@ -3,7 +3,7 @@ package user;
 import javax.imageio.ImageIO;
 
 import javax.swing.*;
-import com.google.gson.Gson;
+import com.google.gson.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -21,6 +21,8 @@ class UserView {
     private CardLayout cardLO;
     private SocketController socketController;
     Mode mode;
+
+    User user;
 
     enum Mode {
         LOGIN, SIGNUP, HOME
@@ -57,6 +59,7 @@ class UserView {
     class LoginPanel extends JPanel {
         private JTextField usernameField;
         private JTextField passwordField;
+        private JLabel messageHolder;
 
         LoginPanel() throws IOException {
 
@@ -108,13 +111,30 @@ class UserView {
             submitButton.setMaximumSize(new Dimension(380, 40));
             submitButton.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
-                    SocketController sc = new SocketController();
-                    String packet = getLogInData();
-                    sc.sendRequest(packet);
+                    new Thread(() -> {
+                        SocketController sc = new SocketController();
+                        String packet = getLogInData();
+                        sc.sendRequest(packet);
 
-                    cardLO.show(panel, "HOME");
+                        System.out.println("test");
+                        String res = sc.getResponse();
+                        Gson gson = new Gson();
 
-                    sc.close();
+                        System.out.println(res);
+                        sc.close();
+                        JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = jsonObject.get("header").getAsString();
+                        if (resHeader.equals("logined")) {
+                            user = gson.fromJson(res, User.class);
+                            cardLO.show(panel, "HOME");
+
+                        } else {
+                            messageHolder.setText("LOGIN FAILED");
+                            messageHolder.setForeground(randomColor());
+                        }
+
+                        // cardLO.show(panel, "HOME");
+                    }).start();
                 }
             });
 
@@ -148,6 +168,15 @@ class UserView {
 
             });
 
+            messageHolder = new JLabel(" ");
+
+            messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 18));
+            messageHolder.setForeground(Color.decode("#ffc107"));
+
+            // instructionText.setFont(new Font("Nunito Sans", Font.BOLD, 18));
+            // instructionText.setForeground(new Color(127, 38, 91));
+            // instructionText.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
             leftPanel.add(banner);
 
             rightPanel.add(Box.createVerticalGlue());
@@ -167,6 +196,8 @@ class UserView {
             rightPanel.add(Box.createRigidArea(new Dimension(0, 60)));
 
             rightPanel.add(registerInstruction);
+
+            rightPanel.add(messageHolder);
             rightPanel.add(Box.createVerticalGlue());
 
             add(leftPanel, BorderLayout.WEST);
@@ -187,6 +218,17 @@ class UserView {
             String json = gson.toJson(loginData);
             return json;
 
+        }
+
+        public static Color randomColor() {
+            // Tạo đối tượng Random
+            Random rand = new Random();
+
+            int red = rand.nextInt(256);
+            int green = rand.nextInt(256);
+            int blue = rand.nextInt(256);
+
+            return new Color(red, green, blue);
         }
 
         // void sendLoginRequest() {
