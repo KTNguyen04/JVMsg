@@ -87,12 +87,13 @@ class DatabaseController {
     boolean checkLogin(String username, String password) {
         Connection connection = connect();
 
-        String query = String.format("select id from %s.%s where username= ?", this.USERS, "USER");
+        String query = String.format("select id from %s.%s where username= ? and password =?", this.USERS, "USER");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
+            pstm.setString(2, password);
             // stm.setString(2, password);
 
             rs = pstm.executeQuery();
