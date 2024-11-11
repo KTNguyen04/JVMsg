@@ -28,7 +28,7 @@ class SocketController {
             socket = new Socket(serverIP, serverPort);
             System.out.println(socket);
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            pw = new PrintWriter(socket.getOutputStream());
+            pw = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
             if (socket != null && !socket.isClosed()) {
                 try {
@@ -51,11 +51,18 @@ class SocketController {
     }
 
     void sendRequest(String data) {
-        pw.write(data);
-        pw.flush();
+        pw.println(data);
+
     }
 
     String getResponse() {
+        try {
+            System.out.println("test2");
+            return br.readLine();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return "";
     }
 

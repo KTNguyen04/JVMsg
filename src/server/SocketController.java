@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 
 class SocketController {
     private int port;
@@ -83,7 +83,7 @@ class ClientHandler extends Thread {
     public void run() {
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(communicateSocket.getInputStream()));
-                PrintWriter pw = new PrintWriter(communicateSocket.getOutputStream())) {
+                PrintWriter pw = new PrintWriter(communicateSocket.getOutputStream(), true)) {
 
             String json = br.readLine();
             System.out.println("message= " + json);
@@ -105,6 +105,23 @@ class ClientHandler extends Thread {
                     String password = data.get("password");
                     if (dbc.checkLogin(username, password)) {
                         System.out.println("Login thanh con");
+                        String header = "logined";
+
+                        String userData = dbc.getUserData(username);
+                        JsonObject jsonObject = JsonParser.parseString(userData).getAsJsonObject();
+
+                        jsonObject.addProperty("header", header);
+
+                        String jsonResponse = gson.toJson(jsonObject);
+                        pw.println(jsonResponse);
+
+                        System.out.println(jsonResponse);
+                    } else {
+                        JsonObject jsonResponseObject = new JsonObject();
+                        jsonResponseObject.addProperty("header", "nologin");
+                        String jsonResponse = gson.toJson(jsonResponseObject);
+                        pw.println(jsonResponse);
+
                     }
 
                     break;
@@ -117,7 +134,9 @@ class ClientHandler extends Thread {
             e.printStackTrace();
         } finally {
             try {
+
                 communicateSocket.close();
+                // implement closing all socket here
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -125,8 +144,10 @@ class ClientHandler extends Thread {
 
     }
 
-    // String getUserData() {
-
+    // String getUserData(String username) {
+    // String user = dbc.getUser(username);
+    // System.out.println(user);
+    // return "";
     // }
 
 }
