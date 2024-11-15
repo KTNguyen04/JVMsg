@@ -12,6 +12,8 @@ public class User {
 
     ArrayList<User> friends;
 
+    ArrayList<Message> messages;
+
     @Override
     public String toString() {
         // TODO Auto-generated method stub
@@ -64,6 +66,14 @@ public class User {
 
     public void setFriends(ArrayList<User> friends) {
         this.friends = friends;
+    }
+
+    public void setMessages(ArrayList<Message> messages) {
+        this.messages = messages;
+    }
+
+    public ArrayList<Message> getMessages() {
+        return messages;
     }
 
     // public void setFullname(String fullname) {
