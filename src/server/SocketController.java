@@ -128,6 +128,23 @@ class ClientHandler extends Thread {
 
                     break;
 
+                case "messages":
+                    String messages = dbc.getUserMessage(data.get("username1"), data.get("username2"));
+                    // String userFriends = dbc.getUserFriends(username);
+                    // String header = "messagesed";
+
+                    // JsonArray jsonArray = gson.fromJson(messages, JsonArray.class);
+
+                    // // jsonArray.addProperty("header", header);
+
+                    // String jsonResponse = gson.toJson(jsonObject);
+                    pw.println(messages);
+
+                    System.out.println(messages);
+
+                    System.out.println("message test");
+                    break;
+
                 default:
                     break;
             }

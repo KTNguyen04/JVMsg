@@ -1,6 +1,7 @@
 package server;
 
 import user.User;
+import user.Message;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ class DatabaseController {
             connection.close();
 
             user.setFriends(getUserFriends(username));
+            // user.setMessages(getMessage(username, username));
             Gson gson = new Gson();
             return gson.toJson(user);
         } catch (SQLException e) {
@@ -155,6 +157,66 @@ class DatabaseController {
             }
         }
         return friends;
+    }
+
+    String getUserMessage(String username1, String username2) {
+        Connection connection = connect();
+
+        String query = String.format("select * from %s.%s m " +
+                "where (m.from = ? and m.to = ? )or (m.from = ? and m.to = ?) " +
+                "ORDER BY m.time_stamp;",
+                this.USERS, "MESSAGE");
+
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        ArrayList<Message> messages = new ArrayList<>();
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username1);
+            pstm.setString(2, username2);
+            pstm.setString(3, username2);
+            pstm.setString(4, username1);
+            rs = pstm.executeQuery();
+            while (rs.next()) {
+
+                String from = rs.getString("from");
+                String to = rs.getString("to");
+                String timeStamp = rs.getString("time_stamp");
+                String content = rs.getString("content");
+
+                Message msg = new Message(from, to, content, timeStamp);
+                messages.add(msg);
+
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+            Gson gson = new Gson();
+            return gson.toJson(messages);
+            // return messages;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return "";
     }
 
     boolean checkLogin(String username, String password) {

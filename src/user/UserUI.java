@@ -4,8 +4,12 @@ import javax.imageio.ImageIO;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
+import java.lang.reflect.Type;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+
+// import com.google.gson.reflect.TypeToken;
+// import com.google.gson.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -59,7 +63,7 @@ class UserView {
         frame.setVisible(true);
     }
 
-    class LoginPanel extends JPanel {
+    private class LoginPanel extends JPanel {
         private JTextField usernameField;
         private JTextField passwordField;
         private JLabel messageHolder;
@@ -117,25 +121,25 @@ class UserView {
                     new Thread(() -> {
                         SocketController sc = new SocketController();
                         String packet = getLogInData();
-                        System.out.println(packet);
+                        // System.out.println(packet);
                         sc.sendRequest(packet);
 
                         System.out.println("test");
                         String res = sc.getResponse();
                         Gson gson = new Gson();
 
-                        System.out.println(res);
+                        // System.out.println(res);
                         sc.close();
                         JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = jsonObject.get("header").getAsString();
                         if (resHeader.equals("logined")) {
-                            System.out.println("Break1");
+                            // System.out.println("Break1");
                             user = gson.fromJson(res, User.class);
 
                             panel.add("HOME", new HomePanel());
 
                             cardLO.show(panel, "HOME");
-                            System.out.println("Break2");
+                            // System.out.println("Break2");
 
                         } else {
                             messageHolder.setText("LOGIN FAILED");
@@ -229,7 +233,7 @@ class UserView {
 
         }
 
-        public static Color randomColor() {
+        static Color randomColor() {
             // Tạo đối tượng Random
             Random rand = new Random();
 
@@ -246,7 +250,7 @@ class UserView {
         // }
     }
 
-    class SignupPanel extends JPanel {
+    private class SignupPanel extends JPanel {
         private JTextField usernameField;
         private JTextField passwordField;
         private JTextField fullnameField;
@@ -485,55 +489,80 @@ class UserView {
         }
     }
 
-    class HomePanel extends JPanel {
+    private class HomePanel extends JPanel {
+        JLabel chatLabel;
+        GridBagConstraints gbc;
+        JPanel chatPanel;
+        JPanel chatMessagePanel;
+
         HomePanel() {
             super();
             setLayout(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
+            gbc = new GridBagConstraints();
             gbc.fill = GridBagConstraints.BOTH;
 
+            JPanel settingPanel = createSettingPanel();
+            gbc.gridx = 0;
+            gbc.weightx = 0;
+            gbc.gridwidth = 1;
+            gbc.weighty = 1;
+            add(settingPanel, gbc);
+            JPanel friendsPanel = createFriendPanel();
+            gbc.gridx = 1;
+            // gbc.weightx = 6;
+            gbc.weightx = 0;
+            gbc.gridwidth = 1;
+            gbc.weighty = 1;
+            add(friendsPanel, gbc);
+
+            // JPanel chatPanel = new JPanel();
+            // chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
+
+            // // chatPanel.setBackground(Color.YELLOW);
+            // gbc.gridx = 2;
+            // gbc.weightx = 18;
+            // gbc.weighty = 1;
+
+            // chatLabel = new JLabel("Chatting");
+            // // chatLabel.setMaximumSize(new Dimension(400, 100));
+            // // chatLabel.setPreferredSize(new Dimension(400, 100));
+            // chatLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            // JScrollPane chatScrollPanel = createChatScrollPanel();
+            // chatScrollPanel.setPreferredSize(new Dimension(500, 100));
+            // chatScrollPanel.setMaximumSize(new Dimension(500, 600));
+            chatPanel = createChatPanel();
+            gbc.gridx = 2;
+            gbc.weightx = 18;
+            gbc.weighty = 1;
+            // chatPanel.add(chatLabel);
+            // chatPanel.add(chatScrollPanel);
+
+            // chatPanel.setVisible(false);
+            add(chatPanel, gbc);
+
+            // settingPanel.add(setting);
+            // friendsPanel.add(users);
+            // chatPanel.add(chat);
+
+            // add(usersPanel);
+            // add(chatPanel);
+
+        }
+
+        JPanel createSettingPanel() {
             JPanel settingPanel = new JPanel();
             settingPanel.setLayout(new BoxLayout(settingPanel, BoxLayout.Y_AXIS));
             settingPanel.setSize(120, 800);
 
             settingPanel.setBackground(Color.WHITE);
-            gbc.gridx = 0;
-            gbc.weightx = 1;
-            gbc.weighty = 1;
 
-            add(settingPanel, gbc);
-
-            JPanel friendsPanel = new JPanel();
-            friendsPanel.setLayout(new BoxLayout(friendsPanel, BoxLayout.Y_AXIS));
-            // usersPanel.setBorder(BorderFactory.create(0, 20, 0, 0));
-
-            // friendsPanel.setBackground(Color.BLUE);
-            gbc.gridx = 1;
-            gbc.weightx = 6;
-            gbc.weighty = 1;
-
-            JLabel friendsLabel = new JLabel("Friend List");
-            friendsLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
-            friendsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            JScrollPane friendListScroll = createFriendListPanel();
-
-            friendsPanel.add(friendsLabel);
-            friendsPanel.add(friendListScroll);
-            add(friendsPanel, gbc);
-
-            JPanel chatPanel = new JPanel();
-            chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
-
-            chatPanel.setBackground(Color.YELLOW);
-            gbc.gridx = 2;
-            gbc.weightx = 18;
-            gbc.weighty = 1;
-            add(chatPanel, gbc);
-
-            JLabel setting = new JLabel("setting panel");
-            JLabel users = new JLabel("users panel");
-            JLabel chat = new JLabel("chat panel");
+            JLabel addFriendIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/add_friend.png"));
+            addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel friendsIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/friends.png"));
+            friendsIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel unfriendIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/unfriend.png"));
+            unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel userIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/user.png"));
             userIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -546,27 +575,31 @@ class UserView {
                 }
             });
 
-            JLabel addFriendIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/add_friend.png"));
-            addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-            JLabel friendsIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/friends.png"));
-            friendsIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-            JLabel unfriendIcon = new JLabel(new ImageIcon("./src/user/asset/imgs/unfriend.png"));
-            unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-
             settingPanel.add(userIcon);
             settingPanel.add(addFriendIcon);
             settingPanel.add(friendsIcon);
             settingPanel.add(unfriendIcon);
-            // settingPanel.add(setting);
-            // friendsPanel.add(users);
-            chatPanel.add(chat);
-
-            // add(usersPanel);
-            // add(chatPanel);
-
+            return settingPanel;
         }
 
-        JScrollPane createFriendListPanel() {
+        JPanel createFriendPanel() {
+            JPanel friendsPanel = new JPanel();
+            friendsPanel.setLayout(new BoxLayout(friendsPanel, BoxLayout.Y_AXIS));
+            // usersPanel.setBorder(BorderFactory.create(0, 20, 0, 0));
+
+            // friendsPanel.setBackground(Color.BLUE);
+            gbc.gridx = 1;
+            // gbc.weightx = 6;
+            gbc.weightx = 0;
+            gbc.gridwidth = 1;
+            gbc.weighty = 1;
+
+            JLabel friendsLabel = new JLabel("Friend List");
+            friendsLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            friendsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // JScrollPane friendListScroll = createFriendListPanel();
+
             JPanel friendListPanel = new JPanel();
             friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
             JScrollPane friendListScroll = new JScrollPane(friendListPanel);
@@ -579,20 +612,130 @@ class UserView {
                         "<html><b>" + usr.getUsername() + "</b><br/>" + usr.getFullname() + "</html>");
                 btn.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
                 // btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-                btn.setPreferredSize(new Dimension(100, 100));
+                btn.setPreferredSize(new Dimension(400, 100));
                 btn.setMaximumSize(new Dimension(400, 100));
+                btn.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent me) {
+                        chatLabel.setText(usr.getUsername() + " - Chatting");
+                        // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                        new Thread(() -> {
+                            SocketController sc = new SocketController();
+                            String packet = createMessageReq(user.getUsername(), usr.getUsername());
+                            System.out.println(packet);
+                            sc.sendRequest(packet);
+
+                            String res = sc.getResponse();
+                            Gson gson = new Gson();
+                            Type messageListType = new TypeToken<ArrayList<Message>>() {
+                            }.getType();
+
+                            // Parse the JSON into an ArrayList of Message objects
+                            ArrayList<Message> messages = gson.fromJson(res, messageListType);
+                            // usr.setMessages(messages);
+
+                            // messages.forEach((m) -> {
+                            // System.out.println(m.getContent());
+                            // });
+
+                            user.setMessages(messages);
+                            sc.close();
+
+                            addMessages();
+                            // chatMessagePanel.revalidate();
+                            // chatMessagePanel.repaint();
+
+                        }).start();
+
+                    }
+                });
                 friendListPanel.add(btn);
             });
-            // for (var i = 1; i <= 9; ++i) {
-            // JButton btn = new JButton("test");
-            // btn.setPreferredSize(new Dimension(100, 100));
-            // btn.setMaximumSize(new Dimension(400, 100));
-            // friendListPanel.add(btn);
-            // }
-
-            return friendListScroll;
+            friendsPanel.add(friendsLabel);
+            friendsPanel.add(friendListScroll);
+            return friendsPanel;
 
         }
+
+        String createMessageReq(String username1, String username2) {
+            HashMap<String, String> packet = new HashMap<>();
+
+            packet.put("header", "messages");
+            packet.put("username1", username1);
+            packet.put("username2", username2);
+
+            Gson gson = new Gson();
+            String json = gson.toJson(packet);
+            return json;
+
+        }
+
+        JPanel createChatPanel() {
+            JPanel chatPanel = new JPanel();
+            chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
+            chatLabel = new JLabel("Chatting");
+            chatLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, chatLabel.getPreferredSize().height));
+            // chatLabel.setPreferredSize(new Dimension(400, 100));
+            chatLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            // chatLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            // chatPanel.setBackground(Color.YELLOW);
+
+            chatMessagePanel = new JPanel();
+            chatMessagePanel.setLayout(new BoxLayout(chatMessagePanel, BoxLayout.Y_AXIS));
+            chatMessagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            // chatMessagePanel.setPreferredSize(new Dimension(500, 100));
+            JScrollPane chatMessageScroll = new JScrollPane(chatMessagePanel);
+            chatMessageScroll.getVerticalScrollBar().setUnitIncrement(16);
+            chatMessageScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            // chatMessageScroll.setPreferredSize(new Dimension(600, 600));
+
+            chatPanel.add(chatLabel);
+
+            chatPanel.add(chatMessageScroll);
+
+            JPanel chatAreaPanel = createChatArea();
+            chatAreaPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+            // chatAreaPanel.setPreferredSize(new Dimension(0, 100));
+
+            chatPanel.add(chatAreaPanel);
+
+            return chatPanel;
+        }
+
+        void addMessages() {
+            chatMessagePanel.removeAll();
+
+            ArrayList<Message> messages = user.getMessages();
+
+            messages.forEach((Message msg) -> {
+                JLabel msgL = new JLabel(msg.getContent());
+                msgL.setFont(new Font("Nunito Sans", Font.PLAIN, 16));
+
+                // msgL.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+                // msgL.getPreferredSize().height));
+                JPanel mRow = new JPanel();
+                mRow.setLayout(new BoxLayout(mRow, BoxLayout.X_AXIS));
+                if (msg.getFrom().equals(user.getUsername())) {
+                    mRow.add(Box.createHorizontalGlue());
+                    msgL.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    // chatMessagePanel.add(Box.createHorizontalGlue());
+                    mRow.add(msgL);
+                } else {
+                    System.out.println("123");
+
+                    msgL.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    mRow.add(msgL);
+                    mRow.add(Box.createHorizontalGlue());
+                }
+                chatMessagePanel.add(mRow);
+            });
+            chatMessagePanel.revalidate(); // Đảm bảo layout được tính toán lại
+            chatMessagePanel.repaint();
+        }
+
+        // void addMessage(Message msg){
+
+        // }
 
         JDialog createUserInfoDialog() {
             JDialog dialog = new JDialog(frame, "User info");
@@ -680,5 +823,31 @@ class UserView {
 
         }
 
+        JPanel createChatArea() {
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+            JTextArea textArea = new JTextArea("Chat Here", 5, 20);
+            textArea.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            textArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+            // textArea.setAlignmentX(Component.BOTTOM_ALIGNMENT);
+
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            // scrollPane.setMaximumSize(new Dimension(800, 100));
+
+            JButton btn = new JButton("Send");
+            btn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            // btn.setPreferredSize(new Dimension(100, 100));
+            btn.setMaximumSize(new Dimension(100, Integer.MAX_VALUE));
+
+            panel.add(scrollPane, BorderLayout.CENTER);
+            panel.add(btn, BorderLayout.WEST);
+
+            // panel.setVisible(false);
+
+            return panel;
+        }
     }
 }
