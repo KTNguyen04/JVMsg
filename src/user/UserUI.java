@@ -477,23 +477,29 @@ class UserView {
             String fullname = fullnameField.getText();
             String address = addressField.getText();
             String email = emailField.getText();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String dob = sdf.format(dobField.getDate());
             String gender = maleRadio.isSelected() ? "male" : "female";
             String password = passwordField.getText();
 
-            signupData.put("header", "signup");
-            signupData.put("username", username);
-            signupData.put("fullname", fullname);
-            signupData.put("address", address);
-            signupData.put("email", email);
-            signupData.put("dob", dob);
-            signupData.put("gender", gender);
-            signupData.put("password", password);
+            User user = new User(username, fullname, address, email, dob, gender);
+            user.setPassword(password);
+            // signupData.put("header", "signup");
+            // signupData.put("username", username);
+            // signupData.put("fullname", fullname);
+            // signupData.put("address", address);
+            // signupData.put("email", email);
+            // signupData.put("dob", dob);
+            // signupData.put("gender", gender);
+            // signupData.put("password", password);
 
             Gson gson = new Gson();
-            String json = gson.toJson(signupData);
-            return json;
+            String json = gson.toJson(user);
+            JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+
+            jsonObject.addProperty("header", "signup");
+
+            return jsonObject.toString();
             // for (Map.Entry<String, String> entry : registrationData.entrySet()) {
             // String key = entry.getKey();
             // String value = entry.getValue();
@@ -609,6 +615,9 @@ class UserView {
         JPanel createFriendPanel() {
             JPanel friendsPanel = new JPanel();
             friendsPanel.setLayout(new BoxLayout(friendsPanel, BoxLayout.Y_AXIS));
+            friendsPanel.setPreferredSize(new Dimension(400, 100));
+            friendsPanel.setMaximumSize(new Dimension(400, 100));
+
             // usersPanel.setBorder(BorderFactory.create(0, 20, 0, 0));
 
             // friendsPanel.setBackground(Color.BLUE);

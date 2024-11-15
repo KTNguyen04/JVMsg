@@ -7,6 +7,7 @@ import java.util.*;
 import com.google.gson.*;
 
 import user.Message;
+import user.User;
 
 class SocketController {
     private int port;
@@ -141,6 +142,10 @@ class SocketController {
                 switch (data.get("header")) {
                     case "signup":
                         System.out.println("Signuphandle");
+                        User usr = gson.fromJson(json, User.class);
+                        dbc.insertUser(usr);
+
+                        // dbc.insertUser()
 
                         break;
                     case "login":
