@@ -18,6 +18,7 @@ class Server {
 
     void run() {
         sc.openSocket();
+        sc.openChatSocket();
     }
 
     void close() {

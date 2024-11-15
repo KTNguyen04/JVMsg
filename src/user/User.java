@@ -1,6 +1,9 @@
 package user;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import com.mysql.cj.protocol.MessageListener;
 
 public class User {
     private String username;
@@ -13,6 +16,7 @@ public class User {
     ArrayList<User> friends;
 
     ArrayList<Message> messages;
+    private MessageListener listener;
 
     @Override
     public String toString() {
@@ -34,6 +38,10 @@ public class User {
         this.gender = gender;
         this.friends = null;
     };
+
+    interface MessageListener {
+        void onNewMessage();
+    }
 
     public String getUsername() {
         return username;
@@ -74,6 +82,23 @@ public class User {
 
     public ArrayList<Message> getMessages() {
         return messages;
+    }
+
+    void addMessage(Message msg) {
+        messages.add(msg);
+        notifyListener();
+    }
+
+    void addMessageListener(MessageListener listener) {
+        this.listener = listener;
+    }
+
+    void removeMessageListener() {
+        this.listener = null;
+    }
+
+    private void notifyListener() {
+        listener.onNewMessage();
     }
 
     // public void setFullname(String fullname) {
