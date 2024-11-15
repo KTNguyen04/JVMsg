@@ -219,6 +219,54 @@ class DatabaseController {
         return "";
     }
 
+    boolean addOnline(String username, String ip) {
+        Connection connection = connect();
+
+        String query = String.format("insert into  %s.%s " +
+                "values (?,?)", this.USERS, "ONLINE");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username);
+            pstm.setString(2, ip);
+            // stm.setString(2, password);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     boolean checkLogin(String username, String password) {
         Connection connection = connect();
 

@@ -17,6 +17,10 @@ public class Message {
         return from;
     }
 
+    public String getTo() {
+        return to;
+    }
+
     public String getContent() {
         return content;
     }

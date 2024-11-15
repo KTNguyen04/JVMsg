@@ -20,18 +20,20 @@ import java.util.*;
 import java.util.Date;
 import config.AppConfig;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 class UserView {
     private JFrame frame;
     private JPanel panel;
     private CardLayout cardLO;
-    private SocketController socketController;
+    private PrintWriter chatPW;
 
-    Mode mode;
+    private Mode mode;
 
-    User user;
+    static User user;
 
-    enum Mode {
+    private enum Mode {
         LOGIN, SIGNUP, HOME
     }
 
@@ -61,6 +63,9 @@ class UserView {
         // new SignupPanel(panel);
         frame.add(panel);
         frame.setVisible(true);
+
+        // sc = null;
+
     }
 
     private class LoginPanel extends JPanel {
@@ -129,7 +134,6 @@ class UserView {
                         Gson gson = new Gson();
 
                         // System.out.println(res);
-                        sc.close();
                         JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = jsonObject.get("header").getAsString();
                         if (resHeader.equals("logined")) {
@@ -139,6 +143,12 @@ class UserView {
                             panel.add("HOME", new HomePanel());
 
                             cardLO.show(panel, "HOME");
+
+                            sc.openChatSocket();
+                            chatPW = sc.getChatWriter();
+                            // // System.out.println("chatPW" + chatPW);
+                            sc.close();
+
                             // System.out.println("Break2");
 
                         } else {
@@ -216,7 +226,17 @@ class UserView {
             add(leftPanel, BorderLayout.WEST);
             add(rightPanel, BorderLayout.CENTER);
         }
+        // String createOnlinePacket(){
+        // HashMap<String, String> data = new HashMap<>();
 
+        // // loginData.put("header", "online");
+        // // loginData.put("ip", );
+        // // loginData.put("password", password);
+
+        // Gson gson = new Gson();
+        // String json = gson.toJson(loginData);
+        // return json;
+        // }
         String getLogInData() {
             HashMap<String, String> loginData = new HashMap<>();
 
@@ -495,6 +515,8 @@ class UserView {
         JPanel chatPanel;
         JPanel chatMessagePanel;
 
+        String curPeer;
+
         HomePanel() {
             super();
             setLayout(new GridBagLayout());
@@ -514,6 +536,8 @@ class UserView {
             gbc.gridwidth = 1;
             gbc.weighty = 1;
             add(friendsPanel, gbc);
+
+            user.addMessageListener(this::addMessages);
 
             // JPanel chatPanel = new JPanel();
             // chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
@@ -626,6 +650,7 @@ class UserView {
                             sc.sendRequest(packet);
 
                             String res = sc.getResponse();
+                            System.out.println("msg" + res);
                             Gson gson = new Gson();
                             Type messageListType = new TypeToken<ArrayList<Message>>() {
                             }.getType();
@@ -634,14 +659,15 @@ class UserView {
                             ArrayList<Message> messages = gson.fromJson(res, messageListType);
                             // usr.setMessages(messages);
 
-                            // messages.forEach((m) -> {
-                            // System.out.println(m.getContent());
-                            // });
+                            messages.forEach((Message m) -> {
+                                System.out.println(m.getContent());
+                            });
 
                             user.setMessages(messages);
                             sc.close();
 
                             addMessages();
+                            curPeer = usr.getUsername();
                             // chatMessagePanel.revalidate();
                             // chatMessagePanel.repaint();
 
@@ -669,6 +695,19 @@ class UserView {
             return json;
 
         }
+
+        // String createMessage(String username1, String username2) {
+        // HashMap<String, String> packet = new HashMap<>();
+
+        // packet.put("header", "messages");
+        // packet.put("username1", username1);
+        // packet.put("username2", username2);
+
+        // Gson gson = new Gson();
+        // String json = gson.toJson(packet);
+        // return json;
+
+        // }
 
         JPanel createChatPanel() {
             JPanel chatPanel = new JPanel();
@@ -729,13 +768,17 @@ class UserView {
                 }
                 chatMessagePanel.add(mRow);
             });
-            chatMessagePanel.revalidate(); // Đảm bảo layout được tính toán lại
+            chatMessagePanel.revalidate();
             chatMessagePanel.repaint();
         }
 
-        // void addMessage(Message msg){
+        void addMessage(Message msg) {
+            user.addMessage(msg);
+            addMessages();
+            // chatMessagePanel.revalidate();
+            // chatMessagePanel.repaint();
 
-        // }
+        }
 
         JDialog createUserInfoDialog() {
             JDialog dialog = new JDialog(frame, "User info");
@@ -841,6 +884,32 @@ class UserView {
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
             // btn.setPreferredSize(new Dimension(100, 100));
             btn.setMaximumSize(new Dimension(100, Integer.MAX_VALUE));
+            btn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent me) {
+
+                    HashMap<String, String> packet = new HashMap<>();
+                    packet.put("header", "chat");
+                    packet.put("from", user.getUsername());
+                    packet.put("to", curPeer);
+                    packet.put("content", textArea.getText());
+
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                    LocalDateTime now = LocalDateTime.now();
+
+                    packet.put("time_stamp", dtf.format(now));
+                    Message msg = new Message(user.getUsername(), curPeer, textArea.getText(), dtf.format(now));
+                    Gson gson = new Gson();
+                    String json = gson.toJson(packet);
+                    System.out.println(json);
+                    // SocketController sc = new SocketController();
+                    // chatPW = sc.getChatWriter();
+                    chatPW.println(json);
+
+                    addMessage(msg);
+                    // sc.close();
+                }
+
+            });
 
             panel.add(scrollPane, BorderLayout.CENTER);
             panel.add(btn, BorderLayout.WEST);
