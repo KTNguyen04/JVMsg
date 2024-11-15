@@ -531,38 +531,26 @@ class UserView {
 
             JPanel settingPanel = createSettingPanel();
             gbc.gridx = 0;
-            gbc.weightx = 0;
-            gbc.gridwidth = 1;
+            gbc.weightx = 1;
+            // gbc.gridwidth = 1;
             gbc.weighty = 1;
             add(settingPanel, gbc);
             JPanel friendsPanel = createFriendPanel();
             gbc.gridx = 1;
             // gbc.weightx = 6;
-            gbc.weightx = 0;
-            gbc.gridwidth = 1;
+            gbc.weightx = 6;
+            // gbc.gridwidth = 6;
             gbc.weighty = 1;
             add(friendsPanel, gbc);
 
             user.addMessageListener(this::addMessages);
 
-            // JPanel chatPanel = new JPanel();
-            // chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
-
-            // // chatPanel.setBackground(Color.YELLOW);
-            // gbc.gridx = 2;
-            // gbc.weightx = 18;
-            // gbc.weighty = 1;
-
-            // chatLabel = new JLabel("Chatting");
-            // // chatLabel.setMaximumSize(new Dimension(400, 100));
-            // // chatLabel.setPreferredSize(new Dimension(400, 100));
-            // chatLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
-            // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            // JScrollPane chatScrollPanel = createChatScrollPanel();
-            // chatScrollPanel.setPreferredSize(new Dimension(500, 100));
-            // chatScrollPanel.setMaximumSize(new Dimension(500, 600));
             chatPanel = createChatPanel();
+            // chatPanel.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));
+
             gbc.gridx = 2;
+            // gbc.gridwidth = 18;
+
             gbc.weightx = 18;
             gbc.weighty = 1;
             // chatPanel.add(chatLabel);
@@ -615,21 +603,25 @@ class UserView {
         JPanel createFriendPanel() {
             JPanel friendsPanel = new JPanel();
             friendsPanel.setLayout(new BoxLayout(friendsPanel, BoxLayout.Y_AXIS));
-            friendsPanel.setPreferredSize(new Dimension(400, 100));
-            friendsPanel.setMaximumSize(new Dimension(400, 100));
+            // friendsPanel.setPreferredSize(new Dimension(400, ));
+            // friendsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+            // Integer.MAX_VALUE));
+            friendsPanel.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
+            friendsPanel.setPreferredSize(new Dimension(400, Integer.MAX_VALUE));
 
             // usersPanel.setBorder(BorderFactory.create(0, 20, 0, 0));
 
             // friendsPanel.setBackground(Color.BLUE);
-            gbc.gridx = 1;
+            // gbc.gridx = 1;
             // gbc.weightx = 6;
-            gbc.weightx = 0;
-            gbc.gridwidth = 1;
-            gbc.weighty = 1;
+            // // gbc.weightx = 0;
+            // gbc.gridwidth = 6;
+            // gbc.weighty = 1;
 
             JLabel friendsLabel = new JLabel("Friend List");
             friendsLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
             friendsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            friendsLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, friendsLabel.getPreferredSize().height));
 
             // JScrollPane friendListScroll = createFriendListPanel();
 
@@ -644,12 +636,15 @@ class UserView {
                 JButton btn = new JButton(
                         "<html><b>" + usr.getUsername() + "</b><br/>" + usr.getFullname() + "</html>");
                 btn.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
-                // btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-                btn.setPreferredSize(new Dimension(400, 100));
-                btn.setMaximumSize(new Dimension(400, 100));
+                btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                // btn.setPreferredSize(new Dimension(400, 100));
+                btn.setMaximumSize(new Dimension(400, 80));
                 btn.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent me) {
                         chatLabel.setText(usr.getUsername() + " - Chatting");
+                        // chatPanel.setMaximumSize(new Dimension(500,
+                        // chatLabel.getPreferredSize().height));
+
                         // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
                         new Thread(() -> {
@@ -721,20 +716,28 @@ class UserView {
         JPanel createChatPanel() {
             JPanel chatPanel = new JPanel();
             chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
-            chatLabel = new JLabel("Chatting");
-            chatLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, chatLabel.getPreferredSize().height));
+            chatPanel.setMaximumSize(new Dimension(800, Integer.MAX_VALUE));
+            chatPanel.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
+            // chatPanel.setMaximumSize(new Dimension(800, Integer.MAX_VALUE));
+
+            chatLabel = new JLabel("... - Chatting");
+            chatLabel.setMaximumSize(new Dimension(800, chatLabel.getPreferredSize().height));
+            // chatLabel.setPreferredSize(new Dimension(300,
+            // chatLabel.getPreferredSize().height));
             // chatLabel.setPreferredSize(new Dimension(400, 100));
             chatLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
-            // chatLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             // chatPanel.setBackground(Color.YELLOW);
 
             chatMessagePanel = new JPanel();
             chatMessagePanel.setLayout(new BoxLayout(chatMessagePanel, BoxLayout.Y_AXIS));
             chatMessagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-            // chatMessagePanel.setPreferredSize(new Dimension(500, 100));
+            // chatMessagePanel.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
+            // chatMessagePanel.setPreferredSize(new Dimension(800, 100));
             JScrollPane chatMessageScroll = new JScrollPane(chatMessagePanel);
             chatMessageScroll.getVerticalScrollBar().setUnitIncrement(16);
             chatMessageScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            // chatMessageScroll.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
             // chatMessageScroll.setPreferredSize(new Dimension(600, 600));
 
             chatPanel.add(chatLabel);
@@ -743,7 +746,7 @@ class UserView {
 
             JPanel chatAreaPanel = createChatArea();
             chatAreaPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-            // chatAreaPanel.setPreferredSize(new Dimension(0, 100));
+            // chatAreaPanel.setPreferredSize(new Dimension(800, 100));
 
             chatPanel.add(chatAreaPanel);
 
@@ -881,18 +884,22 @@ class UserView {
 
             JTextArea textArea = new JTextArea("Chat Here", 5, 20);
             textArea.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            // textArea.setPreferredSize(new Dimension(800, 100));
             textArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
             // textArea.setAlignmentX(Component.BOTTOM_ALIGNMENT);
 
             JScrollPane scrollPane = new JScrollPane(textArea);
-            scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            scrollPane.setPreferredSize(new Dimension(Integer.MAX_VALUE, 100));
+            scrollPane.setPreferredSize(new Dimension(800, 100));
+
+            // scrollPane.setMaximumSize(new Dimension(800, 100));
             // scrollPane.setMaximumSize(new Dimension(800, 100));
 
             JButton btn = new JButton("Send");
             btn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-            // btn.setPreferredSize(new Dimension(100, 100));
-            btn.setMaximumSize(new Dimension(100, Integer.MAX_VALUE));
+            btn.setPreferredSize(new Dimension(100, 100));
+            btn.setMaximumSize(new Dimension(100, 100));
             btn.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
 
