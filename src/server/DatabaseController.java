@@ -88,6 +88,61 @@ class DatabaseController {
         return "";
     }
 
+    boolean insertMessage(Message msg) {
+        Connection connection = connect();
+
+        String query = String.format("INSERT INTO %s.%s " +
+                "VALUES (?, ?,?,?);",
+                this.USERS, "MESSAGE");
+
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        ArrayList<User> friends = new ArrayList<>();
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, msg.getFrom());
+            pstm.setString(2, msg.getTo());
+            pstm.setString(3, msg.getTimeStamp());
+            System.out.println("ts" + msg.getTimeStamp());
+            pstm.setString(4, msg.getContent());
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+
+            // return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     ArrayList<User> getUserFriends(String username) {
         Connection connection = connect();
 
@@ -240,6 +295,7 @@ class DatabaseController {
 
                 return true;
             }
+            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();

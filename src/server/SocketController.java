@@ -17,6 +17,7 @@ class SocketController {
     private String justForTest;
     private ArrayList<ChatSocketThread> chatClients;
     private int numberClients;
+    private DatabaseController dbc;
 
     String curAccepted;
 
@@ -25,6 +26,8 @@ class SocketController {
         this.chatPort = 8147;
         chatClients = new ArrayList<>();
         numberClients = 0;
+
+        dbc = new DatabaseController();
 
     }
 
@@ -114,12 +117,9 @@ class SocketController {
 
     class ClientHandler extends Thread {
 
-        private DatabaseController dbc;
-
         private Socket communicateSocket;
 
         ClientHandler(Socket communicateSocket) {
-            dbc = new DatabaseController();
             this.communicateSocket = communicateSocket;
         }
 
@@ -190,6 +190,12 @@ class SocketController {
                         System.out.println("message test");
                         break;
                     case "chat":
+                        // Gson gson = new Gson();
+                        Message msg = gson.fromJson(json, Message.class);
+                        dbc.insertMessage(msg);
+
+                        // dbc.insertMessage(msg);
+
                         System.out.println("cte" + data.get("content"));
                         break;
 
@@ -255,7 +261,7 @@ class SocketController {
                     System.out.println(message);
                     Gson gson = new Gson();
                     Message msg = gson.fromJson(message, Message.class);
-
+                    // System.out.println("thr" + msg.getContent() + msg.getTimeStamp());
                     for (ChatSocketThread sct : chatClients) {
                         System.out.println(sct.getSocketThreadName());
                         if (sct.getSocketThreadName().equals(msg.getTo())) {

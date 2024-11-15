@@ -893,20 +893,21 @@ class UserView {
                     packet.put("to", curPeer);
                     packet.put("content", textArea.getText());
 
-                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                     LocalDateTime now = LocalDateTime.now();
 
                     packet.put("time_stamp", dtf.format(now));
+                    packet.put("header", "chat");
                     Message msg = new Message(user.getUsername(), curPeer, textArea.getText(), dtf.format(now));
                     Gson gson = new Gson();
                     String json = gson.toJson(packet);
                     System.out.println(json);
-                    // SocketController sc = new SocketController();
-                    // chatPW = sc.getChatWriter();
                     chatPW.println(json);
+                    SocketController sc = new SocketController();
+                    sc.sendRequest(json);
 
                     addMessage(msg);
-                    // sc.close();
+                    sc.close();
                 }
 
             });
