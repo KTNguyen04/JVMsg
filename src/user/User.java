@@ -12,6 +12,7 @@ public class User {
     private String email;
     private String dob;
     private String gender;
+    private String password;
 
     ArrayList<User> friends;
 
@@ -22,6 +23,10 @@ public class User {
     public String toString() {
         // TODO Auto-generated method stub
         return this.username;
+    }
+
+    void setPassword(String password) {
+        this.password = password;
     }
 
     public User(String username,
@@ -65,6 +70,10 @@ public class User {
 
     public String getGender() {
         return gender;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public ArrayList<User> getFriends() {

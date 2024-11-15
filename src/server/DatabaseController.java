@@ -4,8 +4,9 @@ import user.User;
 import user.Message;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import com.google.gson.Gson;
+import org.mindrot.jbcrypt.BCrypt;
 
 class DatabaseController {
 
@@ -73,7 +74,9 @@ class DatabaseController {
                 e.printStackTrace();
             }
             try {
-                rs.close();
+                if (rs != null)
+
+                    rs.close();
             } catch (SQLException e) {
 
                 e.printStackTrace();
@@ -128,7 +131,9 @@ class DatabaseController {
                 e.printStackTrace();
             }
             try {
-                rs.close();
+                if (rs != null)
+
+                    rs.close();
             } catch (SQLException e) {
 
                 e.printStackTrace();
@@ -199,7 +204,9 @@ class DatabaseController {
                 e.printStackTrace();
             }
             try {
-                rs.close();
+                if (rs != null)
+
+                    rs.close();
             } catch (SQLException e) {
 
                 e.printStackTrace();
@@ -259,7 +266,9 @@ class DatabaseController {
                 e.printStackTrace();
             }
             try {
-                rs.close();
+                if (rs != null)
+
+                    rs.close();
             } catch (SQLException e) {
 
                 e.printStackTrace();
@@ -274,7 +283,64 @@ class DatabaseController {
         return "";
     }
 
-    boolean addOnline(String username, String ip) {
+    boolean insertUser(User user) {
+        Connection connection = connect();
+
+        String query = String.format("INSERT INTO %s.%s (username, password, fullname, address, gender, dob,email) " +
+                "VALUES (?, ?, ?, ?, ?, ?,?);", this.USERS, "USER");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+
+            String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            pstm.setString(1, user.getUsername());
+            pstm.setString(2, hashedPassword);
+            pstm.setString(3, user.getFullname());
+            pstm.setString(4, user.getAddress());
+            pstm.setString(5, user.getGender());
+            pstm.setString(6, user.getDob());
+            pstm.setString(7, user.getEmail());
+            // stm.setString(2, password);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    boolean insertOnline(String username, String ip) {
         Connection connection = connect();
 
         String query = String.format("insert into  %s.%s " +
@@ -308,7 +374,9 @@ class DatabaseController {
                 e.printStackTrace();
             }
             try {
-                rs.close();
+                if (rs != null)
+
+                    rs.close();
             } catch (SQLException e) {
 
                 e.printStackTrace();
@@ -326,19 +394,20 @@ class DatabaseController {
     boolean checkLogin(String username, String password) {
         Connection connection = connect();
 
-        String query = String.format("select id from %s.%s where username= ? and password =?", this.USERS, "USER");
+        String query = String.format("select password from %s.%s where username= ?", this.USERS, "USER");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
-            pstm.setString(2, password);
+            // pstm.setString(2, password);
             // stm.setString(2, password);
 
             rs = pstm.executeQuery();
 
             if (rs.next()) {
-                System.out.println("THanh cong dang nhap");
+                if (BCrypt.checkpw(password, rs.getString("password")))
+                    return true;
 
                 // HashMap<String, String> data = new HashMap<>();
                 // data.put("header", "logined");
@@ -353,8 +422,8 @@ class DatabaseController {
                 // Gson gson = new Gson();
                 // String json = gson.toJson(signupData);
 
-                return true;
             }
+            return false;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -367,7 +436,9 @@ class DatabaseController {
                 e.printStackTrace();
             }
             try {
-                rs.close();
+                if (rs != null)
+
+                    rs.close();
             } catch (SQLException e) {
 
                 e.printStackTrace();
