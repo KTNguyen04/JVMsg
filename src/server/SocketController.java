@@ -214,6 +214,36 @@ class SocketController {
                         System.out.println("cte" + data.get("content"));
                         break;
                     }
+                    case "edit": {
+                        // Gson gson = new Gson();
+                        System.out.println(json);
+                        String header = "";
+                        User usr = gson.fromJson(json, User.class);
+                        if (dbc.editUser(usr, data.get("newPassword"))) {
+                            header = "edited";
+
+                        } else {
+                            header = "noedit";
+                        }
+
+                        String userData = dbc.getUserData(usr.getUsername());
+                        // String userFriends = dbc.getUserFriends(username);
+
+                        JsonObject jsonObject = JsonParser.parseString(userData).getAsJsonObject();
+
+                        jsonObject.addProperty("header", header);
+
+                        String jsonResponse = gson.toJson(jsonObject);
+
+                        pw.println(jsonResponse);
+
+                        // dbc.insertMessage(msg);
+
+                        // dbc.insertMessage(msg);
+
+                        System.out.println("cte" + data.get("content"));
+                        break;
+                    }
                     default:
                         break;
                 }

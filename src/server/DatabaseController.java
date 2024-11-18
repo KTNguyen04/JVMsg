@@ -340,6 +340,78 @@ class DatabaseController {
         return false;
     }
 
+    boolean editUser(User user, String newPassword) {
+
+        if (!newPassword.equals("")) {
+            if (!checkLogin(user.getUsername(), user.getPassword())) {
+                System.out.println("CHECK");
+                return false;
+            }
+        }
+
+        Connection connection = connect();
+
+        String query = String.format("update %s.%s " +
+                "set password = ?, " +
+                "fullname = ?, " +
+                "address = ?, " +
+                "gender = ?, " +
+                "dob = ?, " +
+                "email = ? " +
+                "where username=?;", this.USERS, "USER");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+            pstm.setString(1, hashedPassword);
+            pstm.setString(2, user.getFullname());
+            pstm.setString(3, user.getAddress());
+            pstm.setString(4, user.getGender());
+            pstm.setString(5, user.getDob());
+            pstm.setString(6, user.getEmail());
+            pstm.setString(7, user.getUsername());
+
+            // stm.setString(2, password);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     boolean insertOnline(String username, String ip) {
         Connection connection = connect();
 
@@ -408,19 +480,7 @@ class DatabaseController {
             if (rs.next()) {
                 if (BCrypt.checkpw(password, rs.getString("password")))
                     return true;
-
-                // HashMap<String, String> data = new HashMap<>();
-                // data.put("header", "logined");
-                // data.put("username", username);
-                // data.put("fullname", fullname);
-                // data.put("address", address);
-                // data.put("email", email);
-                // data.put("dob", dob);
-                // data.put("gender", gender);
-                // data.put("password", password);
-
-                // Gson gson = new Gson();
-                // String json = gson.toJson(signupData);
+                return false;
 
             }
             return false;
