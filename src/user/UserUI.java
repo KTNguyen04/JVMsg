@@ -375,6 +375,10 @@ class UserView {
             passwordField.setMargin(new Insets(5, 5, 5, 5));
             passwordField.setMaximumSize(passwordField.getPreferredSize());
 
+            JLabel messageHolder = new JLabel("");
+            messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            messageHolder.setForeground(Color.decode("#198754"));
+
             JButton submitButton = new JButton("Sign Up");
             submitButton.setFont(new Font("Nunito Sans", Font.BOLD, 20));
             submitButton.setBackground(new Color(127, 38, 91));
@@ -383,10 +387,26 @@ class UserView {
             submitButton.setMaximumSize(new Dimension(380, 40));
             submitButton.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
-                    SocketController sc = new SocketController();
-                    String packet = getSignUpData();
-                    sc.sendRequest(packet);
-                    sc.close();
+                    new Thread(() -> {
+                        SocketController sc = new SocketController();
+                        String packet = getSignUpData();
+                        sc.sendRequest(packet);
+
+                        String res = sc.getResponse();
+                        sc.close();
+                        Gson gson = new Gson();
+
+                        // System.out.println(res);
+                        JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = jsonObject.get("header").getAsString();
+                        if (resHeader.equals("signuped")) {
+                            // System.out.println("Break1");
+
+                            messageHolder.setText("SIGN UP SUCCESSFUL");
+                            // System.out.println("Break2");
+                        }
+                        // cardLO.show(panel, "HOME");
+                    }).start();
                 }
             });
 
@@ -459,7 +479,10 @@ class UserView {
             rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 
             rightPanel.add(submitButton);
-            rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+            rightPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+            rightPanel.add(messageHolder);
+            // rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 
             rightPanel.add(loginInstruction);
             rightPanel.add(Box.createVerticalGlue());

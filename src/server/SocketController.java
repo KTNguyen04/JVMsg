@@ -140,15 +140,23 @@ class SocketController {
                 // }
 
                 switch (data.get("header")) {
-                    case "signup":
+                    case "signup": {
                         System.out.println("Signuphandle");
                         User usr = gson.fromJson(json, User.class);
-                        dbc.insertUser(usr);
+                        String header = "";
+                        if (dbc.insertUser(usr)) {
+                            header = "signuped";
+                        } else {
+                            header = "nosignup";
+                        }
+                        String wrappedJson = gson.toJson(Map.of("header", header));
+                        pw.println(wrappedJson);
 
                         // dbc.insertUser()
 
                         break;
-                    case "login":
+                    }
+                    case "login": {
                         String username = data.get("username");
                         String password = data.get("password");
                         if (dbc.checkLogin(username, password)) {
@@ -177,8 +185,9 @@ class SocketController {
                         }
 
                         break;
+                    }
 
-                    case "messages":
+                    case "messages": {
                         String messages = dbc.getUserMessage(data.get("username1"), data.get("username2"));
                         // String userFriends = dbc.getUserFriends(username);
                         // String header = "messagesed";
@@ -194,7 +203,8 @@ class SocketController {
 
                         System.out.println("message test");
                         break;
-                    case "chat":
+                    }
+                    case "chat": {
                         // Gson gson = new Gson();
                         Message msg = gson.fromJson(json, Message.class);
                         dbc.insertMessage(msg);
@@ -203,7 +213,7 @@ class SocketController {
 
                         System.out.println("cte" + data.get("content"));
                         break;
-
+                    }
                     default:
                         break;
                 }
