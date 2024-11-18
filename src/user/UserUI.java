@@ -19,6 +19,9 @@ import com.toedter.calendar.JDateChooser;
 import java.util.*;
 import java.util.Date;
 import config.AppConfig;
+
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -126,6 +129,7 @@ class UserView {
                     new Thread(() -> {
                         SocketController sc = new SocketController();
                         String packet = getLogInData();
+                        String password = passwordField.getText();
                         // System.out.println(packet);
                         sc.sendRequest(packet);
 
@@ -139,7 +143,7 @@ class UserView {
                         if (resHeader.equals("logined")) {
                             // System.out.println("Break1");
                             user = gson.fromJson(res, User.class);
-
+                            user.setPassword(password);
                             panel.add("HOME", new HomePanel());
 
                             cardLO.show(panel, "HOME");
@@ -353,6 +357,7 @@ class UserView {
             femaleRadio = new JRadioButton("Female");
             maleRadio.setBackground(Color.WHITE);
             maleRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            maleRadio.setSelected(true);
             femaleRadio.setBackground(Color.WHITE);
             femaleRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             ButtonGroup bg = new ButtonGroup();
@@ -402,7 +407,7 @@ class UserView {
                         if (resHeader.equals("signuped")) {
                             // System.out.println("Break1");
 
-                            messageHolder.setText("SIGN UP SUCCESSFUL");
+                            messageHolder.setText("SIGN UP SUCCESSFULLY");
                             // System.out.println("Break2");
                         }
                         // cardLO.show(panel, "HOME");
@@ -505,19 +510,11 @@ class UserView {
             String gender = maleRadio.isSelected() ? "male" : "female";
             String password = passwordField.getText();
 
-            User user = new User(username, fullname, address, email, dob, gender);
-            user.setPassword(password);
-            // signupData.put("header", "signup");
-            // signupData.put("username", username);
-            // signupData.put("fullname", fullname);
-            // signupData.put("address", address);
-            // signupData.put("email", email);
-            // signupData.put("dob", dob);
-            // signupData.put("gender", gender);
-            // signupData.put("password", password);
+            User usr = new User(username, fullname, address, email, dob, gender);
+            usr.setPassword(password);
 
             Gson gson = new Gson();
-            String json = gson.toJson(user);
+            String json = gson.toJson(usr);
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 
             jsonObject.addProperty("header", "signup");
@@ -821,23 +818,25 @@ class UserView {
             dPanel.setLayout(new BoxLayout(dPanel, BoxLayout.Y_AXIS));
 
             JLabel usernameLabel = new JLabel("Username");
-            usernameLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+            usernameLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel usnField = new JLabel(user.getUsername());
             usnField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            usnField.setMaximumSize(usnField.getPreferredSize());
+            // usnField.setMaximumSize(new);
 
             JLabel fullnameLabel = new JLabel("Full name");
-            fullnameLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+            fullnameLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
 
             JTextField fnField = new JTextField(40);
             fnField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             fnField.setText(user.getFullname());
 
             fnField.setMaximumSize(fnField.getPreferredSize());
+            // fnField.setMaximumSize(fnField);
 
             JLabel addressLabel = new JLabel("Address");
-            addressLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+            addressLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
 
             JTextField addrField = new JTextField(40);
             addrField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
@@ -846,25 +845,55 @@ class UserView {
             addrField.setMaximumSize(addrField.getPreferredSize());
 
             JLabel dobLabel = new JLabel("Date of Birth");
-            dobLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+            dobLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
 
-            JTextField dField = new JTextField(40);
+            // JTextField dField = new JTextField(40);
+            // dField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // dField.setText(user.getDob());
+
+            // dField.setMaximumSize(dField.getPreferredSize());
+
+            JDateChooser dField = new JDateChooser();
+            dField.setMaximumSize(new Dimension(800, 30));
+            dField.setPreferredSize(new Dimension(800, 30));
+
             dField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            dField.setText(user.getDob());
-
-            dField.setMaximumSize(dField.getPreferredSize());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                dField.setDate(sdf.parse(user.getDob()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             JLabel genderLabel = new JLabel("Gender");
-            genderLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+            genderLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
 
-            JTextField gField = new JTextField(40);
-            gField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            gField.setText(user.getGender());
+            // JTextField gField = new JTextField(40);
+            // gField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // gField.setText(user.getGender());
 
-            gField.setMaximumSize(gField.getPreferredSize());
+            // gField.setMaximumSize(gField.getPreferredSize());
+
+            JRadioButton mRadio = new JRadioButton("Male");
+            JRadioButton fRadio = new JRadioButton("Female");
+
+            mRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            mRadio.setSelected(user.getGender().equals("male"));
+            fRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            fRadio.setSelected(user.getGender().equals("female"));
+
+            ButtonGroup bg = new ButtonGroup();
+            bg.add(mRadio);
+            bg.add(fRadio);
+            JPanel genderRow = new JPanel();
+            genderRow.add(mRadio);
+            genderRow.add(fRadio);
+            genderRow.setMaximumSize(genderRow.getPreferredSize());
+
+            // genderRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             JLabel emailLabel = new JLabel("Email");
-            emailLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+            emailLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
 
             JTextField emField = new JTextField(40);
             emField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
@@ -872,9 +901,133 @@ class UserView {
 
             emField.setMaximumSize(emField.getPreferredSize());
 
-            dialog.setSize(500, 600);
+            JLabel curPasswordLabel = new JLabel("Current password");
+            curPasswordLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+
+            JTextField curPasswordField = new JTextField(40);
+            curPasswordField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // curPasswordField.setText(user.getEmail());
+            curPasswordField.setMaximumSize(emField.getPreferredSize());
+
+            JLabel newPasswordLabel = new JLabel("New password");
+            newPasswordLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+
+            JTextField newPasswordField = new JTextField(40);
+            newPasswordField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            // newPasswordField.setText(user.getEmail());
+
+            newPasswordField.setMaximumSize(emField.getPreferredSize());
+
+            JLabel messageHolder = new JLabel("test");
+            messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 18));
+
+            JButton saveButton = new JButton("SAVE CHANGE");
+            saveButton.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            saveButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent me) {
+                    boolean flag = true;
+
+                    HashMap<String, String> editData = new HashMap<>();
+                    String username = usnField.getText();
+                    String fullname = fnField.getText();
+                    String address = addrField.getText();
+                    String email = emField.getText();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String dob = sdf.format(dField.getDate());
+                    String gender = mRadio.isSelected() ? "male" : "female";
+                    String curPassword = curPasswordField.getText();
+                    String newPassword = newPasswordField.getText();
+
+                    editData.put("username", username);
+                    editData.put("fullname", fullname);
+                    editData.put("address", address);
+                    editData.put("email", email);
+                    editData.put("dob", dob);
+                    editData.put("gender", gender);
+
+                    for (Map.Entry<String, String> entry : editData.entrySet()) {
+                        if (entry.getValue().equals("")) {
+                            messageHolder.setText("Empty fields are not allowed");
+                            messageHolder.setForeground(Color.RED);
+                            flag = false;
+                            break;
+                        }
+                    }
+
+                    if (!curPassword.equals("")) {
+                        if (newPassword.equals("")) {
+                            messageHolder.setText("<html>" + messageHolder.getText()
+                                    + "<br/>Empty new password are not allowed<html/>");
+                            messageHolder.setForeground(Color.RED);
+                            flag = false;
+
+                        }
+
+                    }
+                    System.out.println("pw" + user.getPassword());
+
+                    if (curPassword.equals("") && newPassword.equals("")) {
+                        curPassword = newPassword = user.getPassword();
+                    }
+                    System.out.println("cur" + curPassword.equals(""));
+
+                    editData.put("password", curPassword);
+                    editData.put("newPassword", newPassword);
+                    System.out.println("cur" + curPassword.equals(""));
+
+                    if (flag) {
+                        Gson gson = new Gson();
+                        String json = gson.toJson(editData);
+                        System.out.println("js" + json + "cur: " + curPassword);
+                        System.out.println("cur" + curPassword.equals(""));
+
+                        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+
+                        jsonObject.addProperty("header", "edit");
+
+                        SocketController sc = new SocketController();
+                        sc.sendRequest(jsonObject.toString());
+
+                        String res = sc.getResponse();
+                        sc.close();
+
+                        System.out.println(res);
+                        jsonObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = jsonObject.get("header").getAsString();
+                        if (resHeader.equals("edited")) {
+                            // System.out.println("Break1");
+                            String pass = newPassword;
+                            System.out.println("new" + pass);
+                            user = gson.fromJson(res, User.class);
+                            user.setPassword(pass);
+
+                            messageHolder.setText("EDITED SUCCESSFULLY");
+                            messageHolder.setForeground(Color.decode("#198754"));
+
+                            // System.out.println("Break2");
+                            revalidate();
+                            repaint();
+
+                        } else {
+                            messageHolder.setText("EDITED FAILED");
+                            messageHolder.setForeground(Color.RED);
+
+                        }
+
+                    }
+
+                    // return jsonObject.toString();
+                }
+            });
+
+            // messageHolder.setForeground(Color.decode("#ffc107"));
+
+            dialog.setSize(500, 700);
 
             dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+            saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             dPanel.add(usernameLabel);
             dPanel.add(usnField);
@@ -885,9 +1038,16 @@ class UserView {
             dPanel.add(dobLabel);
             dPanel.add(dField);
             dPanel.add(genderLabel);
-            dPanel.add(gField);
+            dPanel.add(genderRow);
             dPanel.add(emailLabel);
             dPanel.add(emField);
+            dPanel.add(curPasswordLabel);
+            dPanel.add(curPasswordField);
+            dPanel.add(newPasswordLabel);
+            dPanel.add(newPasswordField);
+            dPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+            dPanel.add(saveButton);
+            dPanel.add(messageHolder);
 
             dialog.add(dPanel);
 
