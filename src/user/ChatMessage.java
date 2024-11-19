@@ -1,12 +1,12 @@
 package user;
 
-public class Message {
+public class ChatMessage {
     private String from;
     private String to;
     private String content;
     private String time_stamp;
 
-    public Message(String from, String to, String content, String timeStamp) {
+    public ChatMessage(String from, String to, String content, String timeStamp) {
         this.from = from;
         this.to = to;
         this.content = content;

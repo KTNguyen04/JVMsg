@@ -1,13 +1,19 @@
 package server;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
 import com.google.gson.*;
 
-import user.Message;
-import user.User;
+import config.AppConfig;
+
+import javax.mail.*;
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
+import javax.mail.internet.*;
+import user.*;
 
 class SocketController {
     private int port;
@@ -19,6 +25,7 @@ class SocketController {
     private ArrayList<ChatSocketThread> chatClients;
     private int numberClients;
     private DatabaseController dbc;
+    private Dotenv dotenv = Dotenv.load();
 
     String curAccepted;
 
@@ -147,6 +154,7 @@ class SocketController {
                         if (dbc.insertUser(usr)) {
                             header = "signuped";
                         } else {
+                            System.out.println("aba");
                             header = "nosignup";
                         }
                         String wrappedJson = gson.toJson(Map.of("header", header));
@@ -206,7 +214,7 @@ class SocketController {
                     }
                     case "chat": {
                         // Gson gson = new Gson();
-                        Message msg = gson.fromJson(json, Message.class);
+                        ChatMessage msg = gson.fromJson(json, ChatMessage.class);
                         dbc.insertMessage(msg);
 
                         // dbc.insertMessage(msg);
@@ -244,6 +252,37 @@ class SocketController {
                         System.out.println("cte" + data.get("content"));
                         break;
                     }
+                    case "reset": {
+                        String username = data.get("username");
+                        String email = data.get("email");
+                        String header = "";
+                        String pwd = passwordUsingName(username);
+                        if (dbc.checkReset(username, email)) {
+
+                            header = "reseted";
+                            String body = "<html><body>" +
+                                    "<h1>Hello there!</h1>" +
+                                    "<p>This is your new password</p>"
+                                    +
+                                    "<p>" + pwd + "</p>"
+                                    +
+                                    "<p>Thank you!</p>" +
+                                    "</body></html>";
+                            System.out.println("reset");
+                            sendEmail(email,
+                                    "[JVMsg] Reset Password", body);
+
+                            dbc.editPassword(username, pwd);
+
+                        } else {
+                            header = "noreset";
+                        }
+                        JsonObject jsonResponseObject = new JsonObject();
+                        jsonResponseObject.addProperty("header", header);
+                        String jsonResponse = gson.toJson(jsonResponseObject);
+                        pw.println(jsonResponse);
+
+                    }
                     default:
                         break;
                 }
@@ -260,6 +299,20 @@ class SocketController {
                 // }
             }
 
+        }
+
+        static String passwordUsingName(String Name) {
+
+            String initials = Name.substring(0, 1).toUpperCase() + Name.substring(1, Math.min(Name.length(), 4));
+
+            Random random = new Random();
+            int randomNumber = 1000 + random.nextInt(9000);
+
+            String generatedString = initials + randomNumber;
+
+            System.out.println(generatedString);
+
+            return generatedString;
         }
 
         // String getUserData(String username) {
@@ -305,7 +358,7 @@ class SocketController {
                     // String ;
                     System.out.println(message);
                     Gson gson = new Gson();
-                    Message msg = gson.fromJson(message, Message.class);
+                    ChatMessage msg = gson.fromJson(message, ChatMessage.class);
                     // System.out.println("thr" + msg.getContent() + msg.getTimeStamp());
                     for (ChatSocketThread sct : chatClients) {
                         System.out.println(sct.getSocketThreadName());
@@ -322,6 +375,69 @@ class SocketController {
 
         }
 
+    }
+
+    void sendEmail(String to, String subject, String body) {
+
+        // Sender's email ID needs to be mentioned
+        String username = dotenv.get("username");
+        String password = dotenv.get("password");
+        String from = username;
+        // Assuming you are sending email from through gmails smtp
+        String host = "smtp.gmail.com";
+
+        // Get system properties
+        Properties properties = System.getProperties();
+
+        // Setup mail server
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", "587");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.ssl.protocols", "TLSv1.2");
+
+        // Get the Session object.// and pass username and password
+        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+
+            protected PasswordAuthentication getPasswordAuthentication() {
+
+                return new PasswordAuthentication(username, password);
+
+            }
+
+        });
+
+        // Used to debug SMTP issues
+        session.setDebug(true);
+
+        try {
+            // Create a default MimeMessage object.
+            MimeMessage message = new MimeMessage(session);
+
+            // Set From: header field of the header.
+            message.setFrom(new InternetAddress(from));
+
+            // Set To: header field of the header.
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+
+            // Set Subject: header field
+            message.setSubject(subject);
+
+            // Now set the actual message
+            // message.setText("This is actual message");
+
+            // Send the actual HTML message.
+            message.setContent(
+                    body,
+                    "text/html");
+
+            // System.out.println("sending...");
+            // Send message
+            Transport.send(message);
+            // System.out.println("Sent message successfully....");
+        } catch (MessagingException mex) {
+            mex.printStackTrace();
+        }
     }
 
 }

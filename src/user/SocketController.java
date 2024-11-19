@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.*;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
@@ -23,7 +24,7 @@ class SocketController {
     private Socket cSocket;
     // private CountDownLatch latch = new CountDownLatch(1);
 
-    private Consumer<Message> addMessageCallback;
+    private Consumer<ChatMessage> addMessageCallback;
 
     int chatPort;
 
@@ -75,7 +76,7 @@ class SocketController {
 
     }
 
-    void setAddMessageCallback(Consumer<Message> addMessageCallback) {
+    void setAddMessageCallback(Consumer<ChatMessage> addMessageCallback) {
         this.addMessageCallback = addMessageCallback;
     }
 
@@ -138,7 +139,7 @@ class SocketController {
                     while ((message = chatBR.readLine()) != null) {
 
                         Gson gson = new Gson();
-                        Message msg = gson.fromJson(message, Message.class);
+                        ChatMessage msg = gson.fromJson(message, ChatMessage.class);
 
                         UserView.user.addMessage(msg);
                     }
