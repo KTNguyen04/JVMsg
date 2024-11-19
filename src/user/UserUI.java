@@ -118,6 +118,29 @@ class UserView {
             passwordField.setMargin(new Insets(5, 5, 5, 5));
             passwordField.setMaximumSize(passwordField.getPreferredSize());
 
+            JLabel forgetText = new JLabel("Forgot your password?");
+
+            forgetText.setFont(new Font("Nunito Sans", Font.BOLD, 15));
+            forgetText.setForeground(new Color(127, 38, 91));
+            forgetText.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            forgetText.addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent me) {
+                    forgetText.setText("<html><u>Forgot your password?</u></html>");
+                }
+
+                public void mouseExited(MouseEvent me) {
+                    forgetText.setText("<html>Forgot your password?</html>");
+                }
+
+                public void mouseClicked(MouseEvent me) {
+                    JDialog resetPassDialog = createResetPasswordDialog();
+                    resetPassDialog.setVisible(true);
+                    // cardLO.show(panel, "SIGNUP");
+                }
+
+            });
+
             JButton submitButton = new JButton("Login");
             submitButton.setFont(new Font("Nunito Sans", Font.BOLD, 20));
             submitButton.setBackground(new Color(127, 38, 91));
@@ -140,6 +163,7 @@ class UserView {
                         // System.out.println(res);
                         JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = jsonObject.get("header").getAsString();
+
                         if (resHeader.equals("logined")) {
                             // System.out.println("Break1");
                             user = gson.fromJson(res, User.class);
@@ -218,6 +242,7 @@ class UserView {
             rightPanel.add(passwordLabel);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             rightPanel.add(passwordField);
+            rightPanel.add(forgetText);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 60)));
             rightPanel.add(submitButton);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 60)));
@@ -257,15 +282,100 @@ class UserView {
 
         }
 
-        static Color randomColor() {
-            // Tạo đối tượng Random
-            Random rand = new Random();
+        JDialog createResetPasswordDialog() {
+            JDialog dialog = new JDialog(frame, "User info");
+            JPanel dPanel = new JPanel();
+            dPanel.setLayout(new BoxLayout(dPanel, BoxLayout.Y_AXIS));
 
-            int red = rand.nextInt(256);
-            int green = rand.nextInt(256);
-            int blue = rand.nextInt(256);
+            JLabel confirmText = new JLabel("Send new password through your email?");
+            confirmText.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            confirmText.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            return new Color(red, green, blue);
+            JLabel usrnLabel = new JLabel("Enter your username");
+            usrnLabel.setFont(new Font("Nunito Sans", Font.BOLD, 20));
+            usrnLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JTextField usrnField = new JTextField();
+            usrnField.setFont(new Font("Nunito Sans", Font.BOLD, 20));
+            usrnField.setAlignmentX(Component.CENTER_ALIGNMENT);
+            usrnField.setMaximumSize(new Dimension(400, 35));
+
+            JLabel emailLabel = new JLabel("Enter your registered email");
+            emailLabel.setFont(new Font("Nunito Sans", Font.BOLD, 20));
+            emailLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JTextField emailField = new JTextField();
+            emailField.setFont(new Font("Nunito Sans", Font.BOLD, 20));
+            emailField.setAlignmentX(Component.CENTER_ALIGNMENT);
+            emailField.setMaximumSize(new Dimension(400, 35));
+
+            JLabel messageHolder = new JLabel("");
+            messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 20));
+            messageHolder.setForeground(Color.decode("#198754"));
+            messageHolder.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JButton sendBtn = new JButton("Send");
+            sendBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            sendBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            sendBtn.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent me) {
+                    HashMap<String, String> resetData = new HashMap<>();
+
+                    String email = emailField.getText();
+                    String usrn = usrnField.getText();
+
+                    resetData.put("header", "reset");
+                    resetData.put("username", usrn);
+                    resetData.put("email", email);
+                    Gson gson = new Gson();
+
+                    String json = gson.toJson(resetData);
+
+                    SocketController sc = new SocketController();
+
+                    sc.sendRequest(json);
+                    String res = sc.getResponse();
+                    JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
+                    String resHeader = jsonObject.get("header").getAsString();
+
+                    if (resHeader.equals("reseted")) {
+                        messageHolder.setText("SENT");
+                        messageHolder.setForeground(Color.decode("#198754"));
+
+                    } else {
+                        messageHolder.setText("CANNOT FIND YOUR USERNAME OR PASSWORD");
+                        messageHolder.setForeground(randomColor());
+                    }
+
+                    sc.close();
+
+                }
+            });
+
+            // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            dialog.setSize(500, 300);
+
+            dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+            dPanel.add(confirmText);
+            dPanel.add(usrnLabel);
+            dPanel.add(usrnField);
+            dPanel.add(emailLabel);
+            dPanel.add(emailField);
+            dPanel.add(sendBtn);
+            dPanel.add(messageHolder);
+
+            dialog.add(dPanel);
+
+            dialog.setLocationRelativeTo(null); // center the frame
+
+            dialog.setResizable(false);
+
+            // System.out.println(user.getFriends().get(0));
+
+            return dialog;
         }
 
         // void sendLoginRequest() {
@@ -408,8 +518,15 @@ class UserView {
                             // System.out.println("Break1");
 
                             messageHolder.setText("SIGN UP SUCCESSFULLY");
+                            messageHolder.setForeground(Color.decode("#198754"));
+
                             // System.out.println("Break2");
+
+                        } else {
+                            messageHolder.setText("SIGNUP FAILED");
+                            messageHolder.setForeground(randomColor());
                         }
+
                         // cardLO.show(panel, "HOME");
                     }).start();
                 }
@@ -424,6 +541,7 @@ class UserView {
             instructionText.setForeground(new Color(127, 38, 91));
             instructionText.setCursor(new Cursor(Cursor.HAND_CURSOR));
             instructionText.addMouseListener(new MouseAdapter() {
+
                 public void mouseEntered(MouseEvent me) {
                     instructionText.setText("<html><u>Log in</u></html>");
                 }
@@ -497,7 +615,7 @@ class UserView {
         }
 
         String getSignUpData() {
-            HashMap<String, String> signupData = new HashMap<>();
+            // HashMap<String, String> signupData = new HashMap<>();
             // registrationData.put("username", "user123");
             // registrationData.put("email", "user@example.com");
             // registrationData.put("password", "securePassword");
@@ -676,14 +794,14 @@ class UserView {
                             String res = sc.getResponse();
                             System.out.println("msg" + res);
                             Gson gson = new Gson();
-                            Type messageListType = new TypeToken<ArrayList<Message>>() {
+                            Type messageListType = new TypeToken<ArrayList<ChatMessage>>() {
                             }.getType();
 
                             // Parse the JSON into an ArrayList of Message objects
-                            ArrayList<Message> messages = gson.fromJson(res, messageListType);
+                            ArrayList<ChatMessage> messages = gson.fromJson(res, messageListType);
                             // usr.setMessages(messages);
 
-                            messages.forEach((Message m) -> {
+                            messages.forEach((ChatMessage m) -> {
                                 System.out.println(m.getContent());
                             });
 
@@ -776,9 +894,9 @@ class UserView {
         void addMessages() {
             chatMessagePanel.removeAll();
 
-            ArrayList<Message> messages = user.getMessages();
+            ArrayList<ChatMessage> messages = user.getMessages();
 
-            messages.forEach((Message msg) -> {
+            messages.forEach((ChatMessage msg) -> {
                 JLabel msgL = new JLabel(msg.getContent());
                 msgL.setFont(new Font("Nunito Sans", Font.PLAIN, 16));
 
@@ -804,7 +922,7 @@ class UserView {
             chatMessagePanel.repaint();
         }
 
-        void addMessage(Message msg) {
+        void addMessage(ChatMessage msg) {
             user.addMessage(msg);
             addMessages();
             // chatMessagePanel.revalidate();
@@ -1003,7 +1121,7 @@ class UserView {
                             user.setPassword(pass);
 
                             messageHolder.setText("EDITED SUCCESSFULLY");
-                            messageHolder.setForeground(Color.decode("#198754"));
+                            messageHolder.setForeground(randomColor());
 
                             // System.out.println("Break2");
                             revalidate();
@@ -1011,7 +1129,7 @@ class UserView {
 
                         } else {
                             messageHolder.setText("EDITED FAILED");
-                            messageHolder.setForeground(Color.RED);
+                            messageHolder.setForeground(randomColor());
 
                         }
 
@@ -1097,7 +1215,7 @@ class UserView {
 
                     packet.put("time_stamp", dtf.format(now));
                     packet.put("header", "chat");
-                    Message msg = new Message(user.getUsername(), curPeer, textArea.getText(), dtf.format(now));
+                    ChatMessage msg = new ChatMessage(user.getUsername(), curPeer, textArea.getText(), dtf.format(now));
                     Gson gson = new Gson();
                     String json = gson.toJson(packet);
                     System.out.println(json);
@@ -1118,5 +1236,17 @@ class UserView {
 
             return panel;
         }
+
+    }
+
+    static Color randomColor() {
+        // Tạo đối tượng Random
+        Random rand = new Random();
+
+        int red = rand.nextInt(256);
+        int green = rand.nextInt(256);
+        int blue = rand.nextInt(256);
+
+        return new Color(red, green, blue);
     }
 }

@@ -16,7 +16,7 @@ public class User {
 
     ArrayList<User> friends;
 
-    ArrayList<Message> messages;
+    ArrayList<ChatMessage> messages;
     private MessageListener listener;
 
     @Override
@@ -85,15 +85,15 @@ public class User {
         this.friends = friends;
     }
 
-    public void setMessages(ArrayList<Message> messages) {
+    public void setMessages(ArrayList<ChatMessage> messages) {
         this.messages = messages;
     }
 
-    public ArrayList<Message> getMessages() {
+    public ArrayList<ChatMessage> getMessages() {
         return messages;
     }
 
-    void addMessage(Message msg) {
+    void addMessage(ChatMessage msg) {
         messages.add(msg);
         notifyListener();
     }

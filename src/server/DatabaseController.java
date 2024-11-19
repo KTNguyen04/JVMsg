@@ -1,7 +1,7 @@
 package server;
 
 import user.User;
-import user.Message;
+import user.ChatMessage;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -91,7 +91,7 @@ class DatabaseController {
         return "";
     }
 
-    boolean insertMessage(Message msg) {
+    boolean insertMessage(ChatMessage msg) {
         Connection connection = connect();
 
         String query = String.format("INSERT INTO %s.%s " +
@@ -231,7 +231,7 @@ class DatabaseController {
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
-        ArrayList<Message> messages = new ArrayList<>();
+        ArrayList<ChatMessage> messages = new ArrayList<>();
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username1);
@@ -246,7 +246,7 @@ class DatabaseController {
                 String timeStamp = rs.getString("time_stamp");
                 String content = rs.getString("content");
 
-                Message msg = new Message(from, to, content, timeStamp);
+                ChatMessage msg = new ChatMessage(from, to, content, timeStamp);
                 messages.add(msg);
 
             }
@@ -284,6 +284,11 @@ class DatabaseController {
     }
 
     boolean insertUser(User user) {
+
+        if (checkExistAcc(user.getUsername())) {
+            System.out.println("exist");
+            return false;
+        }
         Connection connection = connect();
 
         String query = String.format("INSERT INTO %s.%s (username, password, fullname, address, gender, dob,email) " +
@@ -311,7 +316,9 @@ class DatabaseController {
 
                 return true;
             }
+
             connection.close();
+            return false;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -372,6 +379,60 @@ class DatabaseController {
             pstm.setString(5, user.getDob());
             pstm.setString(6, user.getEmail());
             pstm.setString(7, user.getUsername());
+
+            // stm.setString(2, password);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    boolean editPassword(String username, String password) {
+        Connection connection = connect();
+
+        String query = String.format("update %s.%s " +
+                "set password = ? " +
+                "where username=?;", this.USERS, "USER");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+            pstm.setString(1, hashedPassword);
+            pstm.setString(2, username);
 
             // stm.setString(2, password);
 
@@ -479,6 +540,105 @@ class DatabaseController {
 
             if (rs.next()) {
                 if (BCrypt.checkpw(password, rs.getString("password")))
+                    return true;
+                return false;
+
+            }
+            return false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+
+    }
+
+    boolean checkExistAcc(String username) {
+        Connection connection = connect();
+
+        String query = String.format("select username from %s.%s where username= ?", this.USERS, "USER");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username);
+            // pstm.setString(2, password);
+            // stm.setString(2, password);
+
+            rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                return true;
+            }
+            return false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    boolean checkReset(String username, String email) {
+        Connection connection = connect();
+
+        String query = String.format("select email from %s.%s where username= ?", this.USERS, "USER");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username);
+            // pstm.setString(2, password);
+            // stm.setString(2, password);
+
+            rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("has usrn");
+                if (rs.getString("email").equals(email))
                     return true;
                 return false;
 
