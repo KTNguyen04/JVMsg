@@ -1,5 +1,0 @@
-package admin;
-
-class Admin {
-
-}
