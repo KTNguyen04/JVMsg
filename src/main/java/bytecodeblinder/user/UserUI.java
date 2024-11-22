@@ -783,15 +783,47 @@ class UserView {
             friendsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             friendsLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, friendsLabel.getPreferredSize().height));
 
-            // JScrollPane friendListScroll = createFriendListPanel();
+            JPanel searchPanel = new JPanel();
+            searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
+            searchPanel.setMaximumSize(new Dimension(400, 30));
 
+            ArrayList<User> friendList = user.getFriends();
             JPanel friendListPanel = new JPanel();
             friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
             JScrollPane friendListScroll = new JScrollPane(friendListPanel);
             friendListScroll.getVerticalScrollBar().setUnitIncrement(16);
 
             // friendsLabel.setForeground(new Color(82, 82, 82));
-            ArrayList<User> friendList = user.getFriends();
+            renderFriendList(friendList, friendListPanel);
+
+            JTextField searchField = new JTextField(20);
+            searchField.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchPanel.add(searchField);
+
+            JButton searchButton = new JButton("Search");
+            searchButton.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    System.out.println("fileter");
+                    ArrayList<User> filteredList = filterFriends(friendList, searchField.getText());
+                    renderFriendList(filteredList, friendListPanel);
+
+                }
+            });
+            searchPanel.add(searchButton);
+
+            // JScrollPane friendListScroll = createFriendListPanel();
+
+            friendsPanel.add(friendsLabel);
+            friendsPanel.add(searchPanel);
+            friendsPanel.add(friendListScroll);
+            return friendsPanel;
+
+        }
+
+        void renderFriendList(ArrayList<User> friendList, JPanel friendListPanel) {
+            friendListPanel.removeAll();
             friendList.forEach((User usr) -> {
 
                 JButton btn = new JButton(
@@ -807,50 +839,68 @@ class UserView {
                 btn.setMaximumSize(new Dimension(400, 80));
                 btn.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent me) {
-                        chatLabel.setText(usr.getUsername() + " - Chatting");
-                        // chatPanel.setMaximumSize(new Dimension(500,
-                        // chatLabel.getPreferredSize().height));
+                        if (me.getButton() == MouseEvent.BUTTON1) {
+                            chatLabel.setText(usr.getUsername() + " - Chatting");
+                            // chatPanel.setMaximumSize(new Dimension(500,
+                            // chatLabel.getPreferredSize().height));
 
-                        // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                            // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-                        new Thread(() -> {
-                            SocketController sc = new SocketController();
-                            String packet = createMessageReq(user.getUsername(), usr.getUsername());
-                            System.out.println(packet);
-                            sc.sendRequest(packet);
+                            new Thread(() -> {
+                                SocketController sc = new SocketController();
+                                String packet = createMessageReq(user.getUsername(), usr.getUsername());
+                                System.out.println(packet);
+                                sc.sendRequest(packet);
 
-                            String res = sc.getResponse();
-                            System.out.println("msg" + res);
-                            Gson gson = new Gson();
-                            Type messageListType = new TypeToken<ArrayList<ChatMessage>>() {
-                            }.getType();
+                                String res = sc.getResponse();
+                                System.out.println("msg" + res);
+                                Gson gson = new Gson();
+                                Type messageListType = new TypeToken<ArrayList<ChatMessage>>() {
+                                }.getType();
 
-                            // Parse the JSON into an ArrayList of Message objects
-                            ArrayList<ChatMessage> messages = gson.fromJson(res, messageListType);
-                            // usr.setMessages(messages);
+                                // Parse the JSON into an ArrayList of Message objects
+                                ArrayList<ChatMessage> messages = gson.fromJson(res, messageListType);
+                                // usr.setMessages(messages);
 
-                            messages.forEach((ChatMessage m) -> {
-                                System.out.println(m.getContent());
-                            });
+                                messages.forEach((ChatMessage m) -> {
+                                    System.out.println(m.getContent());
+                                });
 
-                            user.setMessages(messages);
-                            sc.close();
+                                user.setMessages(messages);
+                                sc.close();
 
-                            addMessages();
-                            curPeer = usr.getUsername();
-                            // chatMessagePanel.revalidate();
-                            // chatMessagePanel.repaint();
+                                addMessages();
+                                curPeer = usr.getUsername();
+                                // chatMessagePanel.revalidate();
+                                // chatMessagePanel.repaint();
 
-                        }).start();
+                            }).start();
+                        }
 
                     }
                 });
                 friendListPanel.add(btn);
             });
-            friendsPanel.add(friendsLabel);
-            friendsPanel.add(friendListScroll);
-            return friendsPanel;
 
+            friendListPanel.revalidate();
+            friendListPanel.repaint();
+
+        }
+
+        ArrayList<User> filterFriends(ArrayList<User> friends, String query) {
+            if (query.equals(""))
+                return friends;
+            ArrayList<User> resultList = new ArrayList<>();
+
+            for (User user : friends) {
+                // Kiểm tra nếu username hoặc fullname chứa query (case-insensitive)
+                if (user.getUsername().toLowerCase().contains(query.toLowerCase()) ||
+                        user.getFullname().toLowerCase().contains(query.toLowerCase())) {
+                    resultList.add(user);
+                }
+            }
+
+            return resultList;
         }
 
         String createMessageReq(String username1, String username2) {
