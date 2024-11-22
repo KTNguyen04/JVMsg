@@ -2,6 +2,7 @@ package bytecodeblinder.user;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.mysql.cj.protocol.MessageListener;
 
@@ -43,6 +44,12 @@ public class User {
         this.dob = dob;
         this.gender = gender;
         this.friends = null;
+    };
+
+    public User(String username,
+            String fullname) {
+        this.username = username;
+        this.fullname = fullname;
     };
 
     interface MessageListener {
@@ -117,6 +124,15 @@ public class User {
 
     boolean isOnline() {
         return this.isOnline;
+    }
+
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        User user = (User) obj;
+        return username != null && username.equals(user.username);
     }
 
     // public void setFullname(String fullname) {

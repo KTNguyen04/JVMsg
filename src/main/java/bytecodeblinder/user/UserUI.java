@@ -53,7 +53,6 @@ class UserView {
         frame.setLocationRelativeTo(null); // center the frame
 
         frame.setResizable(false);
-        mode = Mode.LOGIN;
 
         cardLO = new CardLayout();
         panel = new JPanel(cardLO);
@@ -63,12 +62,14 @@ class UserView {
         // panel.add("HOME", new HomePanel());
 
         cardLO.show(panel, "LOGIN");
+        mode = Mode.LOGIN;
         // new SignupPanel(panel);
         frame.add(panel);
         frame.setVisible(true);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
-                sendOffline();
+                if (mode == Mode.HOME)
+                    sendOffline();
                 System.out.println("test");
             }
         });
@@ -190,6 +191,7 @@ class UserView {
                             panel.add("HOME", new HomePanel());
 
                             cardLO.show(panel, "HOME");
+                            mode = Mode.HOME;
 
                             sc.openChatSocket();
                             chatPW = sc.getChatWriter();
@@ -234,6 +236,7 @@ class UserView {
 
                 public void mouseClicked(MouseEvent me) {
                     cardLO.show(panel, "SIGNUP");
+                    mode = Mode.SIGNUP;
                 }
 
             });
@@ -571,6 +574,7 @@ class UserView {
 
                 public void mouseClicked(MouseEvent me) {
                     cardLO.show(panel, "LOGIN");
+                    mode = Mode.LOGIN;
                 }
             });
             loginInstruction.setMaximumSize(new Dimension(400, 50));
@@ -734,6 +738,14 @@ class UserView {
 
             JLabel addFriendIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "add_friend.png"));
             addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            addFriendIcon.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    JDialog addFriendDialog = createAddFriendDialog();
+
+                    addFriendDialog.setVisible(true);
+                }
+            });
             JLabel friendsIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "friends.png"));
             friendsIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             JLabel unfriendIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "unfriend.png"));
@@ -756,6 +768,7 @@ class UserView {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     cardLO.show(panel, "LOGIN");
+                    mode = Mode.LOGIN;
                     sendOffline();
                 }
             });
@@ -783,10 +796,6 @@ class UserView {
             friendsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             friendsLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, friendsLabel.getPreferredSize().height));
 
-            JPanel searchPanel = new JPanel();
-            searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
-            searchPanel.setMaximumSize(new Dimension(400, 30));
-
             ArrayList<User> friendList = user.getFriends();
             JPanel friendListPanel = new JPanel();
             friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
@@ -795,6 +804,10 @@ class UserView {
 
             // friendsLabel.setForeground(new Color(82, 82, 82));
             renderFriendList(friendList, friendListPanel);
+
+            JPanel searchPanel = new JPanel();
+            searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
+            searchPanel.setMaximumSize(new Dimension(400, 30));
 
             JTextField searchField = new JTextField(20);
             searchField.setFont(new Font("Nunito Sans", Font.BOLD, 19));
@@ -805,8 +818,8 @@ class UserView {
             searchButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    System.out.println("fileter");
                     ArrayList<User> filteredList = filterFriends(friendList, searchField.getText());
+
                     renderFriendList(filteredList, friendListPanel);
 
                 }
@@ -884,6 +897,121 @@ class UserView {
 
             friendListPanel.revalidate();
             friendListPanel.repaint();
+
+        }
+
+        void renderFoundUserList(ArrayList<User> usrList, JPanel usrListPanel) {
+            usrListPanel.removeAll();
+            usrList.forEach((User usr) -> {
+
+                JLabel lb = new JLabel(
+                        "<html><b>" + usr.getUsername() + "</b><br/>" + usr.getFullname() + "</html>");
+                ;
+                lb.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+                lb.setAlignmentX(Component.CENTER_ALIGNMENT);
+                // btn.setPreferredSize(new Dimension(400, 100));
+
+                JButton btnAddFriend = new JButton("Add");
+                btnAddFriend.setFont(new Font("Nunito Sans", Font.PLAIN, 14));
+                btnAddFriend.setMaximumSize(new Dimension(150, 40));
+                btnAddFriend.setAlignmentX(Component.CENTER_ALIGNMENT);
+                btnAddFriend.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent me) {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "addfriend");
+                        jsonObject.addProperty("from", user.getUsername());
+                        jsonObject.addProperty("to", usr.getUsername());
+                        sc.sendRequest(jsonObject.toString());
+
+                        // String res = sc.getResponse();
+                        sc.close();
+
+                        // System.out.println(res);
+                        // JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        // String resHeader = resObject.get("header").getAsString();
+
+                        // if (resHeader.equals("findfriended")) {
+
+                        // JsonObject jo = JsonParser.parseString(res).getAsJsonObject();
+
+                        // JsonArray friendsArray = jo.getAsJsonArray("friends");
+
+                        // ArrayList<User> userList = new ArrayList<>();
+                        // Gson gson = new Gson();
+                        // for (int i = 0; i < friendsArray.size(); i++) {
+                        // // Chuyển mỗi phần tử trong JsonArray thành đối tượng User
+                        // User user = gson.fromJson(friendsArray.get(i), User.class);
+                        // userList.add(user);
+                        // }
+                        // System.out.println("kit");
+
+                        // renderFoundUserList(userList, usrListPanel);
+
+                        // }
+                    }
+                });
+
+                JPanel userRow = new JPanel();
+                userRow.setLayout(new BoxLayout(userRow, BoxLayout.X_AXIS));
+                userRow.setAlignmentX(Component.CENTER_ALIGNMENT);
+                userRow.setMaximumSize(new Dimension(400, 80));
+
+                userRow.add(lb);
+                userRow.add(Box.createHorizontalStrut(10));
+                userRow.add(btnAddFriend);
+
+                userRow.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+
+                userRow.setBackground(Color.lightGray); // M
+
+                // btn.addMouseListener(new MouseAdapter() {
+                // public void mouseClicked(MouseEvent me) {
+                // if (me.getButton() == MouseEvent.BUTTON1) {
+                // chatLabel.setText(usr.getUsername() + " - Chatting");
+                // // chatPanel.setMaximumSize(new Dimension(500,
+                // // chatLabel.getPreferredSize().height));
+
+                // // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                // new Thread(() -> {
+                // SocketController sc = new SocketController();
+                // String packet = createMessageReq(user.getUsername(), usr.getUsername());
+                // System.out.println(packet);
+                // sc.sendRequest(packet);
+
+                // String res = sc.getResponse();
+                // System.out.println("msg" + res);
+                // Gson gson = new Gson();
+                // Type messageListType = new TypeToken<ArrayList<ChatMessage>>() {
+                // }.getType();
+
+                // // Parse the JSON into an ArrayList of Message objects
+                // ArrayList<ChatMessage> messages = gson.fromJson(res, messageListType);
+                // // usr.setMessages(messages);
+
+                // messages.forEach((ChatMessage m) -> {
+                // System.out.println(m.getContent());
+                // });
+
+                // user.setMessages(messages);
+                // sc.close();
+
+                // addMessages();
+                // curPeer = usr.getUsername();
+                // // chatMessagePanel.revalidate();
+                // // chatMessagePanel.repaint();
+
+                // }).start();
+                // }
+
+                // }
+                // });
+                usrListPanel.add(userRow);
+            });
+
+            usrListPanel.revalidate();
+            usrListPanel.repaint();
 
         }
 
@@ -1255,6 +1383,78 @@ class UserView {
 
             return dialog;
 
+        }
+
+        JDialog createAddFriendDialog() {
+            JDialog dialog = new JDialog(frame, "Find friend");
+            JPanel dPanel = new JPanel();
+            dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+            dPanel.setLayout(new BoxLayout(dPanel, BoxLayout.Y_AXIS));
+
+            JPanel searchPanel = new JPanel();
+            searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
+            searchPanel.setMaximumSize(new Dimension(400, 30));
+
+            JPanel usrListPanel = new JPanel();
+            usrListPanel.setLayout(new BoxLayout(usrListPanel, BoxLayout.Y_AXIS));
+            JScrollPane usrListScroll = new JScrollPane(usrListPanel);
+            usrListScroll.getVerticalScrollBar().setUnitIncrement(10);
+
+            JTextField searchField = new JTextField(20);
+            searchField.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchPanel.add(searchField);
+
+            JButton searchButton = new JButton("Search");
+            searchButton.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (!searchField.getText().equals("")) {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "findfriend");
+                        jsonObject.addProperty("username", searchField.getText());
+                        sc.sendRequest(jsonObject.toString());
+
+                        String res = sc.getResponse();
+                        sc.close();
+
+                        System.out.println(res);
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
+
+                        if (resHeader.equals("findfriended")) {
+
+                            JsonObject jo = JsonParser.parseString(res).getAsJsonObject();
+
+                            JsonArray friendsArray = jo.getAsJsonArray("friends");
+
+                            ArrayList<User> userList = new ArrayList<>();
+                            Gson gson = new Gson();
+                            for (int i = 0; i < friendsArray.size(); i++) {
+                                // Chuyển mỗi phần tử trong JsonArray thành đối tượng User
+                                User u = gson.fromJson(friendsArray.get(i), User.class);
+                                if (!user.getFriends().contains(u)) {
+                                    userList.add(u);
+                                }
+                            }
+                            System.out.println("kit");
+
+                            renderFoundUserList(userList, usrListPanel);
+
+                        }
+
+                    }
+                }
+            });
+            searchPanel.add(searchButton);
+            dPanel.add(searchPanel);
+
+            dialog.setSize(500, 700);
+            dPanel.add(usrListScroll);
+            dialog.add(dPanel);
+            dialog.setLocationRelativeTo(null); // center the frame
+            return dialog;
         }
 
         JPanel createChatArea() {
