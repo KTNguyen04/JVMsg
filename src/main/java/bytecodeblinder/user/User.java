@@ -13,6 +13,7 @@ public class User {
     private String dob;
     private String gender;
     private String password;
+    private boolean isOnline;
 
     ArrayList<User> friends;
 
@@ -108,6 +109,14 @@ public class User {
 
     private void notifyListener() {
         listener.onNewMessage();
+    }
+
+    public void setIsOnline(boolean isOnline) {
+        this.isOnline = isOnline;
+    }
+
+    boolean isOnline() {
+        return this.isOnline;
     }
 
     // public void setFullname(String fullname) {

@@ -59,6 +59,7 @@ class DatabaseController {
             connection.close();
 
             user.setFriends(getUserFriends(username));
+            user.setIsOnline(true);
             // user.setMessages(getMessage(username, username));
             Gson gson = new Gson();
             return gson.toJson(user);
@@ -185,6 +186,7 @@ class DatabaseController {
                 String gender = rs.getString("gender");
 
                 User user = new User(usrn, fullname, address, email, dob, gender);
+                user.setIsOnline(checkOnline(usrn));
                 friends.add(user);
 
             }
@@ -472,17 +474,121 @@ class DatabaseController {
         return false;
     }
 
-    boolean insertOnline(String username, String ip) {
+    boolean checkOnline(String username) {
         Connection connection = connect();
 
-        String query = String.format("insert into  %s.%s " +
-                "values (?,?)", this.USERS, "ONLINE");
+        String query = String.format("select username " +
+                "from  %s.%s " +
+                "where username =?", this.USERS, "ONLINE");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
-            pstm.setString(2, ip);
+            // pstm.setString(2, ip);
+            // stm.setString(2, password);
+
+            rs = pstm.executeQuery();
+            // rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("THanh cong");
+                return true;
+            }
+
+            connection.close();
+            return false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    boolean removeOnline(String username) {
+        Connection connection = connect();
+
+        String query = String.format("delete from  %s.%s " +
+                "where username=?", this.USERS, "ONLINE");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username);
+            // pstm.setString(2, ip);
+            // stm.setString(2, password);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    boolean insertOnline(String username) {
+        Connection connection = connect();
+
+        String query = String.format("insert into  %s.%s " +
+                "values (?)", this.USERS, "ONLINE");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username);
+            // pstm.setString(2, ip);
             // stm.setString(2, password);
 
             int row = pstm.executeUpdate();

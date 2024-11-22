@@ -184,6 +184,7 @@ class SocketController {
                             System.out.println(jsonResponse);
 
                             curAccepted = username;
+                            dbc.insertOnline(username);
                         } else {
                             JsonObject jsonResponseObject = new JsonObject();
                             jsonResponseObject.addProperty("header", "nologin");
@@ -282,6 +283,10 @@ class SocketController {
                         String jsonResponse = gson.toJson(jsonResponseObject);
                         pw.println(jsonResponse);
 
+                    }
+                    case "offline": {
+                        String username = data.get("username");
+                        dbc.removeOnline(username);
                     }
                     default:
                         break;

@@ -66,8 +66,27 @@ class UserView {
         // new SignupPanel(panel);
         frame.add(panel);
         frame.setVisible(true);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                sendOffline();
+                System.out.println("test");
+            }
+        });
 
         // sc = null;
+
+    }
+
+    void sendOffline() {
+        System.out.println("LOG");
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("header", "offline");
+        jsonObject.addProperty("username", user.getUsername());
+
+        SocketController sc = new SocketController();
+
+        sc.sendRequest(jsonObject.toString());
+        sc.close();
 
     }
 
@@ -731,10 +750,22 @@ class UserView {
                 }
             });
 
+            JLabel logoutIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "logout.png"));
+            logoutIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            logoutIcon.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    cardLO.show(panel, "LOGIN");
+                    sendOffline();
+                }
+            });
+
             settingPanel.add(userIcon);
             settingPanel.add(addFriendIcon);
             settingPanel.add(friendsIcon);
             settingPanel.add(unfriendIcon);
+            settingPanel.add(Box.createVerticalGlue());
+            settingPanel.add(logoutIcon);
             return settingPanel;
         }
 
@@ -746,15 +777,6 @@ class UserView {
             // Integer.MAX_VALUE));
             friendsPanel.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
             friendsPanel.setPreferredSize(new Dimension(400, Integer.MAX_VALUE));
-
-            // usersPanel.setBorder(BorderFactory.create(0, 20, 0, 0));
-
-            // friendsPanel.setBackground(Color.BLUE);
-            // gbc.gridx = 1;
-            // gbc.weightx = 6;
-            // // gbc.weightx = 0;
-            // gbc.gridwidth = 6;
-            // gbc.weighty = 1;
 
             JLabel friendsLabel = new JLabel("Friend List");
             friendsLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
@@ -771,8 +793,14 @@ class UserView {
             // friendsLabel.setForeground(new Color(82, 82, 82));
             ArrayList<User> friendList = user.getFriends();
             friendList.forEach((User usr) -> {
+
                 JButton btn = new JButton(
                         "<html><b>" + usr.getUsername() + "</b><br/>" + usr.getFullname() + "</html>");
+                String path = usr.isOnline() ? "online.png" : "offline.png";
+                ImageIcon icon = new ImageIcon(AppConfig.bannerPath + path);
+                btn.setHorizontalTextPosition(SwingConstants.LEFT);
+                // btn.setHorizontalAlignment(SwingConstants.LEFT);
+                btn.setIcon(icon);
                 btn.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
                 btn.setAlignmentX(Component.CENTER_ALIGNMENT);
                 // btn.setPreferredSize(new Dimension(400, 100));
