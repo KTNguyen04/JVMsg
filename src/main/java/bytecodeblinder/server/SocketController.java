@@ -282,11 +282,45 @@ class SocketController {
                         jsonResponseObject.addProperty("header", header);
                         String jsonResponse = gson.toJson(jsonResponseObject);
                         pw.println(jsonResponse);
+                        break;
 
                     }
                     case "offline": {
                         String username = data.get("username");
                         dbc.removeOnline(username);
+                        break;
+                    }
+                    case "findfriend": {
+                        String header = "findfriended";
+                        ArrayList<User> foundFriends = dbc.findFriend(data.get("username"));
+
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", header);
+                        JsonArray friendsArray = new JsonArray();
+                        for (User user : foundFriends) {
+                            JsonObject friendJson = new JsonObject();
+                            friendJson.addProperty("username", user.getUsername());
+                            friendJson.addProperty("fullname", user.getFullname());
+                            friendsArray.add(friendJson);
+                        }
+                        jsonObject.add("friends", friendsArray);
+                        pw.println(jsonObject.toString());
+                        break;
+                    }
+                    case "addfriend": {
+                        String from = data.get("from");
+                        String to = data.get("to");
+                        String header = "";
+                        if (dbc.insertAddFriend(from, to)) {
+                            header = "addfriended";
+                        } else {
+                            header = "noaddfriend";
+                        }
+                        JsonObject jsonResponseObject = new JsonObject();
+                        jsonResponseObject.addProperty("header", header);
+                        String jsonResponse = gson.toJson(jsonResponseObject);
+                        pw.println(jsonResponse);
+                        break;
                     }
                     default:
                         break;

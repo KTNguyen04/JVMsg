@@ -91,6 +91,121 @@ class DatabaseController {
         return "";
     }
 
+    ArrayList<User> findFriend(String pattern) {
+        Connection connection = connect();
+
+        String query = String.format("SELECT username, fullname FROM %s.%s " +
+                "WHERE username LIKE ? " +
+                "or fullname LIKE ?;",
+                this.USERS, "USER");
+
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        ArrayList<User> friends = new ArrayList<>();
+        try {
+            pattern = "%" + pattern + "%";
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, pattern);
+            pstm.setString(2, pattern);
+
+            rs = pstm.executeQuery();
+            while (rs.next()) {
+
+                String usrn = rs.getString("username");
+                String fullname = rs.getString("fullname");
+
+                User user = new User(usrn, fullname);
+
+                friends.add(user);
+
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+
+            return friends;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return friends;
+    }
+
+    boolean insertAddFriend(String from, String to) {
+        Connection connection = connect();
+
+        String query = String.format("INSERT INTO %s.%s (`from`,`to`) " +
+                "VALUES (?, ?);",
+                this.USERS, "ADD_FRIEND");
+
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, from);
+            pstm.setString(2, to);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+            return false;
+            // return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     boolean insertMessage(ChatMessage msg) {
         Connection connection = connect();
 
@@ -117,6 +232,7 @@ class DatabaseController {
                 return true;
             }
             connection.close();
+            return false;
             // System.out.println("123" + friends.get(0));
 
             // return true;
@@ -392,6 +508,7 @@ class DatabaseController {
                 return true;
             }
             connection.close();
+            return false;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -446,6 +563,7 @@ class DatabaseController {
                 return true;
             }
             connection.close();
+            return false;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -549,6 +667,7 @@ class DatabaseController {
                 return true;
             }
             connection.close();
+            return false;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -600,6 +719,7 @@ class DatabaseController {
                 return true;
             }
             connection.close();
+            return false;
 
         } catch (SQLException e) {
             e.printStackTrace();
