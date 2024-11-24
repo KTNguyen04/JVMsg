@@ -697,10 +697,12 @@ class UserView {
             // gbc.gridwidth = 1;
             gbc.weighty = 1;
             add(settingPanel, gbc);
+            // add(Box.createRigidArea(new Dimension(10, 30)));
+
             JPanel friendsPanel = createFriendPanel();
             gbc.gridx = 1;
             // gbc.weightx = 6;
-            gbc.weightx = 6;
+            gbc.weightx = 8;
             // gbc.gridwidth = 6;
             gbc.weighty = 1;
             add(friendsPanel, gbc);
@@ -713,7 +715,7 @@ class UserView {
             gbc.gridx = 2;
             // gbc.gridwidth = 18;
 
-            gbc.weightx = 18;
+            gbc.weightx = 20;
             gbc.weighty = 1;
             // chatPanel.add(chatLabel);
             // chatPanel.add(chatScrollPanel);
@@ -735,12 +737,13 @@ class UserView {
             settingPanel.setLayout(new BoxLayout(settingPanel, BoxLayout.Y_AXIS));
             settingPanel.setSize(120, 800);
 
-            settingPanel.setBackground(Color.WHITE);
+            settingPanel.setBackground(Color.decode("#6E00FF"));
 
             JButton addFriendIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "add_friend.png"));
             addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             addFriendIcon.setToolTipText("Find friends");
-            addFriendIcon.setBackground(Color.WHITE);
+            addFriendIcon.setBackground(Color.decode("#6E00FF"));
+            addFriendIcon.setBorderPainted(false);
 
             addFriendIcon.addMouseListener(new MouseAdapter() {
                 @Override
@@ -752,8 +755,10 @@ class UserView {
             });
             JButton requestIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "request.png"));
             requestIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-            requestIcon.setBackground(Color.WHITE);
+            requestIcon.setBackground(Color.decode("#6E00FF"));
             requestIcon.setToolTipText("Friend request");
+            requestIcon.setBorderPainted(false);
+
             requestIcon.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -765,13 +770,16 @@ class UserView {
 
             JButton unfriendIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "unfriend.png"));
             unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-            unfriendIcon.setBackground(Color.WHITE);
+            unfriendIcon.setBackground(Color.decode("#6E00FF"));
             unfriendIcon.setToolTipText("Unfriend & Block");
+            unfriendIcon.setBorderPainted(false);
 
             JButton userIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "user.png"));
             userIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             userIcon.setToolTipText("Profile");
-            userIcon.setBackground(Color.WHITE);
+            userIcon.setBackground(Color.decode("#6E00FF"));
+            userIcon.setBorderPainted(false);
+
             userIcon.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
                     JDialog userInfoDialog = createUserInfoDialog();
@@ -784,7 +792,9 @@ class UserView {
             JButton logoutIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "logout.png"));
             logoutIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             logoutIcon.setToolTipText("Log out");
-            logoutIcon.setBackground(Color.WHITE);
+            logoutIcon.setBackground(Color.decode("#6E00FF"));
+            logoutIcon.setBorderPainted(false);
+
             logoutIcon.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -795,10 +805,12 @@ class UserView {
             });
 
             settingPanel.add(userIcon);
+            settingPanel.add(Box.createRigidArea(new Dimension(0, 30)));
             settingPanel.add(addFriendIcon);
             settingPanel.add(requestIcon);
             settingPanel.add(unfriendIcon);
             settingPanel.add(Box.createVerticalGlue());
+
             settingPanel.add(logoutIcon);
             return settingPanel;
         }
@@ -806,6 +818,8 @@ class UserView {
         JPanel createFriendPanel() {
             JPanel friendsPanel = new JPanel();
             friendsPanel.setLayout(new BoxLayout(friendsPanel, BoxLayout.Y_AXIS));
+            friendsPanel.setBackground(Color.decode("#EFF6FC"));
+
             // friendsPanel.setPreferredSize(new Dimension(400, ));
             // friendsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
             // Integer.MAX_VALUE));
@@ -822,6 +836,7 @@ class UserView {
             friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
             JScrollPane friendListScroll = new JScrollPane(friendListPanel);
             friendListScroll.getVerticalScrollBar().setUnitIncrement(16);
+            friendListPanel.setBackground(Color.decode("#EFF6FC"));
 
             // friendsLabel.setForeground(new Color(82, 82, 82));
             renderFriendList(friendList, friendListPanel);
@@ -871,6 +886,7 @@ class UserView {
                 btn.setAlignmentX(Component.CENTER_ALIGNMENT);
                 btn.setPreferredSize(new Dimension(300, 100));
                 btn.setMaximumSize(new Dimension(300, 100));
+                btn.setBackground(Color.WHITE);
                 btn.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent me) {
                         if (me.getButton() == MouseEvent.BUTTON1) {
@@ -1161,6 +1177,7 @@ class UserView {
             chatMessagePanel = new JPanel();
             chatMessagePanel.setLayout(new BoxLayout(chatMessagePanel, BoxLayout.Y_AXIS));
             chatMessagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            chatMessagePanel.setBackground(Color.WHITE);
             // chatMessagePanel.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
             // chatMessagePanel.setPreferredSize(new Dimension(800, 100));
             JScrollPane chatMessageScroll = new JScrollPane(chatMessagePanel);
@@ -1178,6 +1195,8 @@ class UserView {
             // chatAreaPanel.setPreferredSize(new Dimension(800, 100));
 
             chatPanel.add(chatAreaPanel);
+
+            chatPanel.setBackground(Color.decode("#EFF6FC"));
 
             return chatPanel;
         }
@@ -1618,10 +1637,8 @@ class UserView {
                         for (User usr : userList) {
                             if (usr.getUsername().toLowerCase().contains(searchField.getText().toLowerCase())) {
                                 filteredUsers.add(usr);
-
                             }
                         }
-
                     }
                     renderFriendRequestList(filteredUsers, usrListPanel);
                 }
