@@ -1606,43 +1606,24 @@ class UserView {
             searchButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (!searchField.getText().equals("")) {
-                        SocketController sc = new SocketController();
-                        JsonObject jsonObject = new JsonObject();
-                        jsonObject.addProperty("header", "findfriendrequest");
-                        jsonObject.addProperty("username", searchField.getText());
-                        sc.sendRequest(jsonObject.toString());
 
-                        // String res = sc.getResponse();
-                        sc.close();
+                    ArrayList<User> filteredUsers = new ArrayList<>();
+                    System.out.println("test");
+                    System.out.println(searchField.getText());
 
-                        // System.out.println(res);
-                        // JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
-                        // String resHeader = resObject.get("header").getAsString();
+                    if (searchField.getText().equals("")) {
+                        System.out.println("empty");
+                        filteredUsers = userList;
+                    } else {
+                        for (User usr : userList) {
+                            if (usr.getUsername().toLowerCase().contains(searchField.getText().toLowerCase())) {
+                                filteredUsers.add(usr);
 
-                        // if (resHeader.equals("findfriended")) {
-
-                        // JsonObject jo = JsonParser.parseString(res).getAsJsonObject();
-
-                        // JsonArray friendsArray = jo.getAsJsonArray("friends");
-
-                        // ArrayList<User> userList = new ArrayList<>();
-                        // Gson gson = new Gson();
-                        // for (int i = 0; i < friendsArray.size(); i++) {
-
-                        // User u = gson.fromJson(friendsArray.get(i), User.class);
-                        // if (!user.getFriends().contains(u) &&
-                        // !user.getUsername().equals(u.getUsername())) {
-                        // userList.add(u);
-                        // }
-                        // }
-                        // System.out.println("kit");
-
-                        // renderFoundUserList(userList, usrListPanel);
-
-                        // }
+                            }
+                        }
 
                     }
+                    renderFriendRequestList(filteredUsers, usrListPanel);
                 }
             });
             searchPanel.add(searchButton);
