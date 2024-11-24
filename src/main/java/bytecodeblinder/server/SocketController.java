@@ -371,6 +371,24 @@ class SocketController {
                         pw.println(jsonObject.toString());
                         break;
                     }
+
+                    case "rejectrequest": {
+                        String username1 = data.get("username1");
+                        String username2 = data.get("username2");
+                        String header = "";
+                        JsonObject jsonObject = new JsonObject();
+                        if (dbc.removeAddFriend(username1, username2)) {
+
+                            header = "rejectrequested";
+
+                        } else {
+                            header = "noacceptrequest";
+                        }
+                        jsonObject.addProperty("header", header);
+                        System.out.println(jsonObject);
+                        pw.println(jsonObject.toString());
+                        break;
+                    }
                     default:
                         break;
                 }

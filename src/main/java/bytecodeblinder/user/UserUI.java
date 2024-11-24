@@ -1003,6 +1003,31 @@ class UserView {
                     }
                 });
 
+                rejectBtn.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent me) {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "rejectrequest");
+                        jsonObject.addProperty("username1", user.getUsername());
+                        jsonObject.addProperty("username2", usr.getUsername());
+                        sc.sendRequest(jsonObject.toString());
+
+                        String res = sc.getResponse();
+                        sc.close();
+
+                        System.out.println(res);
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
+
+                        if (resHeader.equals("rejectrequested")) {
+                            usrListPanel.remove(userRow);
+                            usrListPanel.revalidate();
+                            usrListPanel.repaint();
+
+                        }
+                    }
+                });
+
             });
 
             usrListPanel.revalidate();
