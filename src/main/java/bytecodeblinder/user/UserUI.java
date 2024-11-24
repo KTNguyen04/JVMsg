@@ -882,14 +882,18 @@ class UserView {
             friendListPanel.removeAll();
             friendList.forEach((User usr) -> {
 
-                JButton btn = new JButton(
+                JButton btn = new JButton();
+                JLabel textLabel = new JLabel(
                         "<html><b>" + usr.getUsername() + "</b><br/>" + usr.getFullname() + "</html>");
+                textLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 18));
+
                 String path = usr.isOnline() ? dotenv.get("img.online") : dotenv.get("img.offline");
-                ImageIcon icon = new ImageIcon(imagePath + path);
-                btn.setHorizontalTextPosition(SwingConstants.LEFT);
+                JLabel iconLabel = new JLabel(new ImageIcon(imagePath + path));
+                // btn.setHorizontalTextPosition(SwingConstants.LEFT);
                 // btn.setHorizontalAlignment(SwingConstants.LEFT);
-                btn.setIcon(icon);
-                btn.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+                btn.setLayout(new BorderLayout());
+                btn.add(textLabel, BorderLayout.WEST);
+                btn.add(iconLabel, BorderLayout.EAST);
                 btn.setAlignmentX(Component.CENTER_ALIGNMENT);
                 btn.setPreferredSize(new Dimension(300, 100));
                 btn.setMaximumSize(new Dimension(300, 100));
@@ -1183,13 +1187,13 @@ class UserView {
 
             chatMessagePanel = new JPanel();
             chatMessagePanel.setLayout(new BoxLayout(chatMessagePanel, BoxLayout.Y_AXIS));
-            chatMessagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            // chatMessagePanel.setMaximumSize(new Dimension(0, Integer.MAX_VALUE));
             chatMessagePanel.setBackground(Color.WHITE);
             // chatMessagePanel.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
             // chatMessagePanel.setPreferredSize(new Dimension(800, 100));
             JScrollPane chatMessageScroll = new JScrollPane(chatMessagePanel);
             chatMessageScroll.getVerticalScrollBar().setUnitIncrement(16);
-            chatMessageScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            chatMessageScroll.setMaximumSize(new Dimension(700, Integer.MAX_VALUE));
             // chatMessageScroll.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
             // chatMessageScroll.setPreferredSize(new Dimension(600, 600));
 
@@ -1214,24 +1218,48 @@ class UserView {
             ArrayList<ChatMessage> messages = user.getMessages();
 
             messages.forEach((ChatMessage msg) -> {
-                JLabel msgL = new JLabel(msg.getContent());
-                msgL.setFont(new Font("Nunito Sans", Font.PLAIN, 16));
+                JTextArea msgL = new JTextArea(msg.getContent());
+                msgL.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+                msgL.setLineWrap(true); // Enable line wrapping
+                msgL.setWrapStyleWord(true); // Wrap whole words
 
-                // msgL.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+                msgL.setPreferredSize(new Dimension(400, msgL.getPreferredSize().height));
+
+                msgL.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
+                msgL.setEditable(false);
+                // JLabel msgL = new JLabel("<html>" + msg.getContent() + "</html>");
+
+                // msgL.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
+                // msgL.setPreferredSize(new Dimension(400, msgL.getPreferredSize().height));
+                // msgL.setPreferredSize(new Dimension(400, 80));
                 // msgL.getPreferredSize().height));
                 JPanel mRow = new JPanel();
-                mRow.setLayout(new BoxLayout(mRow, BoxLayout.X_AXIS));
-                if (msg.getFrom().equals(user.getUsername())) {
-                    mRow.add(Box.createHorizontalGlue());
-                    msgL.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    // chatMessagePanel.add(Box.createHorizontalGlue());
-                    mRow.add(msgL);
-                } else {
-                    System.out.println("123");
+                mRow.setLayout(new BorderLayout());
 
-                    msgL.setAlignmentX(Component.LEFT_ALIGNMENT);
-                    mRow.add(msgL);
-                    mRow.add(Box.createHorizontalGlue());
+                mRow.setMaximumSize(new Dimension(700, Integer.MAX_VALUE));
+                mRow.setBackground(Color.WHITE);
+
+                mRow.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                // mRow.setPreferredSize(new Dimension(700, 50));
+
+                // mRow.setPreferredSize(new Dimension(690, ));
+
+                // mRow.setPreferredSize(new Dimension(200, 100));
+
+                if (msg.getFrom().equals(user.getUsername())) {
+                    // mRow.add(Box.createHorizontalGlue());
+                    msgL.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                    // msgL.setHorizontalAlignment(SwingConstants.RIGHT);
+
+                    // chatMessagePanel.add(Box.createHorizontalGlue());
+                    mRow.add(msgL, BorderLayout.EAST);
+                } else {
+                    msgL.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                    mRow.add(msgL, BorderLayout.WEST);
+
+                    // mRow.add(Box.createHorizontalGlue());
+                    // mRow.add(Box.createRigidArea(new Dimension(0, 30)));
+
                 }
                 chatMessagePanel.add(mRow);
             });
@@ -1668,6 +1696,8 @@ class UserView {
             textArea.setFont(new Font("Nunito Sans", Font.BOLD, 22));
             // textArea.setPreferredSize(new Dimension(800, 100));
             textArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
             // textArea.setAlignmentX(Component.BOTTOM_ALIGNMENT);
 
             JScrollPane scrollPane = new JScrollPane(textArea);
@@ -1677,8 +1707,14 @@ class UserView {
             // scrollPane.setMaximumSize(new Dimension(800, 100));
             // scrollPane.setMaximumSize(new Dimension(800, 100));
 
-            JButton btn = new JButton("Send");
+            JButton btn = new JButton();
+            ImageIcon icon = new ImageIcon(imagePath + dotenv.get("img.send"));
+            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
+            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+            // btn.setIconTextGap(500);
+            btn.setIcon(icon);
             btn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            btn.setBackground(Color.decode("#6E00FF"));
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
             btn.setPreferredSize(new Dimension(100, 100));
             btn.setMaximumSize(new Dimension(100, 100));
