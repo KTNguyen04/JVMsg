@@ -74,6 +74,7 @@ class UserView {
             }
         });
 
+        UIManager.put("ToolTip.font", new Font("Arial", Font.BOLD, 16));
         // sc = null;
 
     }
@@ -736,8 +737,11 @@ class UserView {
 
             settingPanel.setBackground(Color.WHITE);
 
-            JLabel addFriendIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "add_friend.png"));
+            JButton addFriendIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "add_friend.png"));
             addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            addFriendIcon.setToolTipText("Find friends");
+            addFriendIcon.setBackground(Color.WHITE);
+
             addFriendIcon.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -746,13 +750,18 @@ class UserView {
                     addFriendDialog.setVisible(true);
                 }
             });
-            JLabel friendsIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "friends.png"));
+            JButton friendsIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "friends.png"));
             friendsIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-            JLabel unfriendIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "unfriend.png"));
-            unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            friendsIcon.setBackground(Color.WHITE);
 
-            JLabel userIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "user.png"));
+            JButton unfriendIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "unfriend.png"));
+            unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            unfriendIcon.setBackground(Color.WHITE);
+
+            JButton userIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "user.png"));
             userIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            userIcon.setToolTipText("Profile");
+            userIcon.setBackground(Color.WHITE);
             userIcon.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
                     JDialog userInfoDialog = createUserInfoDialog();
@@ -907,13 +916,17 @@ class UserView {
                 JLabel lb = new JLabel(
                         "<html><b>" + usr.getUsername() + "</b><br/>" + usr.getFullname() + "</html>");
                 ;
-                lb.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+                lb.setFont(new Font("Nunito Sans", Font.BOLD, 22));
                 lb.setAlignmentX(Component.CENTER_ALIGNMENT);
+                // lb.setMaximumSize(new Dimension(130, 40));
                 // btn.setPreferredSize(new Dimension(400, 100));
 
-                JButton btnAddFriend = new JButton("Add");
-                btnAddFriend.setFont(new Font("Nunito Sans", Font.PLAIN, 14));
-                btnAddFriend.setMaximumSize(new Dimension(150, 40));
+                JLabel messageHolder = new JLabel("");
+                messageHolder.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+
+                JButton btnAddFriend = new JButton("Send request");
+                btnAddFriend.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+                btnAddFriend.setMaximumSize(new Dimension(130, 40));
                 btnAddFriend.setAlignmentX(Component.CENTER_ALIGNMENT);
                 btnAddFriend.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent me) {
@@ -924,33 +937,21 @@ class UserView {
                         jsonObject.addProperty("to", usr.getUsername());
                         sc.sendRequest(jsonObject.toString());
 
-                        // String res = sc.getResponse();
+                        String res = sc.getResponse();
                         sc.close();
 
-                        // System.out.println(res);
-                        // JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
-                        // String resHeader = resObject.get("header").getAsString();
+                        System.out.println(res);
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
 
-                        // if (resHeader.equals("findfriended")) {
-
-                        // JsonObject jo = JsonParser.parseString(res).getAsJsonObject();
-
-                        // JsonArray friendsArray = jo.getAsJsonArray("friends");
-
-                        // ArrayList<User> userList = new ArrayList<>();
-                        // Gson gson = new Gson();
-                        // for (int i = 0; i < friendsArray.size(); i++) {
-                        // // Chuyển mỗi phần tử trong JsonArray thành đối tượng User
-                        // User user = gson.fromJson(friendsArray.get(i), User.class);
-                        // userList.add(user);
-                        // }
-                        // System.out.println("kit");
-
-                        // renderFoundUserList(userList, usrListPanel);
-
-                        // }
+                        if (resHeader.equals("addfriended")) {
+                            messageHolder.setText("Sent");
+                            messageHolder.setForeground(randomColor());
+                        }
                     }
                 });
+
+                // messageHolder.setAlignmentX(Component.CENTER_ALIGNMENT);
 
                 JPanel userRow = new JPanel();
                 userRow.setLayout(new BoxLayout(userRow, BoxLayout.X_AXIS));
@@ -959,11 +960,12 @@ class UserView {
 
                 userRow.add(lb);
                 userRow.add(Box.createHorizontalStrut(10));
+                userRow.add(messageHolder);
                 userRow.add(btnAddFriend);
 
                 userRow.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 
-                userRow.setBackground(Color.lightGray); // M
+                userRow.setBackground(Color.decode("#A6AEBF")); // M
 
                 // btn.addMouseListener(new MouseAdapter() {
                 // public void mouseClicked(MouseEvent me) {
@@ -1397,6 +1399,7 @@ class UserView {
 
             JPanel usrListPanel = new JPanel();
             usrListPanel.setLayout(new BoxLayout(usrListPanel, BoxLayout.Y_AXIS));
+            // usrListPanel.setMaximumSize(new Dimension(3, 30));
             JScrollPane usrListScroll = new JScrollPane(usrListPanel);
             usrListScroll.getVerticalScrollBar().setUnitIncrement(10);
 
@@ -1432,9 +1435,9 @@ class UserView {
                             ArrayList<User> userList = new ArrayList<>();
                             Gson gson = new Gson();
                             for (int i = 0; i < friendsArray.size(); i++) {
-                                // Chuyển mỗi phần tử trong JsonArray thành đối tượng User
+
                                 User u = gson.fromJson(friendsArray.get(i), User.class);
-                                if (!user.getFriends().contains(u)) {
+                                if (!user.getFriends().contains(u) && !user.getUsername().equals(u.getUsername())) {
                                     userList.add(u);
                                 }
                             }
@@ -1453,7 +1456,7 @@ class UserView {
             dialog.setSize(500, 700);
             dPanel.add(usrListScroll);
             dialog.add(dPanel);
-            dialog.setLocationRelativeTo(null); // center the frame
+            dialog.setLocationRelativeTo(null);
             return dialog;
         }
 
