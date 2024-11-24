@@ -682,7 +682,7 @@ class UserView {
         GridBagConstraints gbc;
         JPanel chatPanel;
         JPanel chatMessagePanel;
-
+        JPanel friendListPanel;
         String curPeer;
 
         HomePanel() {
@@ -750,13 +750,23 @@ class UserView {
                     addFriendDialog.setVisible(true);
                 }
             });
-            JButton friendsIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "friends.png"));
-            friendsIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-            friendsIcon.setBackground(Color.WHITE);
+            JButton requestIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "request.png"));
+            requestIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            requestIcon.setBackground(Color.WHITE);
+            requestIcon.setToolTipText("Friend request");
+            requestIcon.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    JDialog requestDialog = createFriendRequestDialog();
+
+                    requestDialog.setVisible(true);
+                }
+            });
 
             JButton unfriendIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "unfriend.png"));
             unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             unfriendIcon.setBackground(Color.WHITE);
+            unfriendIcon.setToolTipText("Unfriend & Block");
 
             JButton userIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "user.png"));
             userIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -771,8 +781,10 @@ class UserView {
                 }
             });
 
-            JLabel logoutIcon = new JLabel(new ImageIcon(AppConfig.bannerPath + "logout.png"));
+            JButton logoutIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "logout.png"));
             logoutIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
+            logoutIcon.setToolTipText("Log out");
+            logoutIcon.setBackground(Color.WHITE);
             logoutIcon.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -784,7 +796,7 @@ class UserView {
 
             settingPanel.add(userIcon);
             settingPanel.add(addFriendIcon);
-            settingPanel.add(friendsIcon);
+            settingPanel.add(requestIcon);
             settingPanel.add(unfriendIcon);
             settingPanel.add(Box.createVerticalGlue());
             settingPanel.add(logoutIcon);
@@ -806,7 +818,7 @@ class UserView {
             friendsLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, friendsLabel.getPreferredSize().height));
 
             ArrayList<User> friendList = user.getFriends();
-            JPanel friendListPanel = new JPanel();
+            friendListPanel = new JPanel();
             friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
             JScrollPane friendListScroll = new JScrollPane(friendListPanel);
             friendListScroll.getVerticalScrollBar().setUnitIncrement(16);
@@ -857,8 +869,8 @@ class UserView {
                 btn.setIcon(icon);
                 btn.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
                 btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-                // btn.setPreferredSize(new Dimension(400, 100));
-                btn.setMaximumSize(new Dimension(400, 80));
+                btn.setPreferredSize(new Dimension(300, 100));
+                btn.setMaximumSize(new Dimension(300, 100));
                 btn.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent me) {
                         if (me.getButton() == MouseEvent.BUTTON1) {
@@ -906,6 +918,95 @@ class UserView {
 
             friendListPanel.revalidate();
             friendListPanel.repaint();
+
+        }
+
+        void renderFriendRequestList(ArrayList<User> usrList, JPanel usrListPanel) {
+            usrListPanel.removeAll();
+            usrList.forEach((User usr) -> {
+
+                JLabel lb = new JLabel("<html>" + usr.getUsername() + "</html>");
+                lb.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+                lb.setAlignmentX(Component.CENTER_ALIGNMENT);
+                // lb.setMaximumSize(new Dimension(130, 40));
+                // btn.setPreferredSize(new Dimension(400, 100));
+
+                JLabel messageHolder = new JLabel("");
+                messageHolder.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+
+                JButton acceptBtn = new JButton("Accept");
+                acceptBtn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+                acceptBtn.setMaximumSize(new Dimension(130, 40));
+                acceptBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                // messageHolder.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                JButton rejectBtn = new JButton("Reject");
+                rejectBtn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+                rejectBtn.setMaximumSize(new Dimension(130, 40));
+                rejectBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                JPanel userRow = new JPanel();
+                userRow.setLayout(new BoxLayout(userRow, BoxLayout.X_AXIS));
+                userRow.setAlignmentX(Component.CENTER_ALIGNMENT);
+                userRow.setMaximumSize(new Dimension(400, 80));
+
+                userRow.add(lb);
+                userRow.add(Box.createHorizontalStrut(10));
+                userRow.add(messageHolder);
+                userRow.add(acceptBtn);
+                userRow.add(rejectBtn);
+
+                userRow.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+
+                userRow.setBackground(Color.decode("#A6AEBF"));
+
+                usrListPanel.add(userRow);
+
+                acceptBtn.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent me) {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "acceptrequest");
+                        jsonObject.addProperty("username1", user.getUsername());
+                        jsonObject.addProperty("username2", usr.getUsername());
+                        sc.sendRequest(jsonObject.toString());
+
+                        String res = sc.getResponse();
+                        sc.close();
+
+                        System.out.println(res);
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
+
+                        if (resHeader.equals("acceptrequested")) {
+                            usrListPanel.remove(userRow);
+                            usrListPanel.revalidate();
+                            usrListPanel.repaint();
+
+                            JsonArray friendsArray = resObject.getAsJsonArray("friends");
+                            System.out.print(friendsArray);
+
+                            ArrayList<User> userList = new ArrayList<>();
+                            Gson gson = new Gson();
+                            for (int i = 0; i < friendsArray.size(); i++) {
+
+                                User u = gson.fromJson(friendsArray.get(i), User.class);
+                                System.out.println(u.getUsername());
+                                userList.add(u);
+
+                            }
+
+                            user.setFriends(userList);
+                            renderFriendList(userList, friendListPanel);
+                        }
+                    }
+                });
+
+            });
+
+            usrListPanel.revalidate();
+            usrListPanel.repaint();
 
         }
 
@@ -965,50 +1066,7 @@ class UserView {
 
                 userRow.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 
-                userRow.setBackground(Color.decode("#A6AEBF")); // M
-
-                // btn.addMouseListener(new MouseAdapter() {
-                // public void mouseClicked(MouseEvent me) {
-                // if (me.getButton() == MouseEvent.BUTTON1) {
-                // chatLabel.setText(usr.getUsername() + " - Chatting");
-                // // chatPanel.setMaximumSize(new Dimension(500,
-                // // chatLabel.getPreferredSize().height));
-
-                // // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-                // new Thread(() -> {
-                // SocketController sc = new SocketController();
-                // String packet = createMessageReq(user.getUsername(), usr.getUsername());
-                // System.out.println(packet);
-                // sc.sendRequest(packet);
-
-                // String res = sc.getResponse();
-                // System.out.println("msg" + res);
-                // Gson gson = new Gson();
-                // Type messageListType = new TypeToken<ArrayList<ChatMessage>>() {
-                // }.getType();
-
-                // // Parse the JSON into an ArrayList of Message objects
-                // ArrayList<ChatMessage> messages = gson.fromJson(res, messageListType);
-                // // usr.setMessages(messages);
-
-                // messages.forEach((ChatMessage m) -> {
-                // System.out.println(m.getContent());
-                // });
-
-                // user.setMessages(messages);
-                // sc.close();
-
-                // addMessages();
-                // curPeer = usr.getUsername();
-                // // chatMessagePanel.revalidate();
-                // // chatMessagePanel.repaint();
-
-                // }).start();
-                // }
-
-                // }
-                // });
+                userRow.setBackground(Color.decode("#A6AEBF"));
                 usrListPanel.add(userRow);
             });
 
@@ -1446,6 +1504,118 @@ class UserView {
                             renderFoundUserList(userList, usrListPanel);
 
                         }
+
+                    }
+                }
+            });
+            searchPanel.add(searchButton);
+            dPanel.add(searchPanel);
+
+            dialog.setSize(500, 700);
+            dPanel.add(usrListScroll);
+            dialog.add(dPanel);
+            dialog.setLocationRelativeTo(null);
+            return dialog;
+        }
+
+        ArrayList<User> getFriendRequest() {
+            SocketController sc = new SocketController();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("header", "friendrequest");
+            jsonObject.addProperty("username", user.getUsername());
+            sc.sendRequest(jsonObject.toString());
+
+            String res = sc.getResponse();
+
+            sc.close();
+
+            JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+            String resHeader = resObject.get("header").getAsString();
+
+            ArrayList<User> userList = new ArrayList<>();
+            if (resHeader.equals("friendrequested")) {
+
+                JsonObject jo = JsonParser.parseString(res).getAsJsonObject();
+
+                JsonArray friendsArray = jo.getAsJsonArray("requests");
+
+                Gson gson = new Gson();
+                for (int i = 0; i < friendsArray.size(); i++) {
+
+                    User u = gson.fromJson(friendsArray.get(i), User.class);
+
+                    userList.add(u);
+
+                }
+
+            }
+            return userList;
+
+        }
+
+        JDialog createFriendRequestDialog() {
+            ArrayList<User> userList = getFriendRequest();
+            JDialog dialog = new JDialog(frame, "Friend request");
+            JPanel dPanel = new JPanel();
+            dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+            dPanel.setLayout(new BoxLayout(dPanel, BoxLayout.Y_AXIS));
+
+            JPanel searchPanel = new JPanel();
+            searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
+            searchPanel.setMaximumSize(new Dimension(400, 30));
+
+            JPanel usrListPanel = new JPanel();
+            usrListPanel.setLayout(new BoxLayout(usrListPanel, BoxLayout.Y_AXIS));
+            // usrListPanel.setMaximumSize(new Dimension(3, 30));
+            JScrollPane usrListScroll = new JScrollPane(usrListPanel);
+            usrListScroll.getVerticalScrollBar().setUnitIncrement(10);
+
+            JTextField searchField = new JTextField(20);
+            searchField.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchPanel.add(searchField);
+
+            renderFriendRequestList(userList, usrListPanel);
+
+            JButton searchButton = new JButton("Search");
+            searchButton.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (!searchField.getText().equals("")) {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "findfriendrequest");
+                        jsonObject.addProperty("username", searchField.getText());
+                        sc.sendRequest(jsonObject.toString());
+
+                        // String res = sc.getResponse();
+                        sc.close();
+
+                        // System.out.println(res);
+                        // JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        // String resHeader = resObject.get("header").getAsString();
+
+                        // if (resHeader.equals("findfriended")) {
+
+                        // JsonObject jo = JsonParser.parseString(res).getAsJsonObject();
+
+                        // JsonArray friendsArray = jo.getAsJsonArray("friends");
+
+                        // ArrayList<User> userList = new ArrayList<>();
+                        // Gson gson = new Gson();
+                        // for (int i = 0; i < friendsArray.size(); i++) {
+
+                        // User u = gson.fromJson(friendsArray.get(i), User.class);
+                        // if (!user.getFriends().contains(u) &&
+                        // !user.getUsername().equals(u.getUsername())) {
+                        // userList.add(u);
+                        // }
+                        // }
+                        // System.out.println("kit");
+
+                        // renderFoundUserList(userList, usrListPanel);
+
+                        // }
 
                     }
                 }
