@@ -52,6 +52,11 @@ public class User {
         this.fullname = fullname;
     };
 
+    public User(String username) {
+        this.username = username;
+
+    };
+
     interface MessageListener {
         void onNewMessage();
     }

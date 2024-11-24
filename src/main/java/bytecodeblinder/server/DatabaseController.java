@@ -151,10 +151,125 @@ class DatabaseController {
         return friends;
     }
 
+    ArrayList<User> getFriendRequest(String username) {
+
+        Connection connection = connect();
+
+        String query = String.format("select * " +
+                "from  %s.%s " +
+                "where `to` = ?;",
+                this.USERS, "ADD_FRIEND");
+
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        ArrayList<User> requests = new ArrayList<>();
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username);
+
+            rs = pstm.executeQuery();
+            while (rs.next()) {
+
+                String usrn = rs.getString("from");
+                // String fullname = rs.getString("fullname");
+
+                User user = new User(usrn);
+
+                requests.add(user);
+
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+
+            return requests;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return requests;
+
+    }
+
+    boolean makeFriend(String username1, String username2) {
+        Connection connection = connect();
+
+        String query = String.format("INSERT INTO %s.%s " +
+                "VALUES (?, ?);",
+                this.USERS, "FRIENDS");
+
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username1);
+            pstm.setString(2, username2);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+            return false;
+            // return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     boolean insertAddFriend(String from, String to) {
         Connection connection = connect();
 
-        String query = String.format("INSERT INTO %s.%s (`from`,`to`) " +
+        String query = String.format("INSERT IGNORE INTO %s.%s (`from`,`to`) " +
                 "VALUES (?, ?);",
                 this.USERS, "ADD_FRIEND");
 
@@ -178,6 +293,61 @@ class DatabaseController {
             // System.out.println("123" + friends.get(0));
             return false;
             // return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    boolean removeAddFriend(String username1, String username2) {
+        Connection connection = connect();
+
+        String query = String.format("delete from  %s.%s " +
+                "where (`from` = ? and `to` = ?) or (`from` = ? and `to` = ?)", this.USERS, "ADD_FRIEND");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username1);
+            pstm.setString(2, username2);
+            pstm.setString(3, username2);
+            pstm.setString(4, username1);
+            // pstm.setString(2, ip);
+            // stm.setString(2, password);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+            return false;
+
         } catch (SQLException e) {
             e.printStackTrace();
 

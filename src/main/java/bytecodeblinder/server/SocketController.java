@@ -322,6 +322,55 @@ class SocketController {
                         pw.println(jsonResponse);
                         break;
                     }
+                    case "friendrequest": {
+                        String header = "friendrequested";
+                        ArrayList<User> requests = dbc.getFriendRequest(data.get("username"));
+
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", header);
+                        JsonArray requestArray = new JsonArray();
+                        for (User user : requests) {
+                            JsonObject userJson = new JsonObject();
+                            userJson.addProperty("username", user.getUsername());
+                            System.out.println(user.getUsername());
+                            requestArray.add(userJson);
+                        }
+                        jsonObject.add("requests", requestArray);
+                        pw.println(jsonObject.toString());
+                        break;
+
+                    }
+                    case "acceptrequest": {
+                        String username1 = data.get("username1");
+                        String username2 = data.get("username2");
+                        String header = "";
+                        JsonObject jsonObject = new JsonObject();
+                        if (dbc.makeFriend(username1, username2)) {
+                            dbc.removeAddFriend(username1, username2);
+
+                            ArrayList<User> newFriendList = dbc.getUserFriends(username1);
+
+                            header = "acceptrequested";
+                            JsonArray friendsArray = new JsonArray();
+                            for (User user : newFriendList) {
+                                JsonObject friendJson = new JsonObject();
+                                friendJson.addProperty("username", user.getUsername());
+                                friendJson.addProperty("fullname", user.getFullname());
+                                friendJson.addProperty("address", user.getAddress());
+                                friendJson.addProperty("email", user.getEmail());
+                                friendJson.addProperty("dob", user.getDob());
+                                friendJson.addProperty("gender", user.getGender());
+                                friendsArray.add(friendJson);
+                            }
+                            jsonObject.add("friends", friendsArray);
+                        } else {
+                            header = "noacceptrequest";
+                        }
+                        jsonObject.addProperty("header", header);
+                        System.out.println(jsonObject);
+                        pw.println(jsonObject.toString());
+                        break;
+                    }
                     default:
                         break;
                 }
