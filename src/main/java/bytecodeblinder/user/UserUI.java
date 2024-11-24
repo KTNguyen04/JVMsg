@@ -18,13 +18,14 @@ import java.awt.image.BufferedImage;
 import com.toedter.calendar.JDateChooser;
 import java.util.*;
 import java.util.Date;
-import bytecodeblinder.config.AppConfig;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 class UserView {
     private JFrame frame;
@@ -36,16 +37,20 @@ class UserView {
 
     static User user;
 
+    private Dotenv dotenv = Dotenv.load();
+
     private enum Mode {
         LOGIN, SIGNUP, HOME
     }
 
+    private String imagePath = dotenv.get("image.path");
+
     UserView() throws IOException {
 
-        Integer width = Integer.valueOf(AppConfig.appWidth);
-        Integer height = Integer.valueOf(AppConfig.appHeight);
+        Integer width = Integer.valueOf(dotenv.get("app.width"));
+        Integer height = Integer.valueOf(dotenv.get("app.height"));
 
-        frame = new JFrame(AppConfig.appName);
+        frame = new JFrame(dotenv.get("app.title"));
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new CardLayout());
@@ -107,8 +112,9 @@ class UserView {
             rightPanel.setBackground(Color.WHITE);
             rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 
-            BufferedImage bannerImage = ImageIO.read(new File(AppConfig.bannerPath + "banner.png"));
-            Image scaledImage = bannerImage.getScaledInstance(AppConfig.bannerWidth, AppConfig.bannerHeight,
+            BufferedImage bannerImage = ImageIO.read(new File(imagePath + dotenv.get("banner")));
+            Image scaledImage = bannerImage.getScaledInstance(Integer.parseInt(dotenv.get("banner.width")),
+                    Integer.parseInt(dotenv.get("banner.height")),
                     Image.SCALE_SMOOTH);
             JLabel banner = new JLabel(new ImageIcon(scaledImage));
 
@@ -428,8 +434,9 @@ class UserView {
             rightPanel.setBackground(Color.WHITE);
             rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 
-            BufferedImage bannerImage = ImageIO.read(new File(AppConfig.bannerPath + "banner.png"));
-            Image scaledImage = bannerImage.getScaledInstance(AppConfig.bannerWidth, AppConfig.bannerHeight,
+            BufferedImage bannerImage = ImageIO.read(new File(imagePath + dotenv.get("banner")));
+            Image scaledImage = bannerImage.getScaledInstance(Integer.parseInt(dotenv.get("banner.width")),
+                    Integer.parseInt(dotenv.get("banner.height")),
                     Image.SCALE_SMOOTH);
             JLabel banner = new JLabel(new ImageIcon(scaledImage));
 
@@ -739,7 +746,7 @@ class UserView {
 
             settingPanel.setBackground(Color.decode("#6E00FF"));
 
-            JButton addFriendIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "add_friend.png"));
+            JButton addFriendIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.addFriend")));
             addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             addFriendIcon.setToolTipText("Find friends");
             addFriendIcon.setBackground(Color.decode("#6E00FF"));
@@ -753,7 +760,7 @@ class UserView {
                     addFriendDialog.setVisible(true);
                 }
             });
-            JButton requestIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "request.png"));
+            JButton requestIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.request")));
             requestIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             requestIcon.setBackground(Color.decode("#6E00FF"));
             requestIcon.setToolTipText("Friend request");
@@ -768,13 +775,13 @@ class UserView {
                 }
             });
 
-            JButton unfriendIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "unfriend.png"));
+            JButton unfriendIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.unFriend")));
             unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             unfriendIcon.setBackground(Color.decode("#6E00FF"));
             unfriendIcon.setToolTipText("Unfriend & Block");
             unfriendIcon.setBorderPainted(false);
 
-            JButton userIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "user.png"));
+            JButton userIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.user")));
             userIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             userIcon.setToolTipText("Profile");
             userIcon.setBackground(Color.decode("#6E00FF"));
@@ -789,7 +796,7 @@ class UserView {
                 }
             });
 
-            JButton logoutIcon = new JButton(new ImageIcon(AppConfig.bannerPath + "logout.png"));
+            JButton logoutIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.logout")));
             logoutIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             logoutIcon.setToolTipText("Log out");
             logoutIcon.setBackground(Color.decode("#6E00FF"));
@@ -877,8 +884,8 @@ class UserView {
 
                 JButton btn = new JButton(
                         "<html><b>" + usr.getUsername() + "</b><br/>" + usr.getFullname() + "</html>");
-                String path = usr.isOnline() ? "online.png" : "offline.png";
-                ImageIcon icon = new ImageIcon(AppConfig.bannerPath + path);
+                String path = usr.isOnline() ? dotenv.get("img.online") : dotenv.get("img.offline");
+                ImageIcon icon = new ImageIcon(imagePath + path);
                 btn.setHorizontalTextPosition(SwingConstants.LEFT);
                 // btn.setHorizontalAlignment(SwingConstants.LEFT);
                 btn.setIcon(icon);

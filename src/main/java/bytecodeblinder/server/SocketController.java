@@ -7,10 +7,8 @@ import java.util.*;
 
 import com.google.gson.*;
 
-import bytecodeblinder.config.AppConfig;
-
 import javax.mail.*;
-import javax.mail.Authenticator;
+
 import javax.mail.PasswordAuthentication;
 import javax.mail.internet.*;
 import bytecodeblinder.user.*;
