@@ -376,6 +376,62 @@ class DatabaseController {
         return false;
     }
 
+    boolean removeFriend(String username1, String username2) {
+        Connection connection = connect();
+
+        String query = String.format("delete from  %s.%s " +
+                "where (`username1` = ? and `username2` = ?) or (`username2` = ? and `username1` = ?)", this.USERS,
+                "FRIENDS");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username1);
+            pstm.setString(2, username2);
+            pstm.setString(3, username2);
+            pstm.setString(4, username1);
+            // pstm.setString(2, ip);
+            // stm.setString(2, password);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+            return false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     boolean insertMessage(ChatMessage msg) {
         Connection connection = connect();
 

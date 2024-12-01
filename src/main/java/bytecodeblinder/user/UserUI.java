@@ -744,12 +744,12 @@ class UserView {
             settingPanel.setLayout(new BoxLayout(settingPanel, BoxLayout.Y_AXIS));
             settingPanel.setSize(120, 800);
 
-            settingPanel.setBackground(Color.decode("#6E00FF"));
+            settingPanel.setBackground(Color.decode(dotenv.get("btnBackground")));
 
             JButton addFriendIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.addFriend")));
             addFriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             addFriendIcon.setToolTipText("Find friends");
-            addFriendIcon.setBackground(Color.decode("#6E00FF"));
+            addFriendIcon.setBackground(Color.decode(dotenv.get("btnBackground")));
             addFriendIcon.setBorderPainted(false);
 
             addFriendIcon.addMouseListener(new MouseAdapter() {
@@ -762,7 +762,7 @@ class UserView {
             });
             JButton requestIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.request")));
             requestIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-            requestIcon.setBackground(Color.decode("#6E00FF"));
+            requestIcon.setBackground(Color.decode(dotenv.get("btnBackground")));
             requestIcon.setToolTipText("Friend request");
             requestIcon.setBorderPainted(false);
 
@@ -777,14 +777,14 @@ class UserView {
 
             JButton unfriendIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.unFriend")));
             unfriendIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
-            unfriendIcon.setBackground(Color.decode("#6E00FF"));
+            unfriendIcon.setBackground(Color.decode(dotenv.get("btnBackground")));
             unfriendIcon.setToolTipText("Unfriend & Block");
             unfriendIcon.setBorderPainted(false);
 
             JButton userIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.user")));
             userIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             userIcon.setToolTipText("Profile");
-            userIcon.setBackground(Color.decode("#6E00FF"));
+            userIcon.setBackground(Color.decode(dotenv.get("btnBackground")));
             userIcon.setBorderPainted(false);
 
             userIcon.addMouseListener(new MouseAdapter() {
@@ -799,7 +799,7 @@ class UserView {
             JButton logoutIcon = new JButton(new ImageIcon(imagePath + dotenv.get("img.logout")));
             logoutIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
             logoutIcon.setToolTipText("Log out");
-            logoutIcon.setBackground(Color.decode("#6E00FF"));
+            logoutIcon.setBackground(Color.decode(dotenv.get("btnBackground")));
             logoutIcon.setBorderPainted(false);
 
             logoutIcon.addMouseListener(new MouseAdapter() {
@@ -825,7 +825,7 @@ class UserView {
         JPanel createFriendPanel() {
             JPanel friendsPanel = new JPanel();
             friendsPanel.setLayout(new BoxLayout(friendsPanel, BoxLayout.Y_AXIS));
-            friendsPanel.setBackground(Color.decode("#EFF6FC"));
+            friendsPanel.setBackground(Color.decode(dotenv.get("background")));
 
             // friendsPanel.setPreferredSize(new Dimension(400, ));
             // friendsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
@@ -843,7 +843,7 @@ class UserView {
             friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
             JScrollPane friendListScroll = new JScrollPane(friendListPanel);
             friendListScroll.getVerticalScrollBar().setUnitIncrement(16);
-            friendListPanel.setBackground(Color.decode("#EFF6FC"));
+            friendListPanel.setBackground(Color.decode(dotenv.get("background")));
 
             // friendsLabel.setForeground(new Color(82, 82, 82));
             renderFriendList(friendList, friendListPanel);
@@ -858,6 +858,9 @@ class UserView {
 
             JButton searchButton = new JButton("Search");
             searchButton.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchButton.setBackground(Color.decode(dotenv.get("btnBackground")));
+            searchButton.setForeground(Color.WHITE);
+
             searchButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -965,6 +968,8 @@ class UserView {
                 acceptBtn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
                 acceptBtn.setMaximumSize(new Dimension(130, 40));
                 acceptBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                acceptBtn.setForeground(Color.WHITE);
+                acceptBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
 
                 // messageHolder.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -972,6 +977,8 @@ class UserView {
                 rejectBtn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
                 rejectBtn.setMaximumSize(new Dimension(130, 40));
                 rejectBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                rejectBtn.setForeground(Color.WHITE);
+                rejectBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
 
                 JPanel userRow = new JPanel();
                 userRow.setLayout(new BoxLayout(userRow, BoxLayout.X_AXIS));
@@ -986,7 +993,7 @@ class UserView {
 
                 userRow.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 
-                userRow.setBackground(Color.decode("#A6AEBF"));
+                userRow.setBackground(Color.WHITE);
 
                 usrListPanel.add(userRow);
 
@@ -1081,6 +1088,9 @@ class UserView {
                 btnAddFriend.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
                 btnAddFriend.setMaximumSize(new Dimension(130, 40));
                 btnAddFriend.setAlignmentX(Component.CENTER_ALIGNMENT);
+                btnAddFriend.setForeground(Color.WHITE);
+                btnAddFriend.setBackground(Color.decode(dotenv.get("btnBackground")));
+
                 btnAddFriend.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent me) {
                         SocketController sc = new SocketController();
@@ -1118,7 +1128,8 @@ class UserView {
 
                 userRow.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 
-                userRow.setBackground(Color.decode("#A6AEBF"));
+                userRow.setBackground(Color.WHITE);
+
                 usrListPanel.add(userRow);
             });
 
@@ -1170,11 +1181,18 @@ class UserView {
         // }
 
         JPanel createChatPanel() {
-            JPanel chatPanel = new JPanel();
-            chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
-            chatPanel.setMaximumSize(new Dimension(800, Integer.MAX_VALUE));
-            chatPanel.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
-            // chatPanel.setMaximumSize(new Dimension(800, Integer.MAX_VALUE));
+            JPanel pan = new JPanel();
+
+            JPanel infoPanel = new JPanel(new BorderLayout());
+
+            infoPanel.setMaximumSize(new Dimension(800, 50));
+            infoPanel.setBackground(Color.decode(dotenv.get("background")));
+            // infoPanel.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
+
+            pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
+            pan.setMaximumSize(new Dimension(800, Integer.MAX_VALUE));
+            pan.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
+            // pan.setMaximumSize(new Dimension(800, Integer.MAX_VALUE));
 
             chatLabel = new JLabel("... - Chatting");
             chatLabel.setMaximumSize(new Dimension(800, chatLabel.getPreferredSize().height));
@@ -1183,7 +1201,7 @@ class UserView {
             // chatLabel.setPreferredSize(new Dimension(400, 100));
             chatLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
             chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            // chatPanel.setBackground(Color.YELLOW);
+            // pan.setBackground(Color.YELLOW);
 
             chatMessagePanel = new JPanel();
             chatMessagePanel.setLayout(new BoxLayout(chatMessagePanel, BoxLayout.Y_AXIS));
@@ -1197,19 +1215,68 @@ class UserView {
             // chatMessageScroll.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
             // chatMessageScroll.setPreferredSize(new Dimension(600, 600));
 
-            chatPanel.add(chatLabel);
+            JButton infoBtn = new JButton();
+            ImageIcon icon = new ImageIcon(imagePath + dotenv.get("img.dots"));
+            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
+            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+            // btn.setIconTextGap(500);
+            infoBtn.setIcon(icon);
+            infoBtn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            infoBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
+            infoBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            infoBtn.setPreferredSize(new Dimension(100, 30));
+            infoBtn.setMaximumSize(new Dimension(100, 30));
+            infoBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent me) {
 
-            chatPanel.add(chatMessageScroll);
+                    JDialog infoDialog = createChatInfoDialog();
+
+                    infoDialog.setVisible(true);
+                }
+            });
+            // public void mouseClicked(MouseEvent me) {
+
+            // HashMap<String, String> packet = new HashMap<>();
+            // packet.put("header", "chat");
+            // packet.put("from", user.getUsername());
+            // packet.put("to", curPeer);
+            // packet.put("content", textArea.getText());
+
+            // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            // LocalDateTime now = LocalDateTime.now();
+
+            // packet.put("time_stamp", dtf.format(now));
+            // packet.put("header", "chat");
+            // ChatMessage msg = new ChatMessage(user.getUsername(), curPeer,
+            // textArea.getText(), dtf.format(now));
+            // Gson gson = new Gson();
+            // String json = gson.toJson(packet);
+            // System.out.println(json);
+            // chatPW.println(json);
+            // SocketController sc = new SocketController();
+            // sc.sendRequest(json);
+
+            // addMessage(msg);
+            // sc.close();
+            // textArea.setText("");
+            // }
+
+            // });
+            infoPanel.add(chatLabel, BorderLayout.WEST);
+            infoPanel.add(infoBtn, BorderLayout.EAST);
+            pan.add(infoPanel);
+
+            pan.add(chatMessageScroll);
 
             JPanel chatAreaPanel = createChatArea();
             chatAreaPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
             // chatAreaPanel.setPreferredSize(new Dimension(800, 100));
 
-            chatPanel.add(chatAreaPanel);
+            pan.add(chatAreaPanel);
 
-            chatPanel.setBackground(Color.decode("#EFF6FC"));
+            pan.setBackground(Color.decode(dotenv.get("background")));
 
-            return chatPanel;
+            return pan;
         }
 
         void addMessages() {
@@ -1282,7 +1349,7 @@ class UserView {
 
             JLabel usernameLabel = new JLabel("Username");
             usernameLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
-            // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            // usernameLabel.setAlignmentX(Component.CEN);
 
             JLabel usnField = new JLabel(user.getUsername());
             usnField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
@@ -1339,6 +1406,8 @@ class UserView {
 
             JRadioButton mRadio = new JRadioButton("Male");
             JRadioButton fRadio = new JRadioButton("Female");
+            mRadio.setBackground(Color.decode(dotenv.get("background")));
+            fRadio.setBackground(Color.decode(dotenv.get("background")));
 
             mRadio.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             mRadio.setSelected(user.getGender().equals("male"));
@@ -1352,7 +1421,7 @@ class UserView {
             genderRow.add(mRadio);
             genderRow.add(fRadio);
             genderRow.setMaximumSize(genderRow.getPreferredSize());
-
+            genderRow.setBackground(Color.decode(dotenv.get("background")));
             // genderRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             JLabel emailLabel = new JLabel("Email");
@@ -1381,11 +1450,14 @@ class UserView {
 
             newPasswordField.setMaximumSize(emField.getPreferredSize());
 
-            JLabel messageHolder = new JLabel("test");
+            JLabel messageHolder = new JLabel("");
             messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 18));
 
             JButton saveButton = new JButton("SAVE CHANGE");
-            saveButton.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            saveButton.setFont(new Font("Nunito Sans", Font.BOLD, 20));
+            saveButton.setForeground(Color.WHITE);
+            saveButton.setBackground(Color.decode(dotenv.get("btnBackground")));
+
             saveButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent me) {
@@ -1490,7 +1562,7 @@ class UserView {
 
             dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-            saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            // saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             dPanel.add(usernameLabel);
             dPanel.add(usnField);
@@ -1512,6 +1584,7 @@ class UserView {
             dPanel.add(saveButton);
             dPanel.add(messageHolder);
 
+            dPanel.setBackground(Color.decode(dotenv.get("background")));
             dialog.add(dPanel);
 
             dialog.setLocationRelativeTo(null); // center the frame
@@ -1522,6 +1595,137 @@ class UserView {
 
             return dialog;
 
+        }
+
+        JDialog createChatInfoDialog() {
+
+            JDialog dialog = new JDialog(frame, "Information");
+            JPanel dPanel = new JPanel();
+            dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+            dPanel.setLayout(new BoxLayout(dPanel, BoxLayout.Y_AXIS));
+
+            JLabel messageHolder = new JLabel("");
+            messageHolder.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+
+            JButton unfriendBtn = new JButton();
+            JLabel ufLabel = new JLabel(
+                    "Unfriend");
+            ufLabel.setFont(new Font("Nunito Sans", Font.BOLD, 18));
+            ufLabel.setForeground(Color.WHITE);
+
+            JLabel ufIcon = new JLabel(new ImageIcon(imagePath + dotenv.get("img.unFriend")));
+            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
+            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+            unfriendBtn.setLayout(new BorderLayout());
+            unfriendBtn.add(ufLabel, BorderLayout.WEST);
+            unfriendBtn.add(ufIcon, BorderLayout.EAST);
+            unfriendBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            unfriendBtn.setPreferredSize(new Dimension(200, 55));
+            unfriendBtn.setMaximumSize(new Dimension(200, 55));
+            unfriendBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
+            unfriendBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    SocketController sc = new SocketController();
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.addProperty("header", "unfriend");
+                    jsonObject.addProperty("username1", user.getUsername());
+                    jsonObject.addProperty("username2", curPeer);
+                    sc.sendRequest(jsonObject.toString());
+
+                    String res = sc.getResponse();
+                    sc.close();
+
+                    System.out.println(res);
+                    JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                    String resHeader = resObject.get("header").getAsString();
+
+                    if (resHeader.equals("unfriended")) {
+
+                        JsonArray friendsArray = resObject.getAsJsonArray("friends");
+                        System.out.print(friendsArray);
+
+                        ArrayList<User> userList = new ArrayList<>();
+                        Gson gson = new Gson();
+                        for (int i = 0; i < friendsArray.size(); i++) {
+
+                            User u = gson.fromJson(friendsArray.get(i), User.class);
+                            System.out.println(u.getUsername());
+                            userList.add(u);
+
+                        }
+
+                        user.setFriends(userList);
+                        renderFriendList(userList, friendListPanel);
+
+                        messageHolder.setText("Done");
+                        messageHolder.setForeground(randomColor());
+                    }
+                }
+            });
+            JButton blockBtn = new JButton();
+            JLabel blcLabel = new JLabel(
+                    "Block");
+            blcLabel.setFont(new Font("Nunito Sans", Font.BOLD, 18));
+            blcLabel.setForeground(Color.WHITE);
+
+            JLabel blcIcon = new JLabel(new ImageIcon(imagePath + dotenv.get("img.block")));
+            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
+            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+            blockBtn.setLayout(new BorderLayout());
+            blockBtn.add(blcLabel, BorderLayout.WEST);
+            blockBtn.add(blcIcon, BorderLayout.EAST);
+            blockBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            blockBtn.setPreferredSize(new Dimension(200, 55));
+            blockBtn.setMaximumSize(new Dimension(200, 55));
+            blockBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
+
+            JButton spamBtn = new JButton();
+            JLabel spLabel = new JLabel(
+                    "Report spam");
+            spLabel.setFont(new Font("Nunito Sans", Font.BOLD, 18));
+            spLabel.setForeground(Color.WHITE);
+
+            JLabel spIcon = new JLabel(new ImageIcon(imagePath + dotenv.get("img.spam")));
+            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
+            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+            spamBtn.setLayout(new BorderLayout());
+            spamBtn.add(spLabel, BorderLayout.WEST);
+            spamBtn.add(spIcon, BorderLayout.EAST);
+            spamBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            spamBtn.setPreferredSize(new Dimension(200, 55));
+            spamBtn.setMaximumSize(new Dimension(200, 55));
+            spamBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
+
+            JButton deleteChatBtn = new JButton();
+            JLabel dcLabel = new JLabel(
+                    "Delete chat");
+            dcLabel.setFont(new Font("Nunito Sans", Font.BOLD, 18));
+            dcLabel.setForeground(Color.WHITE);
+
+            JLabel dcIcon = new JLabel(new ImageIcon(imagePath + dotenv.get("img.trash")));
+            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
+            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+            deleteChatBtn.setLayout(new BorderLayout());
+            deleteChatBtn.add(dcLabel, BorderLayout.WEST);
+            deleteChatBtn.add(dcIcon, BorderLayout.EAST);
+            deleteChatBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            deleteChatBtn.setPreferredSize(new Dimension(200, 55));
+            deleteChatBtn.setMaximumSize(new Dimension(200, 55));
+            deleteChatBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
+
+            dPanel.add(unfriendBtn);
+            dPanel.add(Box.createVerticalGlue());
+            dPanel.add(blockBtn);
+            dPanel.add(Box.createVerticalGlue());
+            dPanel.add(spamBtn);
+            dPanel.add(Box.createVerticalGlue());
+            dPanel.add(deleteChatBtn);
+            dPanel.add(Box.createVerticalGlue());
+            dPanel.add(messageHolder);
+            dialog.setSize(250, 350);
+            dialog.add(dPanel);
+            dialog.setLocationRelativeTo(null);
+            return dialog;
         }
 
         JDialog createAddFriendDialog() {
@@ -1536,6 +1740,8 @@ class UserView {
 
             JPanel usrListPanel = new JPanel();
             usrListPanel.setLayout(new BoxLayout(usrListPanel, BoxLayout.Y_AXIS));
+            usrListPanel.setBackground(Color.decode(dotenv.get("background")));
+
             // usrListPanel.setMaximumSize(new Dimension(3, 30));
             JScrollPane usrListScroll = new JScrollPane(usrListPanel);
             usrListScroll.getVerticalScrollBar().setUnitIncrement(10);
@@ -1546,6 +1752,8 @@ class UserView {
 
             JButton searchButton = new JButton("Search");
             searchButton.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchButton.setForeground(Color.WHITE);
+            searchButton.setBackground(Color.decode(dotenv.get("btnBackground")));
             searchButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -1589,6 +1797,7 @@ class UserView {
             });
             searchPanel.add(searchButton);
             dPanel.add(searchPanel);
+            dPanel.setBackground(Color.decode(dotenv.get("background")));
 
             dialog.setSize(500, 700);
             dPanel.add(usrListScroll);
@@ -1645,6 +1854,8 @@ class UserView {
 
             JPanel usrListPanel = new JPanel();
             usrListPanel.setLayout(new BoxLayout(usrListPanel, BoxLayout.Y_AXIS));
+            usrListPanel.setBackground(Color.decode(dotenv.get("background")));
+
             // usrListPanel.setMaximumSize(new Dimension(3, 30));
             JScrollPane usrListScroll = new JScrollPane(usrListPanel);
             usrListScroll.getVerticalScrollBar().setUnitIncrement(10);
@@ -1657,6 +1868,8 @@ class UserView {
 
             JButton searchButton = new JButton("Search");
             searchButton.setFont(new Font("Nunito Sans", Font.BOLD, 19));
+            searchButton.setForeground(Color.WHITE);
+            searchButton.setBackground(Color.decode(dotenv.get("btnBackground")));
             searchButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -1680,6 +1893,7 @@ class UserView {
             });
             searchPanel.add(searchButton);
             dPanel.add(searchPanel);
+            dPanel.setBackground(Color.decode(dotenv.get("background")));
 
             dialog.setSize(500, 700);
             dPanel.add(usrListScroll);
@@ -1714,7 +1928,7 @@ class UserView {
             // btn.setIconTextGap(500);
             btn.setIcon(icon);
             btn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            btn.setBackground(Color.decode("#6E00FF"));
+            btn.setBackground(Color.decode(dotenv.get("btnBackground")));
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
             btn.setPreferredSize(new Dimension(100, 100));
             btn.setMaximumSize(new Dimension(100, 100));
@@ -1742,6 +1956,7 @@ class UserView {
 
                     addMessage(msg);
                     sc.close();
+                    textArea.setText("");
                 }
 
             });
