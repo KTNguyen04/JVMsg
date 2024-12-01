@@ -414,6 +414,34 @@ class SocketController {
                         pw.println(jsonResponseObject.toString());
                         break;
                     }
+                    case "block": {
+                        String username1 = data.get("username1");
+                        String username2 = data.get("username2");
+                        String header = "";
+                        JsonObject jsonResponseObject = new JsonObject();
+                        if (dbc.blockFriend(username1, username2)) {
+                            dbc.removeFriend(username1, username2);
+                            header = "blocked";
+                            ArrayList<User> newFriendList = dbc.getUserFriends(username1);
+                            JsonArray friendsArray = new JsonArray();
+                            for (User user : newFriendList) {
+                                JsonObject friendJson = new JsonObject();
+                                friendJson.addProperty("username", user.getUsername());
+                                friendJson.addProperty("fullname", user.getFullname());
+                                friendJson.addProperty("address", user.getAddress());
+                                friendJson.addProperty("email", user.getEmail());
+                                friendJson.addProperty("dob", user.getDob());
+                                friendJson.addProperty("gender", user.getGender());
+                                friendsArray.add(friendJson);
+                            }
+                            jsonResponseObject.add("friends", friendsArray);
+                        } else {
+                            header = "noblock";
+                        }
+                        jsonResponseObject.addProperty("header", header);
+                        pw.println(jsonResponseObject.toString());
+                        break;
+                    }
                     default:
                         break;
                 }
