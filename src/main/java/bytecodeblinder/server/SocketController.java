@@ -290,7 +290,7 @@ class SocketController {
                     }
                     case "findfriend": {
                         String header = "findfriended";
-                        ArrayList<User> foundFriends = dbc.findFriend(data.get("username"));
+                        ArrayList<User> foundFriends = dbc.findFriend(data.get("from"), data.get("username"));
 
                         JsonObject jsonObject = new JsonObject();
                         jsonObject.addProperty("header", header);
