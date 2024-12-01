@@ -266,6 +266,61 @@ class DatabaseController {
         return false;
     }
 
+    boolean blockFriend(String username1, String username2) {
+        Connection connection = connect();
+
+        String query = String.format("INSERT INTO %s.%s " +
+                "VALUES (?, ?);",
+                this.USERS, "BLOCK");
+
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username1);
+            pstm.setString(2, username2);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+            return false;
+            // return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     boolean insertAddFriend(String from, String to) {
         Connection connection = connect();
 
@@ -380,7 +435,7 @@ class DatabaseController {
         Connection connection = connect();
 
         String query = String.format("delete from  %s.%s " +
-                "where (`username1` = ? and `username2` = ?) or (`username2` = ? and `username1` = ?)", this.USERS,
+                "where (`username1` = ? and `username2` = ?) or (`username1` = ? and `username2` = ?)", this.USERS,
                 "FRIENDS");
         PreparedStatement pstm = null;
         ResultSet rs = null;

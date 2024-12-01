@@ -1605,7 +1605,7 @@ class UserView {
             dPanel.setLayout(new BoxLayout(dPanel, BoxLayout.Y_AXIS));
 
             JLabel messageHolder = new JLabel("");
-            messageHolder.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+            messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 20));
 
             JButton unfriendBtn = new JButton();
             JLabel ufLabel = new JLabel(
@@ -1678,6 +1678,46 @@ class UserView {
             blockBtn.setPreferredSize(new Dimension(200, 55));
             blockBtn.setMaximumSize(new Dimension(200, 55));
             blockBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
+
+            blockBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    SocketController sc = new SocketController();
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.addProperty("header", "block");
+                    jsonObject.addProperty("username1", user.getUsername());
+                    jsonObject.addProperty("username2", curPeer);
+                    sc.sendRequest(jsonObject.toString());
+
+                    String res = sc.getResponse();
+                    sc.close();
+
+                    // System.out.println(res);
+                    JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                    String resHeader = resObject.get("header").getAsString();
+
+                    if (resHeader.equals("blocked")) {
+
+                        JsonArray friendsArray = resObject.getAsJsonArray("friends");
+                        System.out.print(friendsArray);
+
+                        ArrayList<User> userList = new ArrayList<>();
+                        Gson gson = new Gson();
+                        for (int i = 0; i < friendsArray.size(); i++) {
+
+                            User u = gson.fromJson(friendsArray.get(i), User.class);
+                            System.out.println(u.getUsername());
+                            userList.add(u);
+
+                        }
+
+                        user.setFriends(userList);
+                        renderFriendList(userList, friendListPanel);
+
+                        messageHolder.setText("Done");
+                        messageHolder.setForeground(randomColor());
+                    }
+                }
+            });
 
             JButton spamBtn = new JButton();
             JLabel spLabel = new JLabel(
