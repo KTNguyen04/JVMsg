@@ -387,6 +387,33 @@ class SocketController {
                         pw.println(jsonObject.toString());
                         break;
                     }
+                    case "unfriend": {
+                        String username1 = data.get("username1");
+                        String username2 = data.get("username2");
+                        String header = "";
+                        JsonObject jsonResponseObject = new JsonObject();
+                        if (dbc.removeFriend(username1, username2)) {
+                            header = "unfriended";
+                            ArrayList<User> newFriendList = dbc.getUserFriends(username1);
+                            JsonArray friendsArray = new JsonArray();
+                            for (User user : newFriendList) {
+                                JsonObject friendJson = new JsonObject();
+                                friendJson.addProperty("username", user.getUsername());
+                                friendJson.addProperty("fullname", user.getFullname());
+                                friendJson.addProperty("address", user.getAddress());
+                                friendJson.addProperty("email", user.getEmail());
+                                friendJson.addProperty("dob", user.getDob());
+                                friendJson.addProperty("gender", user.getGender());
+                                friendsArray.add(friendJson);
+                            }
+                            jsonResponseObject.add("friends", friendsArray);
+                        } else {
+                            header = "nounfriend";
+                        }
+                        jsonResponseObject.addProperty("header", header);
+                        pw.println(jsonResponseObject.toString());
+                        break;
+                    }
                     default:
                         break;
                 }
