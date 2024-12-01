@@ -80,7 +80,9 @@ class UserView {
         });
 
         UIManager.put("ToolTip.font", new Font("Arial", Font.BOLD, 16));
-        // sc = null;
+        ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+        toolTipManager.setInitialDelay(50);
+        toolTipManager.setReshowDelay(0);
 
     }
 
@@ -1802,6 +1804,7 @@ class UserView {
                         JsonObject jsonObject = new JsonObject();
                         jsonObject.addProperty("header", "findfriend");
                         jsonObject.addProperty("username", searchField.getText());
+                        jsonObject.addProperty("from", user.getUsername());
                         sc.sendRequest(jsonObject.toString());
 
                         String res = sc.getResponse();

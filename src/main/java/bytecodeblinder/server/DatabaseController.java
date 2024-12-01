@@ -91,12 +91,28 @@ class DatabaseController {
         return "";
     }
 
-    ArrayList<User> findFriend(String pattern) {
+    ArrayList<User> findFriend(String username, String pattern) {
         Connection connection = connect();
 
-        String query = String.format("SELECT username, fullname FROM %s.%s " +
-                "WHERE username LIKE ? " +
-                "or fullname LIKE ?;",
+        String query = String.format("SELECT username, fullname " +
+                "FROM USERS.USER " +
+                "WHERE (username LIKE ? " +
+                "or fullname LIKE ?) " +
+                "AND username not in " +
+                "(SELECT u.username " +
+                "FROM " +
+                "USERS.BLOCK AS b " +
+                "JOIN " +
+                "USERS.USER AS u " +
+                "ON " +
+                "u.username = " +
+                "CASE " +
+                "WHEN b.username1 = ? THEN b.username2 " +
+                "ELSE b.username1 " +
+                "END " +
+                "WHERE " +
+                "b.username1 = ? " +
+                "OR b.username2 = ?);  ",
                 this.USERS, "USER");
 
         PreparedStatement pstm = null;
@@ -107,6 +123,9 @@ class DatabaseController {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, pattern);
             pstm.setString(2, pattern);
+            pstm.setString(3, username);
+            pstm.setString(4, username);
+            pstm.setString(5, username);
 
             rs = pstm.executeQuery();
             while (rs.next()) {
@@ -548,19 +567,19 @@ class DatabaseController {
     ArrayList<User> getUserFriends(String username) {
         Connection connection = connect();
 
-        String query = String.format("\n" + //
-                "        SELECT " + //
-                "        u.username,u.fullname,u.address,u.gender,u.dob,u.email\n" + //
-                "    FROM \n" + //
-                "        %s.%s f\n" + //
-                "    JOIN \n" + //
-                "       %s.%s u\n" + //
-                "        ON u.username = \n" + //
-                "            CASE \n" + //
-                "                WHEN f.username1 = ? THEN f.username2 \n" + //
-                "                ELSE f.username1 \n" + //
-                "            END\n" + //
-                "    WHERE \n" + //
+        String query = String.format("\n" +
+                "        SELECT " +
+                "        u.username,u.fullname,u.address,u.gender,u.dob,u.email" +
+                "    FROM " +
+                "        %s.%s f" +
+                "    JOIN " +
+                "       %s.%s u" +
+                "        ON u.username = " +
+                "            CASE " +
+                "                WHEN f.username1 = ? THEN f.username2 " +
+                "                ELSE f.username1 " +
+                "            END" +
+                "    WHERE " + //
                 "        f.username1 = ? OR f.username2 = ?;",
                 this.USERS, "FRIENDS", this.USERS, "USER");
 
