@@ -1,4 +1,4 @@
-package bytecodeblinder.user;
+package bytecodeblinder.models;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,7 +16,10 @@ import java.util.function.Consumer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-class SocketController {
+import bytecodeblinder.user.ChatMessage;
+import bytecodeblinder.user.User;
+
+public class SocketController {
     private String serverIP;
     private int serverPort;
     private int serverChatPort;
@@ -33,12 +36,12 @@ class SocketController {
     BufferedReader chatBR;
     PrintWriter chatPW;
 
-    SocketController() {
+    public SocketController() {
         this("localhost", 7418); //
         this.serverChatPort = 8147;
     }
 
-    SocketController(String serverIP, int serverPort) {
+    public SocketController(String serverIP, int serverPort) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         try {
@@ -80,12 +83,12 @@ class SocketController {
         this.addMessageCallback = addMessageCallback;
     }
 
-    void sendRequest(String data) {
+    public void sendRequest(String data) {
         pw.println(data);
 
     }
 
-    String getResponse() {
+    public String getResponse() {
         try {
             System.out.println("test2");
             return br.readLine();
@@ -96,7 +99,7 @@ class SocketController {
         return "";
     }
 
-    void close() {
+    public void close() {
         if (sSocket != null && !sSocket.isClosed()) {
             try {
                 System.out.println("dadong");
@@ -117,13 +120,13 @@ class SocketController {
     }
 
     // void chatting(String message)
-    PrintWriter getChatWriter() {
+    public PrintWriter getChatWriter() {
         while (chatPW == null)
             ;
         return chatPW;
     }
 
-    void openChatSocket() {
+    public void openChatSocket(User user) {
         new Thread(() -> {
             try {
 
@@ -141,7 +144,8 @@ class SocketController {
                         Gson gson = new Gson();
                         ChatMessage msg = gson.fromJson(message, ChatMessage.class);
 
-                        UserView.user.addMessage(msg);
+                        user.addMessage(msg);
+                        // UserView.user.addMessage(msg);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

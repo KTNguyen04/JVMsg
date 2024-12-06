@@ -17,6 +17,8 @@ import java.awt.image.BufferedImage;
 
 import com.toedter.calendar.JDateChooser;
 
+import bytecodeblinder.models.SocketController;
+
 import java.util.*;
 import java.util.Date;
 
@@ -36,7 +38,7 @@ class UserView {
 
     private Mode mode;
 
-    static User user;
+    private User user;
 
     private Dotenv dotenv = Dotenv.load();
 
@@ -203,7 +205,7 @@ class UserView {
                             cardLO.show(panel, "HOME");
                             mode = Mode.HOME;
 
-                            sc.openChatSocket();
+                            sc.openChatSocket(user);
                             chatPW = sc.getChatWriter();
                             // // System.out.println("chatPW" + chatPW);
                             sc.close();
