@@ -106,7 +106,7 @@ public class User {
         return messages;
     }
 
-    void addMessage(ChatMessage msg) {
+    public void addMessage(ChatMessage msg) {
         messages.add(msg);
         notifyListener();
     }
