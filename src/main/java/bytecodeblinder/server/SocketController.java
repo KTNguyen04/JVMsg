@@ -458,6 +458,28 @@ class SocketController {
                         pw.println(jsonResponseObject.toString());
                         break;
                     }
+                    case "getallusers": {
+                        ArrayList<User> users = dbc.getAllUsers();
+
+                        String header = "getallusersed";
+                        JsonArray usersArray = new JsonArray();
+                        JsonObject jsonResponseObject = new JsonObject();
+                        for (User user : users) {
+                            JsonObject userJson = new JsonObject();
+                            userJson.addProperty("username", user.getUsername());
+                            userJson.addProperty("fullname", user.getFullname());
+                            userJson.addProperty("address", user.getAddress());
+                            userJson.addProperty("email", user.getEmail());
+                            userJson.addProperty("dob", user.getDob());
+                            userJson.addProperty("gender", user.getGender());
+                            userJson.addProperty("createDate", user.getCreateDate());
+                            usersArray.add(userJson);
+                        }
+                        jsonResponseObject.add("users", usersArray);
+                        jsonResponseObject.addProperty("header", header);
+                        pw.println(jsonResponseObject.toString());
+                        break;
+                    }
                     default:
                         break;
                 }

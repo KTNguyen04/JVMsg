@@ -236,7 +236,7 @@ class DatabaseController {
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
-        ArrayList<User> requests = new ArrayList<>();
+        ArrayList<User> users = new ArrayList<>();
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
@@ -249,13 +249,13 @@ class DatabaseController {
 
                 User user = new User(usrn);
 
-                requests.add(user);
+                users.add(user);
 
             }
             connection.close();
             // System.out.println("123" + friends.get(0));
 
-            return requests;
+            return users;
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -281,7 +281,7 @@ class DatabaseController {
                 e.printStackTrace();
             }
         }
-        return requests;
+        return users;
 
     }
 
@@ -1251,6 +1251,68 @@ class DatabaseController {
             }
         }
         return false;
+
+    }
+
+    ArrayList<User> getAllUsers() {
+
+        Connection connection = connect();
+        String query = String.format("SELECT username,fullname,address,gender,dob,email,createDate from %s.%s ",
+                this.USERS, "USER");
+
+        // PreparedStatement pstm = null;
+        Statement stm = null;
+        ResultSet rs = null;
+        ArrayList<User> requests = new ArrayList<>();
+        try {
+            stm = connection.createStatement();
+
+            rs = stm.executeQuery(query);
+            while (rs.next()) {
+                String usrn = rs.getString("username");
+                String fullname = rs.getString("fullname");
+                String address = rs.getString("address");
+                String email = rs.getString("email");
+                String dob = rs.getString("dob");
+                String gender = rs.getString("gender");
+                String createDate = rs.getString("createDate");
+
+                User user = new User(usrn, fullname, address, email, dob, gender);
+                user.setCreateDate(createDate);
+
+                requests.add(user);
+
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+
+            return requests;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                stm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return requests;
 
     }
 }
