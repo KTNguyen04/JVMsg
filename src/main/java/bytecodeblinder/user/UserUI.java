@@ -1754,6 +1754,33 @@ class UserView {
             deleteChatBtn.setPreferredSize(new Dimension(200, 55));
             deleteChatBtn.setMaximumSize(new Dimension(200, 55));
             deleteChatBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
+            deleteChatBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    SocketController sc = new SocketController();
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.addProperty("header", "deletechat");
+                    jsonObject.addProperty("username1", user.getUsername());
+                    jsonObject.addProperty("username2", curPeer);
+                    sc.sendRequest(jsonObject.toString());
+
+                    String res = sc.getResponse();
+                    sc.close();
+
+                    // System.out.println(res);
+                    JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                    String resHeader = resObject.get("header").getAsString();
+
+                    if (resHeader.equals("deletechated")) {
+
+                        messageHolder.setText("Done");
+                        messageHolder.setForeground(randomColor());
+
+                        user.setMessages(new ArrayList<>());
+
+                        addMessages();
+                    }
+                }
+            });
 
             dPanel.add(unfriendBtn);
             dPanel.add(Box.createVerticalGlue());

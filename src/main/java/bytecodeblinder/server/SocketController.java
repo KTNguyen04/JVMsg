@@ -442,6 +442,22 @@ class SocketController {
                         pw.println(jsonResponseObject.toString());
                         break;
                     }
+                    case "deletechat": {
+                        String username1 = data.get("username1");
+                        String username2 = data.get("username2");
+                        String header = "";
+                        JsonObject jsonResponseObject = new JsonObject();
+                        if (dbc.removeAllChat(username1, username2)) {
+
+                            header = "deletechated";
+
+                        } else {
+                            header = "nodeletechat";
+                        }
+                        jsonResponseObject.addProperty("header", header);
+                        pw.println(jsonResponseObject.toString());
+                        break;
+                    }
                     default:
                         break;
                 }
