@@ -14,6 +14,7 @@ public class User {
     private String dob;
     private String gender;
     private String password;
+    private String createDate;
     private boolean isOnline;
 
     ArrayList<User> friends;
@@ -138,6 +139,14 @@ public class User {
             return false;
         User user = (User) obj;
         return username != null && username.equals(user.username);
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getCreateDate() {
+        return this.createDate;
     }
 
     // public void setFullname(String fullname) {
