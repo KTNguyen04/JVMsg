@@ -170,6 +170,61 @@ class DatabaseController {
         return friends;
     }
 
+    boolean removeAllChat(String username1, String username2) {
+        Connection connection = connect();
+
+        String query = String.format("delete from  %s.%s " +
+                "where (`from` = ? and `to` = ?) or (`from` = ? and `to` = ?)", this.USERS, "MESSAGE");
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        try {
+            pstm = connection.prepareStatement(query);
+            pstm.setString(1, username1);
+            pstm.setString(2, username2);
+            pstm.setString(3, username2);
+            pstm.setString(4, username1);
+            // pstm.setString(2, ip);
+            // stm.setString(2, password);
+
+            int row = pstm.executeUpdate();
+            // rs = pstm.executeQuery();
+
+            if (row != 0) {
+                System.out.println("THanh cong");
+
+                return true;
+            }
+            connection.close();
+            return false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                pstm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     ArrayList<User> getFriendRequest(String username) {
 
         Connection connection = connect();
