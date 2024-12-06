@@ -16,6 +16,7 @@ import java.io.*;
 import java.awt.image.BufferedImage;
 
 import com.toedter.calendar.JDateChooser;
+
 import java.util.*;
 import java.util.Date;
 
@@ -75,7 +76,7 @@ class UserView {
             public void windowClosing(WindowEvent we) {
                 if (mode == Mode.HOME)
                     sendOffline();
-                System.out.println("test");
+
             }
         });
 

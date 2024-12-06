@@ -11,23 +11,29 @@ import java.awt.image.BufferedImage;
 
 import java.util.*;
 
-import bytecodeblinder.config.AppConfig;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.DefaultCategoryDataset;
+import io.github.cdimascio.dotenv.Dotenv;
 
 class AdminView {
     private JFrame frame;
     private JPanel panel;
+    private Admin admin;
     // private CardLayout cardLO;
     // private SocketController socketController;
     // Mode mode;
+    private Dotenv dotenv = Dotenv.load();
 
     // User user;
 
     AdminView() throws IOException {
 
-        Integer width = Integer.valueOf(AppConfig.appWidth);
-        Integer height = Integer.valueOf(AppConfig.appHeight);
+        Integer width = Integer.valueOf(dotenv.get("app.width"));
+        Integer height = Integer.valueOf(dotenv.get("app.height"));
 
-        frame = new JFrame(AppConfig.appName);
+        frame = new JFrame(dotenv.get("app.title"));
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new CardLayout());
@@ -37,7 +43,7 @@ class AdminView {
         frame.setResizable(false);
 
         // cardLO = new CardLayout();
-        panel = new MainPanel();
+        panel = new HomePanel();
 
         // panel.add("LOGIN", new MainPanel());
         // panel.add("SIGNUP", new SignupPanel());
@@ -49,187 +55,92 @@ class AdminView {
         frame.setVisible(true);
     }
 
-    class MainPanel extends JPanel {
+    class HomePanel extends JPanel {
         // private JTextField usernameField;
         // private JTextField passwordField;
         // private JLabel messageHolder;
+        JPanel mainPanel;
 
-        MainPanel() throws IOException {
+        HomePanel() throws IOException {
+            super();
+            GridBagConstraints gbc;
+
+            setLayout(new GridBagLayout());
+            gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.BOTH;
+
+            // JPanel utilPanel = createSettingPanel();
+            JPanel utilPanel = createUtilPanel();
+            utilPanel.setLayout(new BoxLayout(utilPanel, BoxLayout.Y_AXIS));
+            utilPanel.setBackground(Color.WHITE);
+            gbc.gridx = 0;
+            gbc.weightx = 1;
+            // gbc.gridwidth = 1;
+            gbc.weighty = 1;
+            add(utilPanel, gbc);
+            // add(Box.createRigidArea(new Dimension(10, 30)));
+
+            mainPanel = new JPanel();
+            // mainPanel.setBackground(Color.RED);
+
+            gbc.gridx = 1;
+            // gbc.weightx = 6;
+            gbc.weightx = 8;
+            // gbc.gridwidth = 6;
+            gbc.weighty = 1;
+            add(mainPanel, gbc);
+
         }
-        // super(new BorderLayout());
 
-        // JPanel leftPanel = new JPanel();
-        // JPanel rightPanel = new JPanel();
+        JPanel createUtilPanel() {
+            JPanel pan = new JPanel();
+            JLabel chartLabel = new JLabel("Chart");
+            chartLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            chartLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // rightPanel.setBackground(Color.WHITE);
-        // rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+            JButton subBtn = new JButton("Subcribers");
+            subBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            subBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            subBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    mainPanel.removeAll();
+                    mainPanel.revalidate();
+                    mainPanel.repaint();
+                    mainPanel.add(subcriberChart());
+                }
+            });
 
-        // BufferedImage bannerImage = ImageIO.read(new File(AppConfig.bannerPath));
-        // Image scaledImage = bannerImage.getScaledInstance(AppConfig.bannerWidth,
-        // AppConfig.bannerHeight,
-        // Image.SCALE_SMOOTH);
-        // JLabel banner = new JLabel(new ImageIcon(scaledImage));
+            JButton actBtn = new JButton("Active");
+            actBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            actBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+            pan.add(chartLabel);
+            pan.add(subBtn);
+            pan.add(Box.createRigidArea(new Dimension(0, 10)));
+            pan.add(actBtn);
+            return pan;
+        }
 
-        // JLabel loginTitle = new JLabel("Login to your account");
-        // loginTitle.setForeground(new Color(82, 82, 82));
+        ChartPanel subcriberChart() {
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+            dataset.addValue(1, "Series1", "Category1");
+            dataset.addValue(4, "Series1", "Category2");
+            dataset.addValue(3, "Series1", "Category3");
+            dataset.addValue(5, "Series1", "Category4");
 
-        // loginTitle.setFont(new Font("Nunito Sans", Font.BOLD, 36));
+            JFreeChart chart = ChartFactory.createBarChart(
+                    "Subcribers", // Chart title
+                    "Month", // X-Axis label
+                    "Quantity", // Y-Axis label
+                    dataset // Data
+            );
 
-        // JLabel usernameLabel = new JLabel("Username");
-        // usernameLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+            ChartPanel chartPanel = new ChartPanel(chart);
+            chartPanel.setPreferredSize(new Dimension(800, 600));
 
-        // usernameField = new JTextField(40);
-        // usernameField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-        // usernameField.setMaximumSize(usernameField.getPreferredSize());
-        // usernameField.setMargin(new Insets(5, 5, 5, 5));
-        // // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            return chartPanel;
+        }
 
-        // JLabel passwordLabel = new JLabel("Password");
-        // passwordLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
-        // passwordLabel.setForeground(new Color(82, 82, 82));
-
-        // // passwordLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // passwordField = new JPasswordField(40);
-        // passwordField.setFont(new Font("Arial", Font.PLAIN, 20));
-        // passwordField.setMargin(new Insets(5, 5, 5, 5));
-        // passwordField.setMaximumSize(passwordField.getPreferredSize());
-
-        // JButton submitButton = new JButton("Login");
-        // submitButton.setFont(new Font("Nunito Sans", Font.BOLD, 20));
-        // submitButton.setBackground(new Color(127, 38, 91));
-        // submitButton.setForeground(Color.WHITE);
-        // submitButton.setPreferredSize(new Dimension(380, 40));
-        // submitButton.setMaximumSize(new Dimension(380, 40));
-        // submitButton.addMouseListener(new MouseAdapter() {
-        // public void mouseClicked(MouseEvent me) {
-        // new Thread(() -> {
-        // SocketController sc = new SocketController();
-        // String packet = getLogInData();
-        // System.out.println(packet);
-        // sc.sendRequest(packet);
-
-        // System.out.println("test");
-        // String res = sc.getResponse();
-        // Gson gson = new Gson();
-
-        // System.out.println(res);
-        // sc.close();
-        // JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
-        // String resHeader = jsonObject.get("header").getAsString();
-        // if (resHeader.equals("logined")) {
-        // user = gson.fromJson(res, User.class);
-        // cardLO.show(panel, "HOME");
-
-        // } else {
-        // messageHolder.setText("LOGIN FAILED");
-        // messageHolder.setForeground(randomColor());
-        // }
-
-        // // cardLO.show(panel, "HOME");
-        // }).start();
-        // }
-        // });
-
-        // JPanel registerInstruction = new JPanel();
-        // JLabel questionText = new JLabel("Not Registered Yet?");
-        // JLabel instructionText = new JLabel("Create an account");
-        // questionText.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-        // questionText.setForeground(new Color(82, 82, 82));
-        // instructionText.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-        // instructionText.setForeground(new Color(127, 38, 91));
-        // instructionText.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        // registerInstruction.setMaximumSize(new Dimension(400, 50));
-        // registerInstruction.setBackground(Color.WHITE);
-        // registerInstruction.add(questionText);
-        // registerInstruction.add(instructionText);
-        // registerInstruction.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // instructionText.addMouseListener(new MouseAdapter() {
-        // public void mouseEntered(MouseEvent me) {
-        // instructionText.setText("<html><u>Create an account</u></html>");
-        // }
-
-        // public void mouseExited(MouseEvent me) {
-        // instructionText.setText("<html>Create an account</html>");
-        // }
-
-        // public void mouseClicked(MouseEvent me) {
-        // cardLO.show(panel, "SIGNUP");
-        // }
-
-        // });
-
-        // messageHolder = new JLabel(" ");
-
-        // messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-        // messageHolder.setForeground(Color.decode("#ffc107"));
-
-        // // instructionText.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-        // // instructionText.setForeground(new Color(127, 38, 91));
-        // // instructionText.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        // leftPanel.add(banner);
-
-        // rightPanel.add(Box.createVerticalGlue());
-        // rightPanel.add(loginTitle);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
-        // // rightPanel.add(Box.createRigidArea(new Dimension(30, 0)));
-        // rightPanel.add(usernameLabel);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        // rightPanel.add(usernameField);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        // rightPanel.add(passwordLabel);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        // rightPanel.add(passwordField);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 60)));
-        // rightPanel.add(submitButton);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 60)));
-
-        // rightPanel.add(registerInstruction);
-
-        // rightPanel.add(messageHolder);
-        // rightPanel.add(Box.createVerticalGlue());
-
-        // add(leftPanel, BorderLayout.WEST);
-        // add(rightPanel, BorderLayout.CENTER);
-        // }
-
-        // String getLogInData() {
-        // HashMap<String, String> loginData = new HashMap<>();
-
-        // String username = usernameField.getText();
-        // String password = passwordField.getText();
-
-        // loginData.put("header", "login");
-        // loginData.put("username", username);
-        // loginData.put("password", password);
-
-        // Gson gson = new Gson();
-        // String json = gson.toJson(loginData);
-        // return json;
-
-        // }
-
-        // public static Color randomColor() {
-        // // Tạo đối tượng Random
-        // Random rand = new Random();
-
-        // int red = rand.nextInt(256);
-        // int green = rand.nextInt(256);
-        // int blue = rand.nextInt(256);
-
-        // return new Color(red, green, blue);
-        // }
-
-        // // void sendLoginRequest() {
-        // // System.out.println(usernameField.getText());
-        // // System.out.println(passwordField.getText());
-        // // }
     }
 
 }
