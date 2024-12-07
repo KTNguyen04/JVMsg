@@ -158,6 +158,47 @@ class AdminView {
             JButton actBtn = new JButton("Active");
             actBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
             actBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            actBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    new Thread(() -> {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "getlogindata");
+
+                        sc.sendRequest(jsonObject.toString());
+
+                        String res = sc.getResponse();
+                        sc.close();
+
+                        System.out.println(res);
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
+                        if (resHeader.equals("getlogindataed")) {
+                            JsonArray logsArray = resObject.getAsJsonArray("logs");
+                            ArrayList<LoginLog> logs = new ArrayList<>();
+                            Gson gson = new Gson();
+                            for (int i = 0; i < logsArray.size(); i++) {
+
+                                LoginLog u = gson.fromJson(logsArray.get(i), LoginLog.class);
+                                // System.out.println(u.getUsername());
+                                logs.add(u);
+                                // System.out.println(u.getCreateDate());
+
+                            }
+
+                            admin.setLoginLogs(logs);
+
+                        }
+
+                        mainPanel.removeAll();
+                        mainPanel.add(activeChart());
+                        mainPanel.revalidate();
+                        mainPanel.repaint();
+
+                    }).start();
+
+                }
+            });
 
             pan.add(chartLabel);
             pan.add(subBtn);
@@ -220,7 +261,88 @@ class AdminView {
                     chartPanel.setPreferredSize(new Dimension(800, 600));
                     pan.setPreferredSize(new Dimension(800, 600));
 
+                    pan.removeAll();
+                    pan.add(yearLabel);
+                    pan.add(yearList);
                     pan.add(chartPanel);
+                    pan.revalidate();
+                    pan.repaint();
+                }
+            });
+            // petList.setSelectedIndex(4);
+            // petList.addActionListener(this);
+
+            // System.out.println(users.get(0).getCreateDate());
+            // dataset.addValue(1, "Series1", "Category1");
+            // dataset.addValue(4, "Series1", "Category2");
+            // dataset.addValue(3, "Series1", "Category3");
+            // dataset.addValue(5, "Series1", "Category4");
+            pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
+            pan.add(yearLabel);
+            pan.add(yearList);
+            return pan;
+        }
+
+        JPanel activeChart() {
+            ArrayList<LoginLog> logs = admin.getLoginLogs();
+
+            JLabel yearLabel = new JLabel("Select year");
+            yearLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            // yearField.setDate(new Date());
+
+            TreeMap<Integer, int[]> data = new TreeMap<>();
+
+            for (LoginLog log : logs) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDate date = LocalDate.parse(log.getLoginTime(), formatter);
+
+                // Lấy tháng và năm
+                int month = date.getMonthValue();
+                int year = date.getYear();
+
+                data.putIfAbsent(year, new int[12]);
+
+                data.get(year)[month - 1]++;
+
+            }
+
+            Set<Integer> years = data.keySet();
+
+            // Create the combo box, select item at index 4.
+            // Indices start at 0, so 4 specifies the pig.
+
+            JPanel pan = new JPanel();
+            JComboBox yearList = new JComboBox(years.toArray());
+            yearList.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComboBox cb = (JComboBox) e.getSource();
+                    int year = (int) cb.getSelectedItem();
+
+                    int[] month = data.get(year);
+                    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+                    for (int i = 0; i < 12; i++) {
+                        dataset.addValue(month[i], String.valueOf(year), String.valueOf(i + 1));
+
+                    }
+                    JFreeChart chart = ChartFactory.createBarChart(
+                            "Active Count", // Chart title
+                            "Month", // X-Axis label
+                            "Quantity", // Y-Axis label
+                            dataset // Data
+                    );
+
+                    ChartPanel chartPanel = new ChartPanel(chart);
+                    chartPanel.setPreferredSize(new Dimension(800, 600));
+                    pan.setPreferredSize(new Dimension(800, 600));
+
+                    pan.removeAll();
+                    pan.add(yearLabel);
+                    pan.add(yearList);
+                    pan.add(chartPanel);
+                    pan.revalidate();
+                    pan.repaint();
                 }
             });
             // petList.setSelectedIndex(4);
