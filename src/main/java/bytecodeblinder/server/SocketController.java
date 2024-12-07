@@ -11,6 +11,8 @@ import javax.mail.*;
 
 import javax.mail.PasswordAuthentication;
 import javax.mail.internet.*;
+
+import bytecodeblinder.admin.LoginLog;
 import bytecodeblinder.user.*;
 
 class SocketController {
@@ -476,6 +478,24 @@ class SocketController {
                             usersArray.add(userJson);
                         }
                         jsonResponseObject.add("users", usersArray);
+                        jsonResponseObject.addProperty("header", header);
+                        pw.println(jsonResponseObject.toString());
+                        break;
+                    }
+                    case "getlogindata": {
+                        ArrayList<LoginLog> logs = dbc.getLoginData();
+
+                        String header = "getlogindataed";
+                        JsonArray logsArray = new JsonArray();
+                        JsonObject jsonResponseObject = new JsonObject();
+                        for (LoginLog log : logs) {
+                            JsonObject userJson = new JsonObject();
+                            userJson.addProperty("username", log.getUsername());
+                            userJson.addProperty("loginTime", log.getLoginTime());
+
+                            logsArray.add(userJson);
+                        }
+                        jsonResponseObject.add("logs", logsArray);
                         jsonResponseObject.addProperty("header", header);
                         pw.println(jsonResponseObject.toString());
                         break;

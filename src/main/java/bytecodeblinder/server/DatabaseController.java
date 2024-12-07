@@ -1,5 +1,6 @@
 package bytecodeblinder.server;
 
+import bytecodeblinder.admin.LoginLog;
 import bytecodeblinder.user.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -1263,7 +1264,7 @@ class DatabaseController {
         // PreparedStatement pstm = null;
         Statement stm = null;
         ResultSet rs = null;
-        ArrayList<User> requests = new ArrayList<>();
+        ArrayList<User> users = new ArrayList<>();
         try {
             stm = connection.createStatement();
 
@@ -1280,13 +1281,13 @@ class DatabaseController {
                 User user = new User(usrn, fullname, address, email, dob, gender);
                 user.setCreateDate(createDate);
 
-                requests.add(user);
+                users.add(user);
 
             }
             connection.close();
             // System.out.println("123" + friends.get(0));
 
-            return requests;
+            return users;
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -1312,7 +1313,63 @@ class DatabaseController {
                 e.printStackTrace();
             }
         }
-        return requests;
+        return users;
+
+    }
+
+    ArrayList<LoginLog> getLoginData() {
+
+        Connection connection = connect();
+        String query = String.format("SELECT username, time from %s.%s ",
+                this.USERS, "LOGIN");
+
+        // PreparedStatement pstm = null;
+        Statement stm = null;
+        ResultSet rs = null;
+        ArrayList<LoginLog> logs = new ArrayList<>();
+        try {
+            stm = connection.createStatement();
+
+            rs = stm.executeQuery(query);
+            while (rs.next()) {
+                String usrn = rs.getString("username");
+                String loginTime = rs.getString("time");
+
+                LoginLog log = new LoginLog(usrn, loginTime);
+
+                logs.add(log);
+
+            }
+            connection.close();
+            // System.out.println("123" + friends.get(0));
+
+            return logs;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                stm.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                if (rs != null)
+
+                    rs.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
+        }
+        return logs;
 
     }
 }
