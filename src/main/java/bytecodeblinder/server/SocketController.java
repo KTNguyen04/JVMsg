@@ -489,11 +489,12 @@ class SocketController {
                         JsonArray logsArray = new JsonArray();
                         JsonObject jsonResponseObject = new JsonObject();
                         for (LoginLog log : logs) {
-                            JsonObject userJson = new JsonObject();
-                            userJson.addProperty("username", log.getUsername());
-                            userJson.addProperty("loginTime", log.getLoginTime());
+                            JsonObject logJson = new JsonObject();
+                            logJson.addProperty("username", log.getUsername());
+                            logJson.addProperty("loginTime", log.getLoginTime());
+                            logJson.addProperty("fullname", log.getFullname());
 
-                            logsArray.add(userJson);
+                            logsArray.add(logJson);
                         }
                         jsonResponseObject.add("logs", logsArray);
                         jsonResponseObject.addProperty("header", header);

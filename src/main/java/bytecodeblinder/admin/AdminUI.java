@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.awt.image.BufferedImage;
 
@@ -200,10 +201,57 @@ class AdminView {
                 }
             });
 
+            JButton loginLogBtn = new JButton("Login Log");
+            loginLogBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            loginLogBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            loginLogBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    new Thread(() -> {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "getlogindata");
+
+                        sc.sendRequest(jsonObject.toString());
+
+                        String res = sc.getResponse();
+                        sc.close();
+
+                        System.out.println(res);
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
+                        if (resHeader.equals("getlogindataed")) {
+                            JsonArray logsArray = resObject.getAsJsonArray("logs");
+                            ArrayList<LoginLog> logs = new ArrayList<>();
+                            Gson gson = new Gson();
+                            for (int i = 0; i < logsArray.size(); i++) {
+
+                                LoginLog u = gson.fromJson(logsArray.get(i), LoginLog.class);
+                                // System.out.println(u.getUsername());
+                                logs.add(u);
+                                // System.out.println(u.getCreateDate());
+
+                            }
+
+                            admin.setLoginLogs(logs);
+
+                        }
+
+                        mainPanel.removeAll();
+                        mainPanel.add(loginLogTable());
+                        mainPanel.revalidate();
+                        mainPanel.repaint();
+
+                    }).start();
+
+                }
+            });
+
             pan.add(chartLabel);
             pan.add(subBtn);
             pan.add(Box.createRigidArea(new Dimension(0, 10)));
             pan.add(actBtn);
+            pan.add(Box.createRigidArea(new Dimension(0, 10)));
+            pan.add(loginLogBtn);
             return pan;
         }
 
@@ -357,6 +405,49 @@ class AdminView {
             pan.add(yearLabel);
             pan.add(yearList);
             return pan;
+        }
+
+        JScrollPane loginLogTable() {
+            ArrayList<LoginLog> logs = admin.getLoginLogs();
+
+            ArrayList<ArrayList<String>> data = new ArrayList<>();
+
+            // Column Names
+            JTable table;
+            String[] columnNames = { "Time", "Username", "Fullname" };
+
+            for (LoginLog log : logs) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime date = LocalDateTime.parse(log.getLoginTime(), formatter);
+                String formattedLoginTime = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                String username = log.getUsername();
+                String fullname = log.getFullname();
+                String loginTime = formattedLoginTime;
+                ArrayList<String> row = new ArrayList<>();
+                row.add(loginTime);
+                row.add(username);
+                row.add(fullname);
+                data.add(row);
+            }
+            String[][] tableData = data.stream()
+                    .map(row -> row.toArray(new String[0]))
+                    .toArray(String[][]::new);
+            table = new JTable(tableData, columnNames);
+
+            table.setFont(new Font("Arial", Font.PLAIN, 18));
+
+            table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 18));
+            table.setRowHeight(30);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            // table.setBounds(0, 0, 800, 800);
+            // scrollPane.setBounds(0, 0, 600, 100);
+            scrollPane.setPreferredSize(new Dimension(700, 750));
+            // pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
+            // pan.add(table);
+
+            return scrollPane;
         }
 
     }
