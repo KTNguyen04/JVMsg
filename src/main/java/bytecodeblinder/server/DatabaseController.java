@@ -1320,8 +1320,11 @@ class DatabaseController {
     ArrayList<LoginLog> getLoginData() {
 
         Connection connection = connect();
-        String query = String.format("SELECT username, time from %s.%s ",
-                this.USERS, "LOGIN");
+        String query = String.format("select l.username,u.fullname,l.time " +
+                "from %s.%s l join %s.%s u " +
+                "on( l.username = u.username) " +
+                "                ",
+                this.USERS, "LOGIN", this.USERS, "USER");
 
         // PreparedStatement pstm = null;
         Statement stm = null;
@@ -1334,8 +1337,9 @@ class DatabaseController {
             while (rs.next()) {
                 String usrn = rs.getString("username");
                 String loginTime = rs.getString("time");
+                String fullname = rs.getString("fullname");
 
-                LoginLog log = new LoginLog(usrn, loginTime);
+                LoginLog log = new LoginLog(usrn, fullname, loginTime);
 
                 logs.add(log);
 
