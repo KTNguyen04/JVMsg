@@ -246,6 +246,8 @@ class AdminView {
 
             JPanel pan = new JPanel();
             JComboBox yearList = new JComboBox(years.toArray());
+            yearList.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+
             yearList.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -266,7 +268,7 @@ class AdminView {
 
                     ChartPanel chartPanel = new ChartPanel(chart);
                     chartPanel.setPreferredSize(new Dimension(800, 600));
-                    pan.setPreferredSize(new Dimension(800, 600));
+                    pan.setPreferredSize(new Dimension(800, 650));
 
                     pan.removeAll();
                     pan.add(yearLabel);
@@ -277,7 +279,6 @@ class AdminView {
                 }
             });
 
-            pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
             pan.add(yearLabel);
             pan.add(yearList);
             return pan;
@@ -308,6 +309,8 @@ class AdminView {
 
             JPanel pan = new JPanel();
             JComboBox yearList = new JComboBox(years.toArray());
+            yearList.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+
             yearList.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -328,7 +331,7 @@ class AdminView {
 
                     ChartPanel chartPanel = new ChartPanel(chart);
                     chartPanel.setPreferredSize(new Dimension(800, 600));
-                    pan.setPreferredSize(new Dimension(800, 600));
+                    pan.setPreferredSize(new Dimension(800, 650));
 
                     pan.removeAll();
                     pan.add(yearLabel);
@@ -370,6 +373,7 @@ class AdminView {
                     .map(row -> row.toArray(new String[0]))
                     .toArray(String[][]::new);
             table = new JTable(tableData, columnNames);
+            table.setEnabled(false);
 
             table.setFont(new Font("Arial", Font.PLAIN, 18));
 
