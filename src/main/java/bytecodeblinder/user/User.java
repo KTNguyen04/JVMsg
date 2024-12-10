@@ -1,10 +1,6 @@
 package bytecodeblinder.user;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import com.mysql.cj.protocol.MessageListener;
 
 public class User {
     private String username;
@@ -24,7 +20,7 @@ public class User {
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
+
         return this.username;
     }
 
@@ -149,23 +145,4 @@ public class User {
         return this.createDate;
     }
 
-    // public void setFullname(String fullname) {
-    // this.fullname = fullname;
-    // }
-
-    // public void setAddress(String address) {
-    // this.address = address;
-    // }
-
-    // public void setEmail(String email) {
-    // this.email = email;
-    // }
-
-    // public void setDob(String dob) {
-    // this.dob = dob;
-    // }
-
-    // public void setGender(String gender) {
-    // this.gender = gender;
-    // }
 }

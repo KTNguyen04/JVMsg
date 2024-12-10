@@ -1,25 +1,16 @@
 package bytecodeblinder.admin;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
 import com.google.gson.*;
-import com.toedter.calendar.JDateChooser;
-import com.toedter.calendar.JYearChooser;
-
 import bytecodeblinder.models.SocketController;
 import bytecodeblinder.user.User;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.awt.image.BufferedImage;
-
 import java.util.*;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -30,12 +21,8 @@ class AdminView {
     private JFrame frame;
     private JPanel panel;
     private Admin admin;
-    // private CardLayout cardLO;
-    // private SocketController socketController;
-    // Mode mode;
-    private Dotenv dotenv = Dotenv.load();
 
-    // User user;
+    private Dotenv dotenv = Dotenv.load();
 
     AdminView() throws IOException {
 
@@ -47,28 +34,19 @@ class AdminView {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new CardLayout());
 
-        frame.setLocationRelativeTo(null); // center the frame
+        frame.setLocationRelativeTo(null);
 
         frame.setResizable(false);
 
-        // cardLO = new CardLayout();
         panel = new HomePanel();
 
-        // panel.add("LOGIN", new MainPanel());
-        // panel.add("SIGNUP", new SignupPanel());
-        // panel.add("HOME", new HomePanel());
-
-        // cardLO.show(panel, "LOGIN");
-        // new SignupPanel(panel);
         frame.add(panel);
         frame.setVisible(true);
         admin = new Admin();
     }
 
     class HomePanel extends JPanel {
-        // private JTextField usernameField;
-        // private JTextField passwordField;
-        // private JLabel messageHolder;
+
         JPanel mainPanel;
 
         HomePanel() throws IOException {
@@ -79,24 +57,18 @@ class AdminView {
             gbc = new GridBagConstraints();
             gbc.fill = GridBagConstraints.BOTH;
 
-            // JPanel utilPanel = createSettingPanel();
             JPanel utilPanel = createUtilPanel();
             utilPanel.setLayout(new BoxLayout(utilPanel, BoxLayout.Y_AXIS));
             utilPanel.setBackground(Color.WHITE);
             gbc.gridx = 0;
             gbc.weightx = 1;
-            // gbc.gridwidth = 1;
             gbc.weighty = 1;
             add(utilPanel, gbc);
-            // add(Box.createRigidArea(new Dimension(10, 30)));
 
             mainPanel = new JPanel();
-            // mainPanel.setBackground(Color.RED);
 
             gbc.gridx = 1;
-            // gbc.weightx = 6;
             gbc.weightx = 8;
-            // gbc.gridwidth = 6;
             gbc.weighty = 1;
             add(mainPanel, gbc);
 
@@ -123,7 +95,6 @@ class AdminView {
                         String res = sc.getResponse();
                         sc.close();
 
-                        System.out.println(res);
                         JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = resObject.get("header").getAsString();
                         if (resHeader.equals("getallusersed")) {
@@ -133,9 +104,8 @@ class AdminView {
                             for (int i = 0; i < usersArray.size(); i++) {
 
                                 User u = gson.fromJson(usersArray.get(i), User.class);
-                                // System.out.println(u.getUsername());
+
                                 users.add(u);
-                                System.out.println(u.getCreateDate());
 
                             }
 
@@ -149,10 +119,7 @@ class AdminView {
                         mainPanel.repaint();
 
                     }).start();
-                    // mainPanel.removeAll();
-                    // mainPanel.revalidate();
-                    // mainPanel.repaint();
-                    // mainPanel.add(subcriberChart());
+
                 }
             });
 
@@ -171,7 +138,6 @@ class AdminView {
                         String res = sc.getResponse();
                         sc.close();
 
-                        System.out.println(res);
                         JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = resObject.get("header").getAsString();
                         if (resHeader.equals("getlogindataed")) {
@@ -181,9 +147,8 @@ class AdminView {
                             for (int i = 0; i < logsArray.size(); i++) {
 
                                 LoginLog u = gson.fromJson(logsArray.get(i), LoginLog.class);
-                                // System.out.println(u.getUsername());
+
                                 logs.add(u);
-                                // System.out.println(u.getCreateDate());
 
                             }
 
@@ -200,7 +165,9 @@ class AdminView {
 
                 }
             });
-
+            JLabel logLabel = new JLabel("Log");
+            logLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            logLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             JButton loginLogBtn = new JButton("Login Log");
             loginLogBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
             loginLogBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -216,7 +183,6 @@ class AdminView {
                         String res = sc.getResponse();
                         sc.close();
 
-                        System.out.println(res);
                         JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = resObject.get("header").getAsString();
                         if (resHeader.equals("getlogindataed")) {
@@ -226,9 +192,8 @@ class AdminView {
                             for (int i = 0; i < logsArray.size(); i++) {
 
                                 LoginLog u = gson.fromJson(logsArray.get(i), LoginLog.class);
-                                // System.out.println(u.getUsername());
+
                                 logs.add(u);
-                                // System.out.println(u.getCreateDate());
 
                             }
 
@@ -251,6 +216,7 @@ class AdminView {
             pan.add(Box.createRigidArea(new Dimension(0, 10)));
             pan.add(actBtn);
             pan.add(Box.createRigidArea(new Dimension(0, 10)));
+            pan.add(logLabel);
             pan.add(loginLogBtn);
             return pan;
         }
@@ -261,15 +227,12 @@ class AdminView {
             JLabel yearLabel = new JLabel("Select year");
             yearLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
 
-            // yearField.setDate(new Date());
-
             TreeMap<Integer, int[]> data = new TreeMap<>();
 
             for (User user : users) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 LocalDate date = LocalDate.parse(user.getCreateDate(), formatter);
 
-                // Lấy tháng và năm
                 int month = date.getMonthValue();
                 int year = date.getYear();
 
@@ -280,9 +243,6 @@ class AdminView {
             }
 
             Set<Integer> years = data.keySet();
-
-            // Create the combo box, select item at index 4.
-            // Indices start at 0, so 4 specifies the pig.
 
             JPanel pan = new JPanel();
             JComboBox yearList = new JComboBox(years.toArray());
@@ -299,11 +259,10 @@ class AdminView {
 
                     }
                     JFreeChart chart = ChartFactory.createBarChart(
-                            "Subcribers", // Chart title
-                            "Month", // X-Axis label
-                            "Quantity", // Y-Axis label
-                            dataset // Data
-                    );
+                            "Subcribers",
+                            "Month",
+                            "Quantity",
+                            dataset);
 
                     ChartPanel chartPanel = new ChartPanel(chart);
                     chartPanel.setPreferredSize(new Dimension(800, 600));
@@ -317,14 +276,7 @@ class AdminView {
                     pan.repaint();
                 }
             });
-            // petList.setSelectedIndex(4);
-            // petList.addActionListener(this);
 
-            // System.out.println(users.get(0).getCreateDate());
-            // dataset.addValue(1, "Series1", "Category1");
-            // dataset.addValue(4, "Series1", "Category2");
-            // dataset.addValue(3, "Series1", "Category3");
-            // dataset.addValue(5, "Series1", "Category4");
             pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
             pan.add(yearLabel);
             pan.add(yearList);
@@ -337,15 +289,12 @@ class AdminView {
             JLabel yearLabel = new JLabel("Select year");
             yearLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
 
-            // yearField.setDate(new Date());
-
             TreeMap<Integer, int[]> data = new TreeMap<>();
 
             for (LoginLog log : logs) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 LocalDate date = LocalDate.parse(log.getLoginTime(), formatter);
 
-                // Lấy tháng và năm
                 int month = date.getMonthValue();
                 int year = date.getYear();
 
@@ -356,9 +305,6 @@ class AdminView {
             }
 
             Set<Integer> years = data.keySet();
-
-            // Create the combo box, select item at index 4.
-            // Indices start at 0, so 4 specifies the pig.
 
             JPanel pan = new JPanel();
             JComboBox yearList = new JComboBox(years.toArray());
@@ -375,11 +321,10 @@ class AdminView {
 
                     }
                     JFreeChart chart = ChartFactory.createBarChart(
-                            "Active Count", // Chart title
-                            "Month", // X-Axis label
-                            "Quantity", // Y-Axis label
-                            dataset // Data
-                    );
+                            "Active Count",
+                            "Month",
+                            "Quantity",
+                            dataset);
 
                     ChartPanel chartPanel = new ChartPanel(chart);
                     chartPanel.setPreferredSize(new Dimension(800, 600));
@@ -393,15 +338,7 @@ class AdminView {
                     pan.repaint();
                 }
             });
-            // petList.setSelectedIndex(4);
-            // petList.addActionListener(this);
 
-            // System.out.println(users.get(0).getCreateDate());
-            // dataset.addValue(1, "Series1", "Category1");
-            // dataset.addValue(4, "Series1", "Category2");
-            // dataset.addValue(3, "Series1", "Category3");
-            // dataset.addValue(5, "Series1", "Category4");
-            pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
             pan.add(yearLabel);
             pan.add(yearList);
             return pan;
@@ -412,7 +349,6 @@ class AdminView {
 
             ArrayList<ArrayList<String>> data = new ArrayList<>();
 
-            // Column Names
             JTable table;
             String[] columnNames = { "Time", "Username", "Fullname" };
 
@@ -441,11 +377,8 @@ class AdminView {
             table.setRowHeight(30);
 
             JScrollPane scrollPane = new JScrollPane(table);
-            // table.setBounds(0, 0, 800, 800);
-            // scrollPane.setBounds(0, 0, 600, 100);
+
             scrollPane.setPreferredSize(new Dimension(700, 750));
-            // pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
-            // pan.add(table);
 
             return scrollPane;
         }

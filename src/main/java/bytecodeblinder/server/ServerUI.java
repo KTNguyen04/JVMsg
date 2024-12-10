@@ -1,20 +1,9 @@
 package bytecodeblinder.server;
 
-import javax.imageio.ImageIO;
-
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.awt.image.BufferedImage;
-
-import com.toedter.calendar.JDateChooser;
-
-import java.util.Date;
-import java.util.LinkedList;
-
-import bytecodeblinder.config.AppConfig;
+import io.github.cdimascio.dotenv.Dotenv;
 
 class ServerView {
     private JFrame frame;
@@ -22,18 +11,19 @@ class ServerView {
     private JPanel panel;
 
     private Server server;
+    private Dotenv dotenv = Dotenv.load();
 
     ServerView(Server sv) {
 
         server = sv;
 
-        Integer width = Integer.valueOf(AppConfig.serverWidth);
-        Integer height = Integer.valueOf(AppConfig.serverHeight);
+        Integer width = Integer.valueOf(dotenv.get("server.width"));
+        Integer height = Integer.valueOf(dotenv.get("server.height"));
 
-        frame = new JFrame(AppConfig.serverTitle);
+        frame = new JFrame(dotenv.get("server.title"));
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null); // center the frame
+        frame.setLocationRelativeTo(null);
 
         frame.setResizable(false);
 
@@ -41,11 +31,6 @@ class ServerView {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         scrollPanel = new JScrollPane(panel);
         scrollPanel.setPreferredSize(new Dimension(300, 200));
-
-        // label.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
-        // panel.add(label);
-        // cardLO.show(panel, "LOGIN");
-        // new SignupPanel(panel);
 
         JToggleButton runServerBtn = new JToggleButton("Run Server");
         runServerBtn.setFont(new Font("Nunito Sans", Font.BOLD, 20));
