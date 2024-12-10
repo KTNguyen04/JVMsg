@@ -1,235 +1,392 @@
 package bytecodeblinder.admin;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
 import com.google.gson.*;
+import bytecodeblinder.models.SocketController;
+import bytecodeblinder.user.User;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.awt.image.BufferedImage;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-import bytecodeblinder.config.AppConfig;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.DefaultCategoryDataset;
+import io.github.cdimascio.dotenv.Dotenv;
 
 class AdminView {
     private JFrame frame;
     private JPanel panel;
-    // private CardLayout cardLO;
-    // private SocketController socketController;
-    // Mode mode;
+    private Admin admin;
 
-    // User user;
+    private Dotenv dotenv = Dotenv.load();
 
     AdminView() throws IOException {
 
-        Integer width = Integer.valueOf(AppConfig.appWidth);
-        Integer height = Integer.valueOf(AppConfig.appHeight);
+        Integer width = Integer.valueOf(dotenv.get("app.width"));
+        Integer height = Integer.valueOf(dotenv.get("app.height"));
 
-        frame = new JFrame(AppConfig.appName);
+        frame = new JFrame(dotenv.get("app.title"));
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new CardLayout());
 
-        frame.setLocationRelativeTo(null); // center the frame
+        frame.setLocationRelativeTo(null);
 
         frame.setResizable(false);
 
-        // cardLO = new CardLayout();
-        panel = new MainPanel();
+        panel = new HomePanel();
 
-        // panel.add("LOGIN", new MainPanel());
-        // panel.add("SIGNUP", new SignupPanel());
-        // panel.add("HOME", new HomePanel());
-
-        // cardLO.show(panel, "LOGIN");
-        // new SignupPanel(panel);
         frame.add(panel);
         frame.setVisible(true);
+        admin = new Admin();
     }
 
-    class MainPanel extends JPanel {
-        // private JTextField usernameField;
-        // private JTextField passwordField;
-        // private JLabel messageHolder;
+    class HomePanel extends JPanel {
 
-        MainPanel() throws IOException {
+        JPanel mainPanel;
+
+        HomePanel() throws IOException {
+            super();
+            GridBagConstraints gbc;
+
+            setLayout(new GridBagLayout());
+            gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.BOTH;
+
+            JPanel utilPanel = createUtilPanel();
+            utilPanel.setLayout(new BoxLayout(utilPanel, BoxLayout.Y_AXIS));
+            utilPanel.setBackground(Color.WHITE);
+            gbc.gridx = 0;
+            gbc.weightx = 1;
+            gbc.weighty = 1;
+            add(utilPanel, gbc);
+
+            mainPanel = new JPanel();
+
+            gbc.gridx = 1;
+            gbc.weightx = 8;
+            gbc.weighty = 1;
+            add(mainPanel, gbc);
+
         }
-        // super(new BorderLayout());
 
-        // JPanel leftPanel = new JPanel();
-        // JPanel rightPanel = new JPanel();
+        JPanel createUtilPanel() {
+            JPanel pan = new JPanel();
+            JLabel chartLabel = new JLabel("Chart");
+            chartLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            chartLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // rightPanel.setBackground(Color.WHITE);
-        // rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+            JButton subBtn = new JButton("Subcribers");
+            subBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            subBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            subBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    new Thread(() -> {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "getallusers");
 
-        // BufferedImage bannerImage = ImageIO.read(new File(AppConfig.bannerPath));
-        // Image scaledImage = bannerImage.getScaledInstance(AppConfig.bannerWidth,
-        // AppConfig.bannerHeight,
-        // Image.SCALE_SMOOTH);
-        // JLabel banner = new JLabel(new ImageIcon(scaledImage));
+                        sc.sendRequest(jsonObject.toString());
 
-        // rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+                        String res = sc.getResponse();
+                        sc.close();
 
-        // JLabel loginTitle = new JLabel("Login to your account");
-        // loginTitle.setForeground(new Color(82, 82, 82));
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
+                        if (resHeader.equals("getallusersed")) {
+                            JsonArray usersArray = resObject.getAsJsonArray("users");
+                            ArrayList<User> users = new ArrayList<>();
+                            Gson gson = new Gson();
+                            for (int i = 0; i < usersArray.size(); i++) {
 
-        // loginTitle.setFont(new Font("Nunito Sans", Font.BOLD, 36));
+                                User u = gson.fromJson(usersArray.get(i), User.class);
 
-        // JLabel usernameLabel = new JLabel("Username");
-        // usernameLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+                                users.add(u);
 
-        // usernameField = new JTextField(40);
-        // usernameField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-        // usernameField.setMaximumSize(usernameField.getPreferredSize());
-        // usernameField.setMargin(new Insets(5, 5, 5, 5));
-        // // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                            }
 
-        // JLabel passwordLabel = new JLabel("Password");
-        // passwordLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
-        // passwordLabel.setForeground(new Color(82, 82, 82));
+                            admin.setUsers(users);
 
-        // // passwordLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                        }
 
-        // passwordField = new JPasswordField(40);
-        // passwordField.setFont(new Font("Arial", Font.PLAIN, 20));
-        // passwordField.setMargin(new Insets(5, 5, 5, 5));
-        // passwordField.setMaximumSize(passwordField.getPreferredSize());
+                        mainPanel.removeAll();
+                        mainPanel.add(subcriberChart());
+                        mainPanel.revalidate();
+                        mainPanel.repaint();
 
-        // JButton submitButton = new JButton("Login");
-        // submitButton.setFont(new Font("Nunito Sans", Font.BOLD, 20));
-        // submitButton.setBackground(new Color(127, 38, 91));
-        // submitButton.setForeground(Color.WHITE);
-        // submitButton.setPreferredSize(new Dimension(380, 40));
-        // submitButton.setMaximumSize(new Dimension(380, 40));
-        // submitButton.addMouseListener(new MouseAdapter() {
-        // public void mouseClicked(MouseEvent me) {
-        // new Thread(() -> {
-        // SocketController sc = new SocketController();
-        // String packet = getLogInData();
-        // System.out.println(packet);
-        // sc.sendRequest(packet);
+                    }).start();
 
-        // System.out.println("test");
-        // String res = sc.getResponse();
-        // Gson gson = new Gson();
+                }
+            });
 
-        // System.out.println(res);
-        // sc.close();
-        // JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
-        // String resHeader = jsonObject.get("header").getAsString();
-        // if (resHeader.equals("logined")) {
-        // user = gson.fromJson(res, User.class);
-        // cardLO.show(panel, "HOME");
+            JButton actBtn = new JButton("Active");
+            actBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            actBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            actBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    new Thread(() -> {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "getlogindata");
 
-        // } else {
-        // messageHolder.setText("LOGIN FAILED");
-        // messageHolder.setForeground(randomColor());
-        // }
+                        sc.sendRequest(jsonObject.toString());
 
-        // // cardLO.show(panel, "HOME");
-        // }).start();
-        // }
-        // });
+                        String res = sc.getResponse();
+                        sc.close();
 
-        // JPanel registerInstruction = new JPanel();
-        // JLabel questionText = new JLabel("Not Registered Yet?");
-        // JLabel instructionText = new JLabel("Create an account");
-        // questionText.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-        // questionText.setForeground(new Color(82, 82, 82));
-        // instructionText.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-        // instructionText.setForeground(new Color(127, 38, 91));
-        // instructionText.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
+                        if (resHeader.equals("getlogindataed")) {
+                            JsonArray logsArray = resObject.getAsJsonArray("logs");
+                            ArrayList<LoginLog> logs = new ArrayList<>();
+                            Gson gson = new Gson();
+                            for (int i = 0; i < logsArray.size(); i++) {
 
-        // registerInstruction.setMaximumSize(new Dimension(400, 50));
-        // registerInstruction.setBackground(Color.WHITE);
-        // registerInstruction.add(questionText);
-        // registerInstruction.add(instructionText);
-        // registerInstruction.setAlignmentX(Component.LEFT_ALIGNMENT);
+                                LoginLog u = gson.fromJson(logsArray.get(i), LoginLog.class);
 
-        // instructionText.addMouseListener(new MouseAdapter() {
-        // public void mouseEntered(MouseEvent me) {
-        // instructionText.setText("<html><u>Create an account</u></html>");
-        // }
+                                logs.add(u);
 
-        // public void mouseExited(MouseEvent me) {
-        // instructionText.setText("<html>Create an account</html>");
-        // }
+                            }
 
-        // public void mouseClicked(MouseEvent me) {
-        // cardLO.show(panel, "SIGNUP");
-        // }
+                            admin.setLoginLogs(logs);
 
-        // });
+                        }
 
-        // messageHolder = new JLabel(" ");
+                        mainPanel.removeAll();
+                        mainPanel.add(activeChart());
+                        mainPanel.revalidate();
+                        mainPanel.repaint();
 
-        // messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-        // messageHolder.setForeground(Color.decode("#ffc107"));
+                    }).start();
 
-        // // instructionText.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-        // // instructionText.setForeground(new Color(127, 38, 91));
-        // // instructionText.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                }
+            });
+            JLabel logLabel = new JLabel("Log");
+            logLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            logLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JButton loginLogBtn = new JButton("Login Log");
+            loginLogBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
+            loginLogBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            loginLogBtn.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    new Thread(() -> {
+                        SocketController sc = new SocketController();
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("header", "getlogindata");
 
-        // leftPanel.add(banner);
+                        sc.sendRequest(jsonObject.toString());
 
-        // rightPanel.add(Box.createVerticalGlue());
-        // rightPanel.add(loginTitle);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
-        // // rightPanel.add(Box.createRigidArea(new Dimension(30, 0)));
-        // rightPanel.add(usernameLabel);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+                        String res = sc.getResponse();
+                        sc.close();
 
-        // rightPanel.add(usernameField);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        // rightPanel.add(passwordLabel);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        // rightPanel.add(passwordField);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 60)));
-        // rightPanel.add(submitButton);
-        // rightPanel.add(Box.createRigidArea(new Dimension(0, 60)));
+                        JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
+                        String resHeader = resObject.get("header").getAsString();
+                        if (resHeader.equals("getlogindataed")) {
+                            JsonArray logsArray = resObject.getAsJsonArray("logs");
+                            ArrayList<LoginLog> logs = new ArrayList<>();
+                            Gson gson = new Gson();
+                            for (int i = 0; i < logsArray.size(); i++) {
 
-        // rightPanel.add(registerInstruction);
+                                LoginLog u = gson.fromJson(logsArray.get(i), LoginLog.class);
 
-        // rightPanel.add(messageHolder);
-        // rightPanel.add(Box.createVerticalGlue());
+                                logs.add(u);
 
-        // add(leftPanel, BorderLayout.WEST);
-        // add(rightPanel, BorderLayout.CENTER);
-        // }
+                            }
 
-        // String getLogInData() {
-        // HashMap<String, String> loginData = new HashMap<>();
+                            admin.setLoginLogs(logs);
 
-        // String username = usernameField.getText();
-        // String password = passwordField.getText();
+                        }
 
-        // loginData.put("header", "login");
-        // loginData.put("username", username);
-        // loginData.put("password", password);
+                        mainPanel.removeAll();
+                        mainPanel.add(loginLogTable());
+                        mainPanel.revalidate();
+                        mainPanel.repaint();
 
-        // Gson gson = new Gson();
-        // String json = gson.toJson(loginData);
-        // return json;
+                    }).start();
 
-        // }
+                }
+            });
 
-        // public static Color randomColor() {
-        // // Tạo đối tượng Random
-        // Random rand = new Random();
+            pan.add(chartLabel);
+            pan.add(subBtn);
+            pan.add(Box.createRigidArea(new Dimension(0, 10)));
+            pan.add(actBtn);
+            pan.add(Box.createRigidArea(new Dimension(0, 10)));
+            pan.add(logLabel);
+            pan.add(loginLogBtn);
+            return pan;
+        }
 
-        // int red = rand.nextInt(256);
-        // int green = rand.nextInt(256);
-        // int blue = rand.nextInt(256);
+        JPanel subcriberChart() {
+            ArrayList<User> users = admin.getUsers();
 
-        // return new Color(red, green, blue);
-        // }
+            JLabel yearLabel = new JLabel("Select year");
+            yearLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
 
-        // // void sendLoginRequest() {
-        // // System.out.println(usernameField.getText());
-        // // System.out.println(passwordField.getText());
-        // // }
+            TreeMap<Integer, int[]> data = new TreeMap<>();
+
+            for (User user : users) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDate date = LocalDate.parse(user.getCreateDate(), formatter);
+
+                int month = date.getMonthValue();
+                int year = date.getYear();
+
+                data.putIfAbsent(year, new int[12]);
+
+                data.get(year)[month - 1]++;
+
+            }
+
+            Set<Integer> years = data.keySet();
+
+            JPanel pan = new JPanel();
+            JComboBox yearList = new JComboBox(years.toArray());
+            yearList.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+
+            yearList.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComboBox cb = (JComboBox) e.getSource();
+                    int year = (int) cb.getSelectedItem();
+
+                    int[] month = data.get(year);
+                    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+                    for (int i = 0; i < 12; i++) {
+                        dataset.addValue(month[i], String.valueOf(year), String.valueOf(i + 1));
+
+                    }
+                    JFreeChart chart = ChartFactory.createBarChart(
+                            "Subcribers",
+                            "Month",
+                            "Quantity",
+                            dataset);
+
+                    ChartPanel chartPanel = new ChartPanel(chart);
+                    chartPanel.setPreferredSize(new Dimension(800, 600));
+                    pan.setPreferredSize(new Dimension(800, 650));
+
+                    pan.removeAll();
+                    pan.add(yearLabel);
+                    pan.add(yearList);
+                    pan.add(chartPanel);
+                    pan.revalidate();
+                    pan.repaint();
+                }
+            });
+
+            pan.add(yearLabel);
+            pan.add(yearList);
+            return pan;
+        }
+
+        JPanel activeChart() {
+            ArrayList<LoginLog> logs = admin.getLoginLogs();
+
+            JLabel yearLabel = new JLabel("Select year");
+            yearLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
+
+            TreeMap<Integer, int[]> data = new TreeMap<>();
+
+            for (LoginLog log : logs) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDate date = LocalDate.parse(log.getLoginTime(), formatter);
+
+                int month = date.getMonthValue();
+                int year = date.getYear();
+
+                data.putIfAbsent(year, new int[12]);
+
+                data.get(year)[month - 1]++;
+
+            }
+
+            Set<Integer> years = data.keySet();
+
+            JPanel pan = new JPanel();
+            JComboBox yearList = new JComboBox(years.toArray());
+            yearList.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
+
+            yearList.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComboBox cb = (JComboBox) e.getSource();
+                    int year = (int) cb.getSelectedItem();
+
+                    int[] month = data.get(year);
+                    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+                    for (int i = 0; i < 12; i++) {
+                        dataset.addValue(month[i], String.valueOf(year), String.valueOf(i + 1));
+
+                    }
+                    JFreeChart chart = ChartFactory.createBarChart(
+                            "Active Count",
+                            "Month",
+                            "Quantity",
+                            dataset);
+
+                    ChartPanel chartPanel = new ChartPanel(chart);
+                    chartPanel.setPreferredSize(new Dimension(800, 600));
+                    pan.setPreferredSize(new Dimension(800, 650));
+
+                    pan.removeAll();
+                    pan.add(yearLabel);
+                    pan.add(yearList);
+                    pan.add(chartPanel);
+                    pan.revalidate();
+                    pan.repaint();
+                }
+            });
+
+            pan.add(yearLabel);
+            pan.add(yearList);
+            return pan;
+        }
+
+        JScrollPane loginLogTable() {
+            ArrayList<LoginLog> logs = admin.getLoginLogs();
+
+            ArrayList<ArrayList<String>> data = new ArrayList<>();
+
+            JTable table;
+            String[] columnNames = { "Time", "Username", "Fullname" };
+
+            for (LoginLog log : logs) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime date = LocalDateTime.parse(log.getLoginTime(), formatter);
+                String formattedLoginTime = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                String username = log.getUsername();
+                String fullname = log.getFullname();
+                String loginTime = formattedLoginTime;
+                ArrayList<String> row = new ArrayList<>();
+                row.add(loginTime);
+                row.add(username);
+                row.add(fullname);
+                data.add(row);
+            }
+            String[][] tableData = data.stream()
+                    .map(row -> row.toArray(new String[0]))
+                    .toArray(String[][]::new);
+            table = new JTable(tableData, columnNames);
+            table.setEnabled(false);
+
+            table.setFont(new Font("Arial", Font.PLAIN, 18));
+
+            table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 18));
+            table.setRowHeight(30);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+
+            scrollPane.setPreferredSize(new Dimension(700, 750));
+
+            return scrollPane;
+        }
+
     }
 
 }

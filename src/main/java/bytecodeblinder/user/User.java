@@ -1,10 +1,6 @@
 package bytecodeblinder.user;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import com.mysql.cj.protocol.MessageListener;
 
 public class User {
     private String username;
@@ -14,6 +10,7 @@ public class User {
     private String dob;
     private String gender;
     private String password;
+    private String createDate;
     private boolean isOnline;
 
     ArrayList<User> friends;
@@ -23,7 +20,7 @@ public class User {
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
+
         return this.username;
     }
 
@@ -106,7 +103,7 @@ public class User {
         return messages;
     }
 
-    void addMessage(ChatMessage msg) {
+    public void addMessage(ChatMessage msg) {
         messages.add(msg);
         notifyListener();
     }
@@ -140,23 +137,12 @@ public class User {
         return username != null && username.equals(user.username);
     }
 
-    // public void setFullname(String fullname) {
-    // this.fullname = fullname;
-    // }
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
+    }
 
-    // public void setAddress(String address) {
-    // this.address = address;
-    // }
+    public String getCreateDate() {
+        return this.createDate;
+    }
 
-    // public void setEmail(String email) {
-    // this.email = email;
-    // }
-
-    // public void setDob(String dob) {
-    // this.dob = dob;
-    // }
-
-    // public void setGender(String gender) {
-    // this.gender = gender;
-    // }
 }

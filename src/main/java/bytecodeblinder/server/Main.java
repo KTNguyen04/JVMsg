@@ -1,8 +1,5 @@
 package bytecodeblinder.server;
 
-import java.io.*;
-import java.sql.*;
-
 import javax.swing.SwingUtilities;
 
 public class Main {
