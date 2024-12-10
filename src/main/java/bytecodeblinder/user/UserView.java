@@ -1,33 +1,23 @@
 package bytecodeblinder.user;
 
 import javax.imageio.ImageIO;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.lang.reflect.Type;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-
-// import com.google.gson.reflect.TypeToken;
-// import com.google.gson.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.image.BufferedImage;
-
 import com.toedter.calendar.JDateChooser;
-
 import bytecodeblinder.models.SocketController;
-
 import java.util.*;
 import java.util.Date;
-
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 import io.github.cdimascio.dotenv.Dotenv;
 
 class UserView {
@@ -58,7 +48,7 @@ class UserView {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new CardLayout());
 
-        frame.setLocationRelativeTo(null); // center the frame
+        frame.setLocationRelativeTo(null);
 
         frame.setResizable(false);
 
@@ -67,11 +57,10 @@ class UserView {
 
         panel.add("LOGIN", new LoginPanel());
         panel.add("SIGNUP", new SignupPanel());
-        // panel.add("HOME", new HomePanel());
 
         cardLO.show(panel, "LOGIN");
         mode = Mode.LOGIN;
-        // new SignupPanel(panel);
+
         frame.add(panel);
         frame.setVisible(true);
         frame.addWindowListener(new WindowAdapter() {
@@ -137,13 +126,10 @@ class UserView {
             usernameField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             usernameField.setMaximumSize(usernameField.getPreferredSize());
             usernameField.setMargin(new Insets(5, 5, 5, 5));
-            // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel passwordLabel = new JLabel("Password");
             passwordLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
             passwordLabel.setForeground(new Color(82, 82, 82));
-
-            // passwordLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             passwordField = new JPasswordField(40);
             passwordField.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -168,7 +154,7 @@ class UserView {
                 public void mouseClicked(MouseEvent me) {
                     JDialog resetPassDialog = createResetPasswordDialog();
                     resetPassDialog.setVisible(true);
-                    // cardLO.show(panel, "SIGNUP");
+
                 }
 
             });
@@ -185,19 +171,18 @@ class UserView {
                         SocketController sc = new SocketController();
                         String packet = getLogInData();
                         String password = passwordField.getText();
-                        // System.out.println(packet);
+
                         sc.sendRequest(packet);
 
                         System.out.println("test");
                         String res = sc.getResponse();
                         Gson gson = new Gson();
 
-                        // System.out.println(res);
                         JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = jsonObject.get("header").getAsString();
 
                         if (resHeader.equals("logined")) {
-                            // System.out.println("Break1");
+
                             user = gson.fromJson(res, User.class);
                             user.setPassword(password);
                             panel.add("HOME", new HomePanel());
@@ -207,17 +192,14 @@ class UserView {
 
                             sc.openChatSocket(user);
                             chatPW = sc.getChatWriter();
-                            // // System.out.println("chatPW" + chatPW);
-                            sc.close();
 
-                            // System.out.println("Break2");
+                            sc.close();
 
                         } else {
                             messageHolder.setText("LOGIN FAILED");
                             messageHolder.setForeground(randomColor());
                         }
 
-                        // cardLO.show(panel, "HOME");
                     }).start();
                 }
             });
@@ -258,16 +240,12 @@ class UserView {
             messageHolder.setFont(new Font("Nunito Sans", Font.BOLD, 18));
             messageHolder.setForeground(Color.decode("#ffc107"));
 
-            // instructionText.setFont(new Font("Nunito Sans", Font.BOLD, 18));
-            // instructionText.setForeground(new Color(127, 38, 91));
-            // instructionText.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
             leftPanel.add(banner);
 
             rightPanel.add(Box.createVerticalGlue());
             rightPanel.add(loginTitle);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
-            // rightPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+
             rightPanel.add(usernameLabel);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
@@ -289,17 +267,7 @@ class UserView {
             add(leftPanel, BorderLayout.WEST);
             add(rightPanel, BorderLayout.CENTER);
         }
-        // String createOnlinePacket(){
-        // HashMap<String, String> data = new HashMap<>();
 
-        // // loginData.put("header", "online");
-        // // loginData.put("ip", );
-        // // loginData.put("password", password);
-
-        // Gson gson = new Gson();
-        // String json = gson.toJson(loginData);
-        // return json;
-        // }
         String getLogInData() {
             HashMap<String, String> loginData = new HashMap<>();
 
@@ -387,8 +355,6 @@ class UserView {
                 }
             });
 
-            // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
             dialog.setSize(500, 300);
 
             dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -403,19 +369,13 @@ class UserView {
 
             dialog.add(dPanel);
 
-            dialog.setLocationRelativeTo(null); // center the frame
+            dialog.setLocationRelativeTo(null);
 
             dialog.setResizable(false);
-
-            // System.out.println(user.getFriends().get(0));
 
             return dialog;
         }
 
-        // void sendLoginRequest() {
-        // System.out.println(usernameField.getText());
-        // System.out.println(passwordField.getText());
-        // }
     }
 
     private class SignupPanel extends JPanel {
@@ -429,8 +389,6 @@ class UserView {
         JRadioButton maleRadio;
         JRadioButton femaleRadio;
 
-        // private JTextField addressField;
-        // tên đăng nhập, họ tên, địa chỉ, ngàysinh, giới tính, emai
         SignupPanel() throws IOException {
             super(new BorderLayout());
             JPanel leftPanel = new JPanel();
@@ -459,7 +417,6 @@ class UserView {
             usernameField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             usernameField.setMaximumSize(usernameField.getPreferredSize());
             usernameField.setMargin(new Insets(5, 5, 5, 5));
-            // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel fullnameLabel = new JLabel("Full name");
             fullnameLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
@@ -476,7 +433,7 @@ class UserView {
             emailField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             emailField.setMaximumSize(usernameField.getPreferredSize());
             emailField.setMargin(new Insets(5, 5, 5, 5));
-            // usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
             JLabel addressLabel = new JLabel("Address");
             addressLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
 
@@ -488,12 +445,11 @@ class UserView {
             JLabel dobLabel = new JLabel("Date of birth");
             dobLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
             dobField = new JDateChooser();
-            // dobField.setPreferredSize(new Dimension(330, 80));40
+
             dobField.setMaximumSize(new Dimension(770, 45));
             dobField.setPreferredSize(new Dimension(770, 45));
             dobField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             dobField.setDate(new Date());
-            // dobField.setMaximumSize(new Dimension(380, 80));
 
             JLabel genderLabel = new JLabel("Gender");
             genderLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
@@ -517,8 +473,6 @@ class UserView {
             JLabel passwordLabel = new JLabel("Password");
             passwordLabel.setFont(new Font("Nunito Sans", Font.PLAIN, 22));
             passwordLabel.setForeground(new Color(82, 82, 82));
-
-            // passwordLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             passwordField = new JPasswordField(40);
             passwordField.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -546,23 +500,18 @@ class UserView {
                         sc.close();
                         Gson gson = new Gson();
 
-                        // System.out.println(res);
                         JsonObject jsonObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = jsonObject.get("header").getAsString();
                         if (resHeader.equals("signuped")) {
-                            // System.out.println("Break1");
 
                             messageHolder.setText("SIGN UP SUCCESSFULLY");
                             messageHolder.setForeground(Color.decode("#198754"));
-
-                            // System.out.println("Break2");
 
                         } else {
                             messageHolder.setText("SIGNUP FAILED");
                             messageHolder.setForeground(randomColor());
                         }
 
-                        // cardLO.show(panel, "HOME");
                     }).start();
                 }
             });
@@ -641,7 +590,6 @@ class UserView {
             rightPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
             rightPanel.add(messageHolder);
-            // rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 
             rightPanel.add(loginInstruction);
             rightPanel.add(Box.createVerticalGlue());
@@ -651,10 +599,7 @@ class UserView {
         }
 
         String getSignUpData() {
-            // HashMap<String, String> signupData = new HashMap<>();
-            // registrationData.put("username", "user123");
-            // registrationData.put("email", "user@example.com");
-            // registrationData.put("password", "securePassword");
+
             String username = usernameField.getText();
             String fullname = fullnameField.getText();
             String address = addressField.getText();
@@ -674,18 +619,7 @@ class UserView {
             jsonObject.addProperty("header", "signup");
 
             return jsonObject.toString();
-            // for (Map.Entry<String, String> entry : registrationData.entrySet()) {
-            // String key = entry.getKey();
-            // String value = entry.getValue();
-            // System.out.println(key + ": " + value);
-            // }
-            // System.out.println(dob);
-            // System.out.println(usernameField.getText());
-            // System.out.println(passwordField.getText());
-            // System.out.println(fullnameField.getText());
-            // System.out.println(emailField.getText());
-            // System.out.println(addressField.getText());
-            // System.out.println(maleRadio.getText());
+
         }
     }
 
@@ -706,41 +640,28 @@ class UserView {
             JPanel settingPanel = createSettingPanel();
             gbc.gridx = 0;
             gbc.weightx = 1;
-            // gbc.gridwidth = 1;
+
             gbc.weighty = 1;
             add(settingPanel, gbc);
-            // add(Box.createRigidArea(new Dimension(10, 30)));
 
             JPanel friendsPanel = createFriendPanel();
             gbc.gridx = 1;
-            // gbc.weightx = 6;
+
             gbc.weightx = 8;
-            // gbc.gridwidth = 6;
+
             gbc.weighty = 1;
             add(friendsPanel, gbc);
 
             user.addMessageListener(this::addMessages);
 
             chatPanel = createChatPanel();
-            // chatPanel.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));
 
             gbc.gridx = 2;
-            // gbc.gridwidth = 18;
 
             gbc.weightx = 20;
             gbc.weighty = 1;
-            // chatPanel.add(chatLabel);
-            // chatPanel.add(chatScrollPanel);
 
-            // chatPanel.setVisible(false);
             add(chatPanel, gbc);
-
-            // settingPanel.add(setting);
-            // friendsPanel.add(users);
-            // chatPanel.add(chat);
-
-            // add(usersPanel);
-            // add(chatPanel);
 
         }
 
@@ -832,9 +753,6 @@ class UserView {
             friendsPanel.setLayout(new BoxLayout(friendsPanel, BoxLayout.Y_AXIS));
             friendsPanel.setBackground(Color.decode(dotenv.get("background")));
 
-            // friendsPanel.setPreferredSize(new Dimension(400, ));
-            // friendsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-            // Integer.MAX_VALUE));
             friendsPanel.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
             friendsPanel.setPreferredSize(new Dimension(400, Integer.MAX_VALUE));
 
@@ -850,7 +768,6 @@ class UserView {
             friendListScroll.getVerticalScrollBar().setUnitIncrement(16);
             friendListPanel.setBackground(Color.decode(dotenv.get("background")));
 
-            // friendsLabel.setForeground(new Color(82, 82, 82));
             renderFriendList(friendList, friendListPanel);
 
             JPanel searchPanel = new JPanel();
@@ -877,8 +794,6 @@ class UserView {
             });
             searchPanel.add(searchButton);
 
-            // JScrollPane friendListScroll = createFriendListPanel();
-
             friendsPanel.add(friendsLabel);
             friendsPanel.add(searchPanel);
             friendsPanel.add(friendListScroll);
@@ -897,8 +812,7 @@ class UserView {
 
                 String path = usr.isOnline() ? dotenv.get("img.online") : dotenv.get("img.offline");
                 JLabel iconLabel = new JLabel(new ImageIcon(imagePath + path));
-                // btn.setHorizontalTextPosition(SwingConstants.LEFT);
-                // btn.setHorizontalAlignment(SwingConstants.LEFT);
+
                 btn.setLayout(new BorderLayout());
                 btn.add(textLabel, BorderLayout.WEST);
                 btn.add(iconLabel, BorderLayout.EAST);
@@ -910,10 +824,6 @@ class UserView {
                     public void mouseClicked(MouseEvent me) {
                         if (me.getButton() == MouseEvent.BUTTON1) {
                             chatLabel.setText(usr.getUsername() + " - Chatting");
-                            // chatPanel.setMaximumSize(new Dimension(500,
-                            // chatLabel.getPreferredSize().height));
-
-                            // chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
                             new Thread(() -> {
                                 SocketController sc = new SocketController();
@@ -927,9 +837,7 @@ class UserView {
                                 Type messageListType = new TypeToken<ArrayList<ChatMessage>>() {
                                 }.getType();
 
-                                // Parse the JSON into an ArrayList of Message objects
                                 ArrayList<ChatMessage> messages = gson.fromJson(res, messageListType);
-                                // usr.setMessages(messages);
 
                                 messages.forEach((ChatMessage m) -> {
                                     System.out.println(m.getContent());
@@ -940,8 +848,6 @@ class UserView {
 
                                 addMessages();
                                 curPeer = usr.getUsername();
-                                // chatMessagePanel.revalidate();
-                                // chatMessagePanel.repaint();
 
                             }).start();
                         }
@@ -963,8 +869,6 @@ class UserView {
                 JLabel lb = new JLabel("<html>" + usr.getUsername() + "</html>");
                 lb.setFont(new Font("Nunito Sans", Font.BOLD, 22));
                 lb.setAlignmentX(Component.CENTER_ALIGNMENT);
-                // lb.setMaximumSize(new Dimension(130, 40));
-                // btn.setPreferredSize(new Dimension(400, 100));
 
                 JLabel messageHolder = new JLabel("");
                 messageHolder.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
@@ -975,8 +879,6 @@ class UserView {
                 acceptBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
                 acceptBtn.setForeground(Color.WHITE);
                 acceptBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
-
-                // messageHolder.setAlignmentX(Component.CENTER_ALIGNMENT);
 
                 JButton rejectBtn = new JButton("Reject");
                 rejectBtn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
@@ -1083,8 +985,6 @@ class UserView {
                 ;
                 lb.setFont(new Font("Nunito Sans", Font.BOLD, 22));
                 lb.setAlignmentX(Component.CENTER_ALIGNMENT);
-                // lb.setMaximumSize(new Dimension(130, 40));
-                // btn.setPreferredSize(new Dimension(400, 100));
 
                 JLabel messageHolder = new JLabel("");
                 messageHolder.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
@@ -1119,8 +1019,6 @@ class UserView {
                     }
                 });
 
-                // messageHolder.setAlignmentX(Component.CENTER_ALIGNMENT);
-
                 JPanel userRow = new JPanel();
                 userRow.setLayout(new BoxLayout(userRow, BoxLayout.X_AXIS));
                 userRow.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -1149,7 +1047,7 @@ class UserView {
             ArrayList<User> resultList = new ArrayList<>();
 
             for (User user : friends) {
-                // Kiểm tra nếu username hoặc fullname chứa query (case-insensitive)
+
                 if (user.getUsername().toLowerCase().contains(query.toLowerCase()) ||
                         user.getFullname().toLowerCase().contains(query.toLowerCase())) {
                     resultList.add(user);
@@ -1172,19 +1070,6 @@ class UserView {
 
         }
 
-        // String createMessage(String username1, String username2) {
-        // HashMap<String, String> packet = new HashMap<>();
-
-        // packet.put("header", "messages");
-        // packet.put("username1", username1);
-        // packet.put("username2", username2);
-
-        // Gson gson = new Gson();
-        // String json = gson.toJson(packet);
-        // return json;
-
-        // }
-
         JPanel createChatPanel() {
             JPanel pan = new JPanel();
 
@@ -1192,39 +1077,29 @@ class UserView {
 
             infoPanel.setMaximumSize(new Dimension(800, 50));
             infoPanel.setBackground(Color.decode(dotenv.get("background")));
-            // infoPanel.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
 
             pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
             pan.setMaximumSize(new Dimension(800, Integer.MAX_VALUE));
             pan.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
-            // pan.setMaximumSize(new Dimension(800, Integer.MAX_VALUE));
 
             chatLabel = new JLabel("... - Chatting");
             chatLabel.setMaximumSize(new Dimension(800, chatLabel.getPreferredSize().height));
-            // chatLabel.setPreferredSize(new Dimension(300,
-            // chatLabel.getPreferredSize().height));
-            // chatLabel.setPreferredSize(new Dimension(400, 100));
+
             chatLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
             chatLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            // pan.setBackground(Color.YELLOW);
 
             chatMessagePanel = new JPanel();
             chatMessagePanel.setLayout(new BoxLayout(chatMessagePanel, BoxLayout.Y_AXIS));
-            // chatMessagePanel.setMaximumSize(new Dimension(0, Integer.MAX_VALUE));
+
             chatMessagePanel.setBackground(Color.WHITE);
-            // chatMessagePanel.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
-            // chatMessagePanel.setPreferredSize(new Dimension(800, 100));
+
             JScrollPane chatMessageScroll = new JScrollPane(chatMessagePanel);
             chatMessageScroll.getVerticalScrollBar().setUnitIncrement(16);
             chatMessageScroll.setMaximumSize(new Dimension(700, Integer.MAX_VALUE));
-            // chatMessageScroll.setPreferredSize(new Dimension(800, Integer.MAX_VALUE));
-            // chatMessageScroll.setPreferredSize(new Dimension(600, 600));
 
             JButton infoBtn = new JButton();
             ImageIcon icon = new ImageIcon(imagePath + dotenv.get("img.dots"));
-            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
-            // btn.setHorizontalAlignment(SwingConstants.LEFT);
-            // btn.setIconTextGap(500);
+
             infoBtn.setIcon(icon);
             infoBtn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             infoBtn.setBackground(Color.decode(dotenv.get("btnBackground")));
@@ -1239,34 +1114,7 @@ class UserView {
                     infoDialog.setVisible(true);
                 }
             });
-            // public void mouseClicked(MouseEvent me) {
 
-            // HashMap<String, String> packet = new HashMap<>();
-            // packet.put("header", "chat");
-            // packet.put("from", user.getUsername());
-            // packet.put("to", curPeer);
-            // packet.put("content", textArea.getText());
-
-            // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            // LocalDateTime now = LocalDateTime.now();
-
-            // packet.put("time_stamp", dtf.format(now));
-            // packet.put("header", "chat");
-            // ChatMessage msg = new ChatMessage(user.getUsername(), curPeer,
-            // textArea.getText(), dtf.format(now));
-            // Gson gson = new Gson();
-            // String json = gson.toJson(packet);
-            // System.out.println(json);
-            // chatPW.println(json);
-            // SocketController sc = new SocketController();
-            // sc.sendRequest(json);
-
-            // addMessage(msg);
-            // sc.close();
-            // textArea.setText("");
-            // }
-
-            // });
             infoPanel.add(chatLabel, BorderLayout.WEST);
             infoPanel.add(infoBtn, BorderLayout.EAST);
             pan.add(infoPanel);
@@ -1275,7 +1123,6 @@ class UserView {
 
             JPanel chatAreaPanel = createChatArea();
             chatAreaPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-            // chatAreaPanel.setPreferredSize(new Dimension(800, 100));
 
             pan.add(chatAreaPanel);
 
@@ -1292,19 +1139,14 @@ class UserView {
             messages.forEach((ChatMessage msg) -> {
                 JTextArea msgL = new JTextArea(msg.getContent());
                 msgL.setFont(new Font("Nunito Sans", Font.BOLD, 19));
-                msgL.setLineWrap(true); // Enable line wrapping
-                msgL.setWrapStyleWord(true); // Wrap whole words
+                msgL.setLineWrap(true);
+                msgL.setWrapStyleWord(true);
 
                 msgL.setPreferredSize(new Dimension(400, msgL.getPreferredSize().height));
 
                 msgL.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
                 msgL.setEditable(false);
-                // JLabel msgL = new JLabel("<html>" + msg.getContent() + "</html>");
 
-                // msgL.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
-                // msgL.setPreferredSize(new Dimension(400, msgL.getPreferredSize().height));
-                // msgL.setPreferredSize(new Dimension(400, 80));
-                // msgL.getPreferredSize().height));
                 JPanel mRow = new JPanel();
                 mRow.setLayout(new BorderLayout());
 
@@ -1312,25 +1154,15 @@ class UserView {
                 mRow.setBackground(Color.WHITE);
 
                 mRow.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                // mRow.setPreferredSize(new Dimension(700, 50));
-
-                // mRow.setPreferredSize(new Dimension(690, ));
-
-                // mRow.setPreferredSize(new Dimension(200, 100));
 
                 if (msg.getFrom().equals(user.getUsername())) {
-                    // mRow.add(Box.createHorizontalGlue());
-                    msgL.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                    // msgL.setHorizontalAlignment(SwingConstants.RIGHT);
 
-                    // chatMessagePanel.add(Box.createHorizontalGlue());
+                    msgL.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+
                     mRow.add(msgL, BorderLayout.EAST);
                 } else {
                     msgL.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
                     mRow.add(msgL, BorderLayout.WEST);
-
-                    // mRow.add(Box.createHorizontalGlue());
-                    // mRow.add(Box.createRigidArea(new Dimension(0, 30)));
 
                 }
                 chatMessagePanel.add(mRow);
@@ -1342,8 +1174,6 @@ class UserView {
         void addMessage(ChatMessage msg) {
             user.addMessage(msg);
             addMessages();
-            // chatMessagePanel.revalidate();
-            // chatMessagePanel.repaint();
 
         }
 
@@ -1354,11 +1184,9 @@ class UserView {
 
             JLabel usernameLabel = new JLabel("Username");
             usernameLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
-            // usernameLabel.setAlignmentX(Component.CEN);
 
             JLabel usnField = new JLabel(user.getUsername());
             usnField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // usnField.setMaximumSize(new);
 
             JLabel fullnameLabel = new JLabel("Full name");
             fullnameLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
@@ -1368,7 +1196,6 @@ class UserView {
             fnField.setText(user.getFullname());
 
             fnField.setMaximumSize(fnField.getPreferredSize());
-            // fnField.setMaximumSize(fnField);
 
             JLabel addressLabel = new JLabel("Address");
             addressLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
@@ -1381,12 +1208,6 @@ class UserView {
 
             JLabel dobLabel = new JLabel("Date of Birth");
             dobLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
-
-            // JTextField dField = new JTextField(40);
-            // dField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // dField.setText(user.getDob());
-
-            // dField.setMaximumSize(dField.getPreferredSize());
 
             JDateChooser dField = new JDateChooser();
             dField.setMaximumSize(new Dimension(800, 30));
@@ -1402,12 +1223,6 @@ class UserView {
 
             JLabel genderLabel = new JLabel("Gender");
             genderLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
-
-            // JTextField gField = new JTextField(40);
-            // gField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // gField.setText(user.getGender());
-
-            // gField.setMaximumSize(gField.getPreferredSize());
 
             JRadioButton mRadio = new JRadioButton("Male");
             JRadioButton fRadio = new JRadioButton("Female");
@@ -1427,7 +1242,6 @@ class UserView {
             genderRow.add(fRadio);
             genderRow.setMaximumSize(genderRow.getPreferredSize());
             genderRow.setBackground(Color.decode(dotenv.get("background")));
-            // genderRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             JLabel emailLabel = new JLabel("Email");
             emailLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
@@ -1443,7 +1257,7 @@ class UserView {
 
             JTextField curPasswordField = new JTextField(40);
             curPasswordField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // curPasswordField.setText(user.getEmail());
+
             curPasswordField.setMaximumSize(emField.getPreferredSize());
 
             JLabel newPasswordLabel = new JLabel("New password");
@@ -1451,7 +1265,6 @@ class UserView {
 
             JTextField newPasswordField = new JTextField(40);
             newPasswordField.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
-            // newPasswordField.setText(user.getEmail());
 
             newPasswordField.setMaximumSize(emField.getPreferredSize());
 
@@ -1536,7 +1349,7 @@ class UserView {
                         jsonObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = jsonObject.get("header").getAsString();
                         if (resHeader.equals("edited")) {
-                            // System.out.println("Break1");
+
                             String pass = newPassword;
                             System.out.println("new" + pass);
                             user = gson.fromJson(res, User.class);
@@ -1545,7 +1358,6 @@ class UserView {
                             messageHolder.setText("EDITED SUCCESSFULLY");
                             messageHolder.setForeground(randomColor());
 
-                            // System.out.println("Break2");
                             revalidate();
                             repaint();
 
@@ -1557,17 +1369,12 @@ class UserView {
 
                     }
 
-                    // return jsonObject.toString();
                 }
             });
-
-            // messageHolder.setForeground(Color.decode("#ffc107"));
 
             dialog.setSize(500, 700);
 
             dPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-            // saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             dPanel.add(usernameLabel);
             dPanel.add(usnField);
@@ -1592,11 +1399,9 @@ class UserView {
             dPanel.setBackground(Color.decode(dotenv.get("background")));
             dialog.add(dPanel);
 
-            dialog.setLocationRelativeTo(null); // center the frame
+            dialog.setLocationRelativeTo(null);
 
             dialog.setResizable(false);
-
-            // System.out.println(user.getFriends().get(0));
 
             return dialog;
 
@@ -1619,8 +1424,7 @@ class UserView {
             ufLabel.setForeground(Color.WHITE);
 
             JLabel ufIcon = new JLabel(new ImageIcon(imagePath + dotenv.get("img.unFriend")));
-            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
-            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+
             unfriendBtn.setLayout(new BorderLayout());
             unfriendBtn.add(ufLabel, BorderLayout.WEST);
             unfriendBtn.add(ufIcon, BorderLayout.EAST);
@@ -1674,8 +1478,7 @@ class UserView {
             blcLabel.setForeground(Color.WHITE);
 
             JLabel blcIcon = new JLabel(new ImageIcon(imagePath + dotenv.get("img.block")));
-            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
-            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+
             blockBtn.setLayout(new BorderLayout());
             blockBtn.add(blcLabel, BorderLayout.WEST);
             blockBtn.add(blcIcon, BorderLayout.EAST);
@@ -1696,7 +1499,6 @@ class UserView {
                     String res = sc.getResponse();
                     sc.close();
 
-                    // System.out.println(res);
                     JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                     String resHeader = resObject.get("header").getAsString();
 
@@ -1731,8 +1533,7 @@ class UserView {
             spLabel.setForeground(Color.WHITE);
 
             JLabel spIcon = new JLabel(new ImageIcon(imagePath + dotenv.get("img.spam")));
-            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
-            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+
             spamBtn.setLayout(new BorderLayout());
             spamBtn.add(spLabel, BorderLayout.WEST);
             spamBtn.add(spIcon, BorderLayout.EAST);
@@ -1748,8 +1549,7 @@ class UserView {
             dcLabel.setForeground(Color.WHITE);
 
             JLabel dcIcon = new JLabel(new ImageIcon(imagePath + dotenv.get("img.trash")));
-            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
-            // btn.setHorizontalAlignment(SwingConstants.LEFT);
+
             deleteChatBtn.setLayout(new BorderLayout());
             deleteChatBtn.add(dcLabel, BorderLayout.WEST);
             deleteChatBtn.add(dcIcon, BorderLayout.EAST);
@@ -1769,7 +1569,6 @@ class UserView {
                     String res = sc.getResponse();
                     sc.close();
 
-                    // System.out.println(res);
                     JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                     String resHeader = resObject.get("header").getAsString();
 
@@ -1814,7 +1613,6 @@ class UserView {
             usrListPanel.setLayout(new BoxLayout(usrListPanel, BoxLayout.Y_AXIS));
             usrListPanel.setBackground(Color.decode(dotenv.get("background")));
 
-            // usrListPanel.setMaximumSize(new Dimension(3, 30));
             JScrollPane usrListScroll = new JScrollPane(usrListPanel);
             usrListScroll.getVerticalScrollBar().setUnitIncrement(10);
 
@@ -1929,7 +1727,6 @@ class UserView {
             usrListPanel.setLayout(new BoxLayout(usrListPanel, BoxLayout.Y_AXIS));
             usrListPanel.setBackground(Color.decode(dotenv.get("background")));
 
-            // usrListPanel.setMaximumSize(new Dimension(3, 30));
             JScrollPane usrListScroll = new JScrollPane(usrListPanel);
             usrListScroll.getVerticalScrollBar().setUnitIncrement(10);
 
@@ -1981,24 +1778,18 @@ class UserView {
 
             JTextArea textArea = new JTextArea("Chat Here", 5, 20);
             textArea.setFont(new Font("Nunito Sans", Font.BOLD, 22));
-            // textArea.setPreferredSize(new Dimension(800, 100));
+
             textArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
             textArea.setLineWrap(true);
             textArea.setWrapStyleWord(true);
-            // textArea.setAlignmentX(Component.BOTTOM_ALIGNMENT);
 
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new Dimension(Integer.MAX_VALUE, 100));
             scrollPane.setPreferredSize(new Dimension(800, 100));
 
-            // scrollPane.setMaximumSize(new Dimension(800, 100));
-            // scrollPane.setMaximumSize(new Dimension(800, 100));
-
             JButton btn = new JButton();
             ImageIcon icon = new ImageIcon(imagePath + dotenv.get("img.send"));
-            // btn.setHorizontalTextPosition(SwingConstants.LEFT);
-            // btn.setHorizontalAlignment(SwingConstants.LEFT);
-            // btn.setIconTextGap(500);
+
             btn.setIcon(icon);
             btn.setFont(new Font("Nunito Sans", Font.PLAIN, 20));
             btn.setBackground(Color.decode(dotenv.get("btnBackground")));
@@ -2037,15 +1828,13 @@ class UserView {
             panel.add(scrollPane, BorderLayout.CENTER);
             panel.add(btn, BorderLayout.WEST);
 
-            // panel.setVisible(false);
-
             return panel;
         }
 
     }
 
     static Color randomColor() {
-        // Tạo đối tượng Random
+
         Random rand = new Random();
 
         int red = rand.nextInt(256);

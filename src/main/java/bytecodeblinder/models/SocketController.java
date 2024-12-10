@@ -1,23 +1,15 @@
 package bytecodeblinder.models;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.*;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import bytecodeblinder.user.ChatMessage;
 import bytecodeblinder.user.User;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class SocketController {
     private String serverIP;
@@ -25,11 +17,7 @@ public class SocketController {
     private int serverChatPort;
     private Socket sSocket;
     private Socket cSocket;
-    // private CountDownLatch latch = new CountDownLatch(1);
-
-    private Consumer<ChatMessage> addMessageCallback;
-
-    int chatPort;
+    private Dotenv dotenv = Dotenv.load();
 
     BufferedReader br;
     PrintWriter pw;
@@ -37,13 +25,11 @@ public class SocketController {
     PrintWriter chatPW;
 
     public SocketController() {
-        this("localhost", 7418); //
-        this.serverChatPort = 8147;
-    }
 
-    public SocketController(String serverIP, int serverPort) {
-        this.serverIP = serverIP;
-        this.serverPort = serverPort;
+        this.serverIP = dotenv.get("serverIP");
+        this.serverPort = Integer.parseInt(dotenv.get("serverPort"));
+        this.serverChatPort = Integer.parseInt(dotenv.get("serverChatPort"));
+
         try {
             System.out.println("avs");
 
@@ -79,10 +65,6 @@ public class SocketController {
 
     }
 
-    void setAddMessageCallback(Consumer<ChatMessage> addMessageCallback) {
-        this.addMessageCallback = addMessageCallback;
-    }
-
     public void sendRequest(String data) {
         pw.println(data);
 
@@ -93,7 +75,6 @@ public class SocketController {
             System.out.println("test2");
             return br.readLine();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return "";
@@ -119,7 +100,6 @@ public class SocketController {
 
     }
 
-    // void chatting(String message)
     public PrintWriter getChatWriter() {
         while (chatPW == null)
             ;
@@ -133,19 +113,19 @@ public class SocketController {
                 cSocket = new Socket(this.serverIP, this.serverChatPort);
                 chatBR = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
                 chatPW = new PrintWriter(cSocket.getOutputStream(), true);
-                // latch.countDown();
+
                 System.out.println("chatPW" + chatPW);
                 String message;
                 try {
                     System.out.println("waiting");
-                    // chatPW.println("from client");
+
                     while ((message = chatBR.readLine()) != null) {
 
                         Gson gson = new Gson();
                         ChatMessage msg = gson.fromJson(message, ChatMessage.class);
 
                         user.addMessage(msg);
-                        // UserView.user.addMessage(msg);
+
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -158,60 +138,5 @@ public class SocketController {
         }).start();
 
     }
-
-    // class ChatHandler extends Thread {
-
-    // private Socket chatSocket;
-
-    // ChatHandler(Socket chatSocket) {
-    // // dbc = new DatabaseController();
-    // this.chatSocket = chatSocket;
-    // }
-
-    // public void run() {
-
-    // try (BufferedReader br = new BufferedReader(new
-    // InputStreamReader(chatSocket.getInputStream()));
-    // PrintWriter pw = new PrintWriter(chatSocket.getOutputStream(), true)) {
-
-    // do {
-    // String json = br.readLine();
-    // System.out.println("message= " + json);
-    // Gson gson = new Gson();
-    // HashMap<String, String> data = gson.fromJson(json, HashMap.class);
-    // System.out.println("chat" + data.get("header"));
-    // switch (data.get("header")) {
-    // case "signup":
-    // System.out.println("Signuphandle");
-
-    // break;
-
-    // default:
-    // break;
-    // }
-    // } while (true);
-
-    // } catch (IOException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // } finally {
-    // try {
-
-    // chatSocket.close();
-    // // implement closing all socket here
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
-    // }
-
-    // }
-
-    // // String getUserData(String username) {
-    // // String user = dbc.getUser(username);
-    // // System.out.println(user);
-    // // return "";
-    // // }
-
-    // }
 
 }

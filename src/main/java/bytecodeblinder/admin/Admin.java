@@ -1,7 +1,6 @@
 package bytecodeblinder.admin;
 
 import java.util.ArrayList;
-
 import bytecodeblinder.user.User;
 
 class Admin {

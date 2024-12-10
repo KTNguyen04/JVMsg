@@ -2,21 +2,26 @@ package bytecodeblinder.server;
 
 import bytecodeblinder.admin.LoginLog;
 import bytecodeblinder.user.*;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.sql.*;
 import java.util.ArrayList;
-
 import com.google.gson.Gson;
 import org.mindrot.jbcrypt.BCrypt;
 
 class DatabaseController {
-
-    private String hostName = "localhost:3306";
-    private String USERS = "USERS";
-    private String username = "JVMsg";
-    private String password = "JVMsg741*";
-    private String connectionURL = "jdbc:mysql://" + hostName + "/" + USERS;
+    private Dotenv dotenv = Dotenv.load();
+    private String host;
+    private String schema;
+    private String username;
+    private String password;
+    private String connectionURL;
 
     DatabaseController() {
+        host = dotenv.get("db_host");
+        schema = dotenv.get("db_schema");
+        username = dotenv.get("db_username");
+        password = dotenv.get("db_password");
+        connectionURL = "jdbc:mysql://" + host + "/" + schema;
     }
 
     private Connection connect() {
@@ -35,7 +40,7 @@ class DatabaseController {
         Connection connection = connect();
 
         String query = String.format("SELECT username,fullname,address,gender,dob,email from %s.%s where username= ?",
-                this.USERS, "USER");
+                this.schema, "USER");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -61,7 +66,7 @@ class DatabaseController {
 
             user.setFriends(getUserFriends(username));
             user.setIsOnline(true);
-            // user.setMessages(getMessage(username, username));
+
             Gson gson = new Gson();
             return gson.toJson(user);
         } catch (SQLException e) {
@@ -114,7 +119,7 @@ class DatabaseController {
                 "WHERE " +
                 "b.username1 = ? " +
                 "OR b.username2 = ?);  ",
-                this.USERS, "USER");
+                this.schema, "USER");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -140,7 +145,6 @@ class DatabaseController {
 
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
 
             return friends;
         } catch (SQLException e) {
@@ -175,7 +179,7 @@ class DatabaseController {
         Connection connection = connect();
 
         String query = String.format("delete from  %s.%s " +
-                "where (`from` = ? and `to` = ?) or (`from` = ? and `to` = ?)", this.USERS, "MESSAGE");
+                "where (`from` = ? and `to` = ?) or (`from` = ? and `to` = ?)", this.schema, "MESSAGE");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
@@ -184,11 +188,8 @@ class DatabaseController {
             pstm.setString(2, username2);
             pstm.setString(3, username2);
             pstm.setString(4, username1);
-            // pstm.setString(2, ip);
-            // stm.setString(2, password);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -233,7 +234,7 @@ class DatabaseController {
         String query = String.format("select * " +
                 "from  %s.%s " +
                 "where `to` = ?;",
-                this.USERS, "ADD_FRIEND");
+                this.schema, "ADD_FRIEND");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -246,7 +247,6 @@ class DatabaseController {
             while (rs.next()) {
 
                 String usrn = rs.getString("from");
-                // String fullname = rs.getString("fullname");
 
                 User user = new User(usrn);
 
@@ -254,7 +254,6 @@ class DatabaseController {
 
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
 
             return users;
         } catch (SQLException e) {
@@ -291,7 +290,7 @@ class DatabaseController {
 
         String query = String.format("INSERT INTO %s.%s " +
                 "VALUES (?, ?);",
-                this.USERS, "FRIENDS");
+                this.schema, "FRIENDS");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -302,7 +301,6 @@ class DatabaseController {
             pstm.setString(2, username2);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -310,9 +308,9 @@ class DatabaseController {
                 return true;
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
+
             return false;
-            // return true;
+
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -346,7 +344,7 @@ class DatabaseController {
 
         String query = String.format("INSERT INTO %s.%s " +
                 "VALUES (?, ?);",
-                this.USERS, "BLOCK");
+                this.schema, "BLOCK");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -357,7 +355,6 @@ class DatabaseController {
             pstm.setString(2, username2);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -365,9 +362,9 @@ class DatabaseController {
                 return true;
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
+
             return false;
-            // return true;
+
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -401,7 +398,7 @@ class DatabaseController {
 
         String query = String.format("INSERT IGNORE INTO %s.%s (`from`,`to`) " +
                 "VALUES (?, ?);",
-                this.USERS, "ADD_FRIEND");
+                this.schema, "ADD_FRIEND");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -412,7 +409,6 @@ class DatabaseController {
             pstm.setString(2, to);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -420,9 +416,9 @@ class DatabaseController {
                 return true;
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
+
             return false;
-            // return true;
+
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -455,7 +451,7 @@ class DatabaseController {
         Connection connection = connect();
 
         String query = String.format("delete from  %s.%s " +
-                "where (`from` = ? and `to` = ?) or (`from` = ? and `to` = ?)", this.USERS, "ADD_FRIEND");
+                "where (`from` = ? and `to` = ?) or (`from` = ? and `to` = ?)", this.schema, "ADD_FRIEND");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
@@ -464,11 +460,8 @@ class DatabaseController {
             pstm.setString(2, username2);
             pstm.setString(3, username2);
             pstm.setString(4, username1);
-            // pstm.setString(2, ip);
-            // stm.setString(2, password);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -510,7 +503,7 @@ class DatabaseController {
         Connection connection = connect();
 
         String query = String.format("delete from  %s.%s " +
-                "where (`username1` = ? and `username2` = ?) or (`username1` = ? and `username2` = ?)", this.USERS,
+                "where (`username1` = ? and `username2` = ?) or (`username1` = ? and `username2` = ?)", this.schema,
                 "FRIENDS");
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -520,11 +513,8 @@ class DatabaseController {
             pstm.setString(2, username2);
             pstm.setString(3, username2);
             pstm.setString(4, username1);
-            // pstm.setString(2, ip);
-            // stm.setString(2, password);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -567,7 +557,7 @@ class DatabaseController {
 
         String query = String.format("INSERT INTO %s.%s " +
                 "VALUES (?, ?,?,?);",
-                this.USERS, "MESSAGE");
+                this.schema, "MESSAGE");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -580,7 +570,6 @@ class DatabaseController {
             System.out.println("ts" + msg.getTimeStamp());
             pstm.setString(4, msg.getContent());
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -589,9 +578,7 @@ class DatabaseController {
             }
             connection.close();
             return false;
-            // System.out.println("123" + friends.get(0));
 
-            // return true;
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -635,9 +622,9 @@ class DatabaseController {
                 "                WHEN f.username1 = ? THEN f.username2 " +
                 "                ELSE f.username1 " +
                 "            END" +
-                "    WHERE " + //
+                "    WHERE " +
                 "        f.username1 = ? OR f.username2 = ?;",
-                this.USERS, "FRIENDS", this.USERS, "USER");
+                this.schema, "FRIENDS", this.schema, "USER");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -663,7 +650,6 @@ class DatabaseController {
 
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
 
             return friends;
         } catch (SQLException e) {
@@ -700,7 +686,7 @@ class DatabaseController {
         String query = String.format("select * from %s.%s m " +
                 "where (m.from = ? and m.to = ? )or (m.from = ? and m.to = ?) " +
                 "ORDER BY m.time_stamp;",
-                this.USERS, "MESSAGE");
+                this.schema, "MESSAGE");
 
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -724,10 +710,10 @@ class DatabaseController {
 
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
+
             Gson gson = new Gson();
             return gson.toJson(messages);
-            // return messages;
+
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -765,7 +751,7 @@ class DatabaseController {
         Connection connection = connect();
 
         String query = String.format("INSERT INTO %s.%s (username, password, fullname, address, gender, dob,email) " +
-                "VALUES (?, ?, ?, ?, ?, ?,?);", this.USERS, "USER");
+                "VALUES (?, ?, ?, ?, ?, ?,?);", this.schema, "USER");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
@@ -779,10 +765,8 @@ class DatabaseController {
             pstm.setString(5, user.getGender());
             pstm.setString(6, user.getDob());
             pstm.setString(7, user.getEmail());
-            // stm.setString(2, password);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -838,7 +822,7 @@ class DatabaseController {
                 "gender = ?, " +
                 "dob = ?, " +
                 "email = ? " +
-                "where username=?;", this.USERS, "USER");
+                "where username=?;", this.schema, "USER");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
@@ -853,10 +837,7 @@ class DatabaseController {
             pstm.setString(6, user.getEmail());
             pstm.setString(7, user.getUsername());
 
-            // stm.setString(2, password);
-
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -898,7 +879,7 @@ class DatabaseController {
 
         String query = String.format("update %s.%s " +
                 "set password = ? " +
-                "where username=?;", this.USERS, "USER");
+                "where username=?;", this.schema, "USER");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
@@ -908,10 +889,7 @@ class DatabaseController {
             pstm.setString(1, hashedPassword);
             pstm.setString(2, username);
 
-            // stm.setString(2, password);
-
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -953,17 +931,14 @@ class DatabaseController {
 
         String query = String.format("select username " +
                 "from  %s.%s " +
-                "where username =?", this.USERS, "ONLINE");
+                "where username =?", this.schema, "ONLINE");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
-            // pstm.setString(2, ip);
-            // stm.setString(2, password);
 
             rs = pstm.executeQuery();
-            // rs = pstm.executeQuery();
 
             if (rs.next()) {
                 System.out.println("THanh cong");
@@ -1005,17 +980,14 @@ class DatabaseController {
         Connection connection = connect();
 
         String query = String.format("delete from  %s.%s " +
-                "where username=?", this.USERS, "ONLINE");
+                "where username=?", this.schema, "ONLINE");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
-            // pstm.setString(2, ip);
-            // stm.setString(2, password);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -1057,17 +1029,14 @@ class DatabaseController {
         Connection connection = connect();
 
         String query = String.format("insert into  %s.%s " +
-                "values (?)", this.USERS, "ONLINE");
+                "values (?)", this.schema, "ONLINE");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
-            // pstm.setString(2, ip);
-            // stm.setString(2, password);
 
             int row = pstm.executeUpdate();
-            // rs = pstm.executeQuery();
 
             if (row != 0) {
                 System.out.println("THanh cong");
@@ -1108,14 +1077,12 @@ class DatabaseController {
     boolean checkLogin(String username, String password) {
         Connection connection = connect();
 
-        String query = String.format("select password from %s.%s where username= ?", this.USERS, "USER");
+        String query = String.format("select password from %s.%s where username= ?", this.schema, "USER");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
-            // pstm.setString(2, password);
-            // stm.setString(2, password);
 
             rs = pstm.executeQuery();
 
@@ -1159,14 +1126,12 @@ class DatabaseController {
     boolean checkExistAcc(String username) {
         Connection connection = connect();
 
-        String query = String.format("select username from %s.%s where username= ?", this.USERS, "USER");
+        String query = String.format("select username from %s.%s where username= ?", this.schema, "USER");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
-            // pstm.setString(2, password);
-            // stm.setString(2, password);
 
             rs = pstm.executeQuery();
 
@@ -1206,14 +1171,12 @@ class DatabaseController {
     boolean checkReset(String username, String email) {
         Connection connection = connect();
 
-        String query = String.format("select email from %s.%s where username= ?", this.USERS, "USER");
+        String query = String.format("select email from %s.%s where username= ?", this.schema, "USER");
         PreparedStatement pstm = null;
         ResultSet rs = null;
         try {
             pstm = connection.prepareStatement(query);
             pstm.setString(1, username);
-            // pstm.setString(2, password);
-            // stm.setString(2, password);
 
             rs = pstm.executeQuery();
 
@@ -1259,9 +1222,8 @@ class DatabaseController {
 
         Connection connection = connect();
         String query = String.format("SELECT username,fullname,address,gender,dob,email,createDate from %s.%s ",
-                this.USERS, "USER");
+                this.schema, "USER");
 
-        // PreparedStatement pstm = null;
         Statement stm = null;
         ResultSet rs = null;
         ArrayList<User> users = new ArrayList<>();
@@ -1285,7 +1247,6 @@ class DatabaseController {
 
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
 
             return users;
         } catch (SQLException e) {
@@ -1324,9 +1285,8 @@ class DatabaseController {
                 "from %s.%s l join %s.%s u " +
                 "on( l.username = u.username) " +
                 "                ",
-                this.USERS, "LOGIN", this.USERS, "USER");
+                this.schema, "LOGIN", this.schema, "USER");
 
-        // PreparedStatement pstm = null;
         Statement stm = null;
         ResultSet rs = null;
         ArrayList<LoginLog> logs = new ArrayList<>();
@@ -1345,7 +1305,6 @@ class DatabaseController {
 
             }
             connection.close();
-            // System.out.println("123" + friends.get(0));
 
             return logs;
         } catch (SQLException e) {
