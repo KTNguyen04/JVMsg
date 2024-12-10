@@ -1266,7 +1266,7 @@ class DatabaseController {
         String query = String.format("select l.username,u.fullname,l.time " +
                 "from %s.%s l join %s.%s u " +
                 "on( l.username = u.username) " +
-                "                ",
+                "order by time DESC",
                 this.schema, "LOGIN", this.schema, "USER");
 
         Statement stm = null;
