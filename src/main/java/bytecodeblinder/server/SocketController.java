@@ -47,16 +47,13 @@ class SocketController {
 
     void openChatSocket() {
         try {
-            System.out.println("try to open ");
 
             new Thread(() -> {
                 try (ServerSocket lisSocket = new ServerSocket(chatPort);) {
                     while (!listenSocket.isClosed()) {
 
                         Socket communicateSocket = lisSocket.accept();
-                        System.out.println(numberClients);
 
-                        System.out.println("Chattttt");
                         ChatSocketThread cst = new ChatSocketThread(communicateSocket, curAccepted);
                         cst.start();
                         chatClients.add(cst);
@@ -86,7 +83,6 @@ class SocketController {
 
                         Socket communicateSocket = listenSocket.accept();
 
-                        System.out.println("Accepted");
                         new ClientHandler(communicateSocket).start();
 
                     } while (!listenSocket.isClosed());
@@ -103,10 +99,8 @@ class SocketController {
     }
 
     void closeSocket() {
-        System.out.println(justForTest);
         if (!listenSocket.isClosed()) {
             try {
-                System.out.println("closrr sev");
                 listenSocket.close();
 
             } catch (Exception e) {
@@ -129,19 +123,16 @@ class SocketController {
                     PrintWriter pw = new PrintWriter(communicateSocket.getOutputStream(), true)) {
 
                 String json = br.readLine();
-                System.out.println("message= " + json);
                 Gson gson = new Gson();
                 HashMap<String, String> data = gson.fromJson(json, HashMap.class);
 
                 switch (data.get("header")) {
                     case "signup": {
-                        System.out.println("Signuphandle");
                         User usr = gson.fromJson(json, User.class);
                         String header = "";
                         if (dbc.insertUser(usr)) {
                             header = "signuped";
                         } else {
-                            System.out.println("aba");
                             header = "nosignup";
                         }
                         String wrappedJson = gson.toJson(Map.of("header", header));
@@ -153,7 +144,6 @@ class SocketController {
                         String username = data.get("username");
                         String password = data.get("password");
                         if (dbc.checkLogin(username, password)) {
-                            System.out.println("Login thanh con");
                             String header = "logined";
 
                             String userData = dbc.getUserData(username);
@@ -164,8 +154,6 @@ class SocketController {
 
                             String jsonResponse = gson.toJson(jsonObject);
                             pw.println(jsonResponse);
-
-                            System.out.println(jsonResponse);
 
                             curAccepted = username;
                             dbc.insertOnline(username);
@@ -185,9 +173,6 @@ class SocketController {
 
                         pw.println(messages);
 
-                        System.out.println(messages);
-
-                        System.out.println("message test");
                         break;
                     }
                     case "chat": {
@@ -195,12 +180,10 @@ class SocketController {
                         ChatMessage msg = gson.fromJson(json, ChatMessage.class);
                         dbc.insertMessage(msg);
 
-                        System.out.println("cte" + data.get("content"));
                         break;
                     }
                     case "edit": {
 
-                        System.out.println(json);
                         String header = "";
                         User usr = gson.fromJson(json, User.class);
                         if (dbc.editUser(usr, data.get("newPassword"))) {
@@ -220,7 +203,6 @@ class SocketController {
 
                         pw.println(jsonResponse);
 
-                        System.out.println("cte" + data.get("content"));
                         break;
                     }
                     case "reset": {
@@ -239,7 +221,6 @@ class SocketController {
                                     +
                                     "<p>Thank you!</p>" +
                                     "</body></html>";
-                            System.out.println("reset");
                             sendEmail(email,
                                     "[JVMsg] Reset Password", body);
 
@@ -302,7 +283,6 @@ class SocketController {
                         for (User user : requests) {
                             JsonObject userJson = new JsonObject();
                             userJson.addProperty("username", user.getUsername());
-                            System.out.println(user.getUsername());
                             requestArray.add(userJson);
                         }
                         jsonObject.add("requests", requestArray);
@@ -337,7 +317,6 @@ class SocketController {
                             header = "noacceptrequest";
                         }
                         jsonObject.addProperty("header", header);
-                        System.out.println(jsonObject);
                         pw.println(jsonObject.toString());
                         break;
                     }
@@ -355,7 +334,6 @@ class SocketController {
                             header = "noacceptrequest";
                         }
                         jsonObject.addProperty("header", header);
-                        System.out.println(jsonObject);
                         pw.println(jsonObject.toString());
                         break;
                     }
@@ -526,16 +504,13 @@ class SocketController {
         @Override
         public void run() {
             try {
-                System.out.println("sve");
                 String message;
                 while ((message = br.readLine()) != null) {
 
-                    System.out.println(message);
                     Gson gson = new Gson();
                     ChatMessage msg = gson.fromJson(message, ChatMessage.class);
 
                     for (ChatSocketThread sct : chatClients) {
-                        System.out.println(sct.getSocketThreadName());
                         if (sct.getSocketThreadName().equals(msg.getTo())) {
                             pw = new PrintWriter(sct.getChatSocket().getOutputStream(), true);
                             pw.println(message);
