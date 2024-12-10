@@ -31,12 +31,7 @@ public class SocketController {
         this.serverChatPort = Integer.parseInt(dotenv.get("serverChatPort"));
 
         try {
-            System.out.println("avs");
-
             sSocket = new Socket(serverIP, serverPort);
-            System.out.println("avs");
-            System.out.println(sSocket.getInetAddress());
-            System.out.println(sSocket.getLocalAddress());
             br = new BufferedReader(new InputStreamReader(sSocket.getInputStream()));
             pw = new PrintWriter(sSocket.getOutputStream(), true);
 
@@ -44,7 +39,6 @@ public class SocketController {
             e.printStackTrace();
             if (sSocket != null && !sSocket.isClosed()) {
                 try {
-                    System.out.println("dong");
                     sSocket.close();
                 } catch (IOException e2) {
                     e2.printStackTrace();
@@ -57,7 +51,6 @@ public class SocketController {
                     e3.printStackTrace();
                 }
             if (pw != null) {
-                System.out.println("close pw");
                 pw.close();
             }
 
@@ -72,7 +65,6 @@ public class SocketController {
 
     public String getResponse() {
         try {
-            System.out.println("test2");
             return br.readLine();
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,7 +75,6 @@ public class SocketController {
     public void close() {
         if (sSocket != null && !sSocket.isClosed()) {
             try {
-                System.out.println("dadong");
                 sSocket.close();
             } catch (IOException e2) {
                 e2.printStackTrace();
@@ -114,10 +105,8 @@ public class SocketController {
                 chatBR = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
                 chatPW = new PrintWriter(cSocket.getOutputStream(), true);
 
-                System.out.println("chatPW" + chatPW);
                 String message;
                 try {
-                    System.out.println("waiting");
 
                     while ((message = chatBR.readLine()) != null) {
 

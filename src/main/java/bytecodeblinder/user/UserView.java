@@ -79,7 +79,6 @@ class UserView {
     }
 
     void sendOffline() {
-        System.out.println("LOG");
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("header", "offline");
         jsonObject.addProperty("username", user.getUsername());
@@ -174,7 +173,6 @@ class UserView {
 
                         sc.sendRequest(packet);
 
-                        System.out.println("test");
                         String res = sc.getResponse();
                         Gson gson = new Gson();
 
@@ -828,11 +826,9 @@ class UserView {
                             new Thread(() -> {
                                 SocketController sc = new SocketController();
                                 String packet = createMessageReq(user.getUsername(), usr.getUsername());
-                                System.out.println(packet);
                                 sc.sendRequest(packet);
 
                                 String res = sc.getResponse();
-                                System.out.println("msg" + res);
                                 Gson gson = new Gson();
                                 Type messageListType = new TypeToken<ArrayList<ChatMessage>>() {
                                 }.getType();
@@ -840,7 +836,6 @@ class UserView {
                                 ArrayList<ChatMessage> messages = gson.fromJson(res, messageListType);
 
                                 messages.forEach((ChatMessage m) -> {
-                                    System.out.println(m.getContent());
                                 });
 
                                 user.setMessages(messages);
@@ -916,7 +911,6 @@ class UserView {
                         String res = sc.getResponse();
                         sc.close();
 
-                        System.out.println(res);
                         JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = resObject.get("header").getAsString();
 
@@ -933,7 +927,6 @@ class UserView {
                             for (int i = 0; i < friendsArray.size(); i++) {
 
                                 User u = gson.fromJson(friendsArray.get(i), User.class);
-                                System.out.println(u.getUsername());
                                 userList.add(u);
 
                             }
@@ -956,7 +949,6 @@ class UserView {
                         String res = sc.getResponse();
                         sc.close();
 
-                        System.out.println(res);
                         JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = resObject.get("header").getAsString();
 
@@ -1008,7 +1000,6 @@ class UserView {
                         String res = sc.getResponse();
                         sc.close();
 
-                        System.out.println(res);
                         JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = resObject.get("header").getAsString();
 
@@ -1318,22 +1309,17 @@ class UserView {
                         }
 
                     }
-                    System.out.println("pw" + user.getPassword());
 
                     if (curPassword.equals("") && newPassword.equals("")) {
                         curPassword = newPassword = user.getPassword();
                     }
-                    System.out.println("cur" + curPassword.equals(""));
 
                     editData.put("password", curPassword);
                     editData.put("newPassword", newPassword);
-                    System.out.println("cur" + curPassword.equals(""));
 
                     if (flag) {
                         Gson gson = new Gson();
                         String json = gson.toJson(editData);
-                        System.out.println("js" + json + "cur: " + curPassword);
-                        System.out.println("cur" + curPassword.equals(""));
 
                         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 
@@ -1345,13 +1331,11 @@ class UserView {
                         String res = sc.getResponse();
                         sc.close();
 
-                        System.out.println(res);
                         jsonObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = jsonObject.get("header").getAsString();
                         if (resHeader.equals("edited")) {
 
                             String pass = newPassword;
-                            System.out.println("new" + pass);
                             user = gson.fromJson(res, User.class);
                             user.setPassword(pass);
 
@@ -1444,7 +1428,6 @@ class UserView {
                     String res = sc.getResponse();
                     sc.close();
 
-                    System.out.println(res);
                     JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                     String resHeader = resObject.get("header").getAsString();
 
@@ -1458,7 +1441,6 @@ class UserView {
                         for (int i = 0; i < friendsArray.size(); i++) {
 
                             User u = gson.fromJson(friendsArray.get(i), User.class);
-                            System.out.println(u.getUsername());
                             userList.add(u);
 
                         }
@@ -1512,7 +1494,6 @@ class UserView {
                         for (int i = 0; i < friendsArray.size(); i++) {
 
                             User u = gson.fromJson(friendsArray.get(i), User.class);
-                            System.out.println(u.getUsername());
                             userList.add(u);
 
                         }
@@ -1638,7 +1619,6 @@ class UserView {
                         String res = sc.getResponse();
                         sc.close();
 
-                        System.out.println(res);
                         JsonObject resObject = JsonParser.parseString(res).getAsJsonObject();
                         String resHeader = resObject.get("header").getAsString();
 
@@ -1657,7 +1637,6 @@ class UserView {
                                     userList.add(u);
                                 }
                             }
-                            System.out.println("kit");
 
                             renderFoundUserList(userList, usrListPanel);
 
@@ -1745,11 +1724,8 @@ class UserView {
                 public void mouseClicked(MouseEvent e) {
 
                     ArrayList<User> filteredUsers = new ArrayList<>();
-                    System.out.println("test");
-                    System.out.println(searchField.getText());
 
                     if (searchField.getText().equals("")) {
-                        System.out.println("empty");
                         filteredUsers = userList;
                     } else {
                         for (User usr : userList) {
@@ -1813,7 +1789,6 @@ class UserView {
                     ChatMessage msg = new ChatMessage(user.getUsername(), curPeer, textArea.getText(), dtf.format(now));
                     Gson gson = new Gson();
                     String json = gson.toJson(packet);
-                    System.out.println(json);
                     chatPW.println(json);
                     SocketController sc = new SocketController();
                     sc.sendRequest(json);

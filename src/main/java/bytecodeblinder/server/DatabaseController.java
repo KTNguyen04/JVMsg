@@ -28,7 +28,6 @@ class DatabaseController {
         Connection connect = null;
         try {
             connect = DriverManager.getConnection(connectionURL, username, password);
-            System.out.println("Connect to database successfully");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -192,7 +191,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -303,7 +301,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -357,7 +354,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -411,7 +407,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -464,7 +459,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -517,7 +511,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -567,12 +560,10 @@ class DatabaseController {
             pstm.setString(1, msg.getFrom());
             pstm.setString(2, msg.getTo());
             pstm.setString(3, msg.getTimeStamp());
-            System.out.println("ts" + msg.getTimeStamp());
             pstm.setString(4, msg.getContent());
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -745,7 +736,6 @@ class DatabaseController {
     boolean insertUser(User user) {
 
         if (checkExistAcc(user.getUsername())) {
-            System.out.println("exist");
             return false;
         }
         Connection connection = connect();
@@ -769,7 +759,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -808,7 +797,6 @@ class DatabaseController {
 
         if (!newPassword.equals("")) {
             if (!checkLogin(user.getUsername(), user.getPassword())) {
-                System.out.println("CHECK");
                 return false;
             }
         }
@@ -840,7 +828,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -892,7 +879,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -941,7 +927,6 @@ class DatabaseController {
             rs = pstm.executeQuery();
 
             if (rs.next()) {
-                System.out.println("THanh cong");
                 return true;
             }
 
@@ -990,7 +975,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -1039,7 +1023,6 @@ class DatabaseController {
             int row = pstm.executeUpdate();
 
             if (row != 0) {
-                System.out.println("THanh cong");
 
                 return true;
             }
@@ -1181,7 +1164,6 @@ class DatabaseController {
             rs = pstm.executeQuery();
 
             if (rs.next()) {
-                System.out.println("has usrn");
                 if (rs.getString("email").equals(email))
                     return true;
                 return false;
