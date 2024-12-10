@@ -4,5 +4,4 @@ Project.pdf
 bin/
 *.txt
 .env
-
 *.jar
