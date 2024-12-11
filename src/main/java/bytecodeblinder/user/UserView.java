@@ -104,7 +104,7 @@ class UserView {
 
             rightPanel.setBackground(Color.WHITE);
             rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
-
+            System.out.println(imagePath + dotenv.get("banner"));
             BufferedImage bannerImage = ImageIO.read(new File(imagePath + dotenv.get("banner")));
             Image scaledImage = bannerImage.getScaledInstance(Integer.parseInt(dotenv.get("banner.width")),
                     Integer.parseInt(dotenv.get("banner.height")),

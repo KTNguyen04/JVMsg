@@ -22,7 +22,7 @@ class SocketController {
     private DatabaseModel dbc;
     private Dotenv dotenv = Dotenv.load();
 
-    String curAccepted;
+    String curAccepted = null;
 
     SocketController() {
         this.port = Integer.parseInt(dotenv.get("serverPort"));
@@ -51,10 +51,12 @@ class SocketController {
                     while (!listenSocket.isClosed()) {
 
                         Socket communicateSocket = lisSocket.accept();
-
-                        ChatSocketThread cst = new ChatSocketThread(communicateSocket, curAccepted);
-                        cst.start();
-                        chatClients.add(cst);
+                        if (curAccepted != null) {
+                            ChatSocketThread cst = new ChatSocketThread(communicateSocket, curAccepted);
+                            cst.start();
+                            chatClients.add(cst);
+                            curAccepted = null;
+                        }
 
                     }
                 } catch (Exception e) {
