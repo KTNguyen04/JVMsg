@@ -80,7 +80,7 @@ class AdminView {
             chartLabel.setFont(new Font("Nunito Sans", Font.BOLD, 22));
             chartLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            JButton subBtn = new JButton("Subcribers");
+            JButton subBtn = new JButton("Subscribers");
             subBtn.setFont(new Font("Nunito Sans", Font.BOLD, 22));
             subBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
             subBtn.addMouseListener(new MouseAdapter() {
@@ -114,7 +114,7 @@ class AdminView {
                         }
 
                         mainPanel.removeAll();
-                        mainPanel.add(subcriberChart());
+                        mainPanel.add(subscriberChart());
                         mainPanel.revalidate();
                         mainPanel.repaint();
 
@@ -221,7 +221,7 @@ class AdminView {
             return pan;
         }
 
-        JPanel subcriberChart() {
+        JPanel subscriberChart() {
             ArrayList<User> users = admin.getUsers();
 
             JLabel yearLabel = new JLabel("Select year");
@@ -261,7 +261,7 @@ class AdminView {
 
                     }
                     JFreeChart chart = ChartFactory.createBarChart(
-                            "Subcribers",
+                            "subscribers",
                             "Month",
                             "Quantity",
                             dataset);
