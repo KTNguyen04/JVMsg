@@ -17,21 +17,19 @@ class SocketController {
 
     private ServerSocket listenSocket;
 
-    private String justForTest;
     private ArrayList<ChatSocketThread> chatClients;
-    private int numberClients;
-    private DatabaseController dbc;
+
+    private DatabaseModel dbc;
     private Dotenv dotenv = Dotenv.load();
 
     String curAccepted;
 
     SocketController() {
-        this.port = 7418;
-        this.chatPort = 8147;
+        this.port = Integer.parseInt(dotenv.get("serverPort"));
+        this.chatPort = Integer.parseInt(dotenv.get("serverChatPort"));
         chatClients = new ArrayList<>();
-        numberClients = 0;
 
-        dbc = new DatabaseController();
+        dbc = new DatabaseModel();
 
     }
 

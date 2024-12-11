@@ -13,9 +13,9 @@ public class User {
     private String createDate;
     private boolean isOnline;
 
-    ArrayList<User> friends;
+    private ArrayList<User> friends;
 
-    ArrayList<ChatMessage> messages;
+    private ArrayList<ChatMessage> messages;
     private MessageListener listener;
 
     @Override
@@ -105,7 +105,7 @@ public class User {
 
     public void addMessage(ChatMessage msg) {
         messages.add(msg);
-        notifyListener();
+        listener.onNewMessage();
     }
 
     void addMessageListener(MessageListener listener) {
@@ -114,10 +114,6 @@ public class User {
 
     void removeMessageListener() {
         this.listener = null;
-    }
-
-    private void notifyListener() {
-        listener.onNewMessage();
     }
 
     public void setIsOnline(boolean isOnline) {

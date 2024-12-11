@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import org.mindrot.jbcrypt.BCrypt;
 
-class DatabaseController {
+class DatabaseModel {
     private Dotenv dotenv = Dotenv.load();
     private String host;
     private String schema;
@@ -16,7 +16,7 @@ class DatabaseController {
     private String password;
     private String connectionURL;
 
-    DatabaseController() {
+    DatabaseModel() {
         host = dotenv.get("db_host");
         schema = dotenv.get("db_schema");
         username = dotenv.get("db_username");

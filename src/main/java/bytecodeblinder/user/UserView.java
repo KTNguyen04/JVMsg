@@ -11,7 +11,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.awt.image.BufferedImage;
 import com.toedter.calendar.JDateChooser;
-import bytecodeblinder.models.SocketController;
+import bytecodeblinder.controller.SocketController;
 import java.util.*;
 import java.util.Date;
 import java.text.ParseException;

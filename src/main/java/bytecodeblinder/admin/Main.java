@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] agrs) {
         SwingUtilities.invokeLater(() -> {
             try {
-                AdminView serverView = new AdminView();
+                AdminView adminView = new AdminView();
             } catch (IOException e) {
 
                 e.printStackTrace();

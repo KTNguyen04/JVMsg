@@ -2,7 +2,7 @@ package bytecodeblinder.admin;
 
 import javax.swing.*;
 import com.google.gson.*;
-import bytecodeblinder.models.SocketController;
+import bytecodeblinder.controller.SocketController;
 import bytecodeblinder.user.User;
 import java.awt.*;
 import java.awt.event.*;
