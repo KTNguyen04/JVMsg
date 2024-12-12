@@ -239,6 +239,7 @@ class SocketController {
                     case "offline": {
                         String username = data.get("username");
                         dbc.removeOnline(username);
+                        chatClients.removeIf(client -> client.getSocketThreadName().equals(username));
                         break;
                     }
                     case "findfriend": {
@@ -514,6 +515,7 @@ class SocketController {
                         if (sct.getSocketThreadName().equals(msg.getTo())) {
                             pw = new PrintWriter(sct.getChatSocket().getOutputStream(), true);
                             pw.println(message);
+                            break;
                         }
                     }
 
